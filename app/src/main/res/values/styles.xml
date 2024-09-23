@@ -1,0 +1,17 @@
+<resources>
+
+    <style name="Widget.Theme.Task3.ButtonBar.Fullscreen" parent="">
+        <item name="android:background">@color/black_overlay</item>
+        <item name="android:buttonBarStyle">?android:attr/buttonBarStyle</item>
+    </style>
+
+<style name="toolbattex" parent="TextAppearance.MaterialComponents.Button">
+
+    <item name="android:textSize">16dp</item>
+</style>
+
+
+
+    
+
+</resources>
