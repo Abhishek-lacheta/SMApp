@@ -6,10 +6,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import com.bumptech.glide.Glide
 import com.example.project01.R
 import com.example.project01.databinding.ActivityEditProfileBinding
@@ -75,7 +72,6 @@ class EditProfileActivity : AppCompatActivity() {
             }
         }
     }
-
     private fun pickImage() {
         val intent = Intent(Intent.ACTION_PICK).apply {
             type = "image/*"
@@ -96,7 +92,6 @@ class EditProfileActivity : AppCompatActivity() {
             }
         }
     }
-
     private fun saveProfile() {
         val username = binding.editTextUsername.text.toString()
         val email = binding.editTextEmail.text.toString()
@@ -119,7 +114,6 @@ class EditProfileActivity : AppCompatActivity() {
                 }
         }
     }
-
     private fun uploadImageToStorage(uri: Uri, userId: String) {
         val storageRef = FirebaseStorage.getInstance().reference.child("profile_images/$userId.jpg")
         storageRef.putFile(uri)
@@ -138,6 +132,5 @@ class EditProfileActivity : AppCompatActivity() {
             .addOnFailureListener { e ->
                 Log.w("EditProfileFragment", "Error uploading image", e)
             }
-
     }
 }

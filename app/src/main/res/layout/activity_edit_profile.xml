@@ -55,7 +55,7 @@
             android:layout_marginTop="10dp"
             android:layout_marginEnd="110dp"
             android:alpha="0.7"
-            android:text="Name"
+            android:text="@string/Name"
             android:textStyle="bold" />
 
         <EditText
@@ -70,7 +70,7 @@
             android:layout_marginTop="10dp"
             android:layout_marginEnd="110dp"
             android:alpha="0.7"
-            android:text="Email"
+            android:text="@string/Email"
             android:textStyle="bold" />
 
         <EditText
@@ -85,7 +85,7 @@
             android:layout_width="match_parent"
             android:layout_height="60dp"
             android:background="@drawable/round_button"
-            android:text="Change Password"
+            android:text="@string/Change_Password"
             android:textColor="@color/white"
             android:theme="@style/Theme.Button" />
 

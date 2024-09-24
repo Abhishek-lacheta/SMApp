@@ -23,9 +23,11 @@ class SignUPActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivitySignUpactivityBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
         binding.arrovBack.setOnClickListener {
             finish()
         }
+
         firebaseAuth = FirebaseAuth.getInstance()
 
         binding.signupButton1.setOnClickListener {
@@ -37,6 +39,7 @@ class SignUPActivity : AppCompatActivity() {
             }
         }
     }
+
     private fun validateInput(email: String, password: String): Boolean {
 
         return when {
@@ -63,6 +66,8 @@ class SignUPActivity : AppCompatActivity() {
             else -> true
         }
     }
+
+    //this is create user with eamil and password and store firebase
     private fun performSignUp(email: String, password: String) {
         binding.singnupLoader.visibility = View.VISIBLE
         binding.signupButton1.visibility = View.GONE
@@ -81,6 +86,7 @@ class SignUPActivity : AppCompatActivity() {
         }, 1000)
 
     }
+
     private fun showSuccessDialog() {
         AlertDialog.Builder(this)
             .setTitle("SignUp Successful")
@@ -103,8 +109,9 @@ class SignUPActivity : AppCompatActivity() {
             .show()
     }
 
+    //store data in user collection
     private fun performSignUp2(uid: String?) {
-        if(uid == null) return
+        if (uid == null) return
 
         val name = binding.signupName.text.toString().trim()
         val email = binding.singupEmail.text.toString().trim()

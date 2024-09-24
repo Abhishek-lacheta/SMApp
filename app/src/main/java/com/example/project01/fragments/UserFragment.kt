@@ -46,7 +46,7 @@ class UserFragment : Fragment() {
         }
 
         binding.editProfileButton.setOnClickListener {
-            val intent=Intent(requireContext(),EditProfileActivity::class.java)
+            val intent = Intent(requireContext(), EditProfileActivity::class.java)
             startActivity(intent)
         }
 

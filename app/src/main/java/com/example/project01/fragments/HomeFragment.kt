@@ -15,7 +15,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.project01.activity.AddHomeActivity
+import com.example.project01.activity.AddPostHomeActivity
 import com.example.project01.adaptor.HomeRecyclerAdaptor
 import com.example.project01.modal.HomeRecyclerModal
 import com.example.project01.R
@@ -109,7 +109,7 @@ class HomeFragment : Fragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.home_add -> {
-                val intent = Intent(requireContext(), AddHomeActivity::class.java)
+                val intent = Intent(requireContext(), AddPostHomeActivity::class.java)
                 startActivity(intent)
                 true
             }

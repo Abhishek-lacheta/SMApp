@@ -6,15 +6,14 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.example.project01.databinding.ActivityAddGroupBinding
-import com.example.project01.databinding.ActivityAddHomeBinding
+import com.example.project01.databinding.ActivityAddPostGroupBinding
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import java.util.UUID
 
-class AddGroupActivity : AppCompatActivity() {
+class AddPostGroupActivity : AppCompatActivity() {
 
-    private lateinit var binding: ActivityAddGroupBinding
+    private lateinit var binding: ActivityAddPostGroupBinding
     private val db = FirebaseFirestore.getInstance()
     private val storage = FirebaseStorage.getInstance()
     private val PICK_IMAGE_REQUEST = 71
@@ -22,7 +21,7 @@ class AddGroupActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityAddGroupBinding.inflate(layoutInflater)
+        binding = ActivityAddPostGroupBinding.inflate(layoutInflater)
         setContentView(binding.root)
         binding.Grouptoolbar.setTitle("Add Post")
         binding.Grouptoolbar.setNavigationOnClickListener {
@@ -42,15 +41,11 @@ class AddGroupActivity : AppCompatActivity() {
         }
 
     }
-
-
     private fun uploadImageAndSaveData() {
         val name = binding.nameId.text.toString().trim()
         val homeMap = hashMapOf(
             "name" to name,
-            //"created_at" to FieldValue.serverTimestamp()
-
-        )
+            )
 
         val storageRef = storage.reference
         val imageRef = storageRef.child("images/${UUID.randomUUID()}.jpg")
@@ -68,15 +63,12 @@ class AddGroupActivity : AppCompatActivity() {
                 }
         }
     }
-
-
     private fun openImageChooser() {
         val intent = Intent()
         intent.type = "image/*"
         intent.action = Intent.ACTION_GET_CONTENT
         startActivityForResult(Intent.createChooser(intent, "Select Image"), PICK_IMAGE_REQUEST)
     }
-
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.data != null) {
@@ -85,7 +77,6 @@ class AddGroupActivity : AppCompatActivity() {
             binding.imageView.visibility = View.VISIBLE
         }
     }
-
     private fun saveGroupData(homeMap: HashMap<String, String>) {
         db.collection("group").document().set(homeMap)
             .addOnSuccessListener {

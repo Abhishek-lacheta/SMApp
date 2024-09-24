@@ -9,15 +9,9 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
-import com.google.android.material.snackbar.Snackbar
 import androidx.appcompat.app.AppCompatActivity
-import androidx.navigation.findNavController
-import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.navigateUp
-import androidx.navigation.ui.setupActionBarWithNavController
 import com.example.project01.R
 import com.example.project01.databinding.ActivityChangePasswordBinding
-import com.example.project01.databinding.ActivityLoginBinding
 import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 
@@ -31,14 +25,15 @@ class ChangePasswordActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         binding = ActivityChangePasswordBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
         binding.arrovBack.setOnClickListener {
             finish()
         }
-        // Initialize Firebase Auth
-        auth = FirebaseAuth.getInstance()
 
+        auth = FirebaseAuth.getInstance()
         currentPasswordEditText = findViewById(R.id.currentPasswordEditText)
         newPasswordEditText = findViewById(R.id.newPasswordEditText)
         changePasswordButton = findViewById(R.id.changePasswordButton)
@@ -54,10 +49,8 @@ class ChangePasswordActivity : AppCompatActivity() {
             }
         }
     }
-
     private fun changePassword(currentPassword: String, newPassword: String) {
         val user = auth.currentUser
-
         binding.changePassworLoader.visibility = View.VISIBLE
         binding.changePasswordButton.visibility = View.GONE
         user?.let {
@@ -92,7 +85,6 @@ class ChangePasswordActivity : AppCompatActivity() {
         }, 1000)
 
     }
-
     private fun showSuccessDialog() {
         AlertDialog.Builder(this)
             .setTitle("Congratulations!!!")
@@ -104,5 +96,4 @@ class ChangePasswordActivity : AppCompatActivity() {
             }
             .show()
     }
-
 }

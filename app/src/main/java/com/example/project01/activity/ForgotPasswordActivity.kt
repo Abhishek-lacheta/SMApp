@@ -5,24 +5,15 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.view.View
-import android.widget.Button
-import android.widget.EditText
 import android.widget.Toast
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
-import com.example.project01.R
 import com.example.project01.databinding.ActivityForgotPasswordBinding
-import com.example.project01.databinding.ActivityLoginBinding
 import com.google.firebase.auth.FirebaseAuth
 
 class ForgotPasswordActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityForgotPasswordBinding
-    private lateinit var emailEditText: EditText
-    private lateinit var sendButton: Button
     private lateinit var auth: FirebaseAuth
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -31,11 +22,9 @@ class ForgotPasswordActivity : AppCompatActivity() {
         setContentView(binding.root)
         // Initialize Firebase Auth
         auth = FirebaseAuth.getInstance()
-        emailEditText = findViewById(R.id.Email)
-        sendButton = findViewById(R.id.resetPasswordButton)
 
-        sendButton.setOnClickListener {
-            val email = emailEditText.text.toString().trim()
+       binding.resetPasswordButton.setOnClickListener {
+            val email = binding.Email.text.toString().trim()
             if (validateInput(email)) {
                 sendPasswordResetEmail(email)
             }

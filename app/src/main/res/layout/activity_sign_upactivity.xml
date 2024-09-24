@@ -45,7 +45,7 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif-medium"
                 android:text="Let's you sign up."
-                android:textColor="#130137"
+                android:textColor="@color/my_blue"
                 android:textSize="32sp"
                 android:textStyle="bold" />
 
@@ -53,7 +53,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:text="Sign in with your data that you have entered during your registration"
+                android:text="@string/SingUp_Title"
                 android:textColor="@color/cardview_shadow_start_color" />
 
 
@@ -63,7 +63,7 @@
                 android:layout_marginTop="60dp"
                 android:layout_marginEnd="150dp"
                 android:alpha="0.7"
-                android:text="Name"
+                android:text="@string/Name"
                 android:textStyle="bold" />
 
             <EditText
@@ -79,7 +79,7 @@
                 android:layout_marginTop="10dp"
                 android:layout_marginEnd="150dp"
                 android:alpha="0.7"
-                android:text="Email"
+                android:text="@string/Email"
                 android:textStyle="bold" />
 
             <EditText
@@ -96,7 +96,7 @@
                 android:layout_marginTop="10dp"
                 android:layout_marginEnd="136dp"
                 android:alpha="0.7"
-                android:text="Password"
+                android:text="@string/Password"
                 android:textStyle="bold" />
 
             <EditText
@@ -113,7 +113,7 @@
                 android:layout_height="60dp"
                 android:layout_marginTop="30dp"
                 android:background="@drawable/round_button"
-                android:text="Sign UP"
+                android:text="@string/Sign_UP"
                 android:textColor="@color/white"
                 android:theme="@style/Theme.Button" />
             <ProgressBar

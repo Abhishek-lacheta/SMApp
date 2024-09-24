@@ -6,15 +6,13 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.project01.R
-import com.example.project01.activity.AddGroupActivity
-import com.example.project01.adaptor.HomeRecyclerAdaptor
+import com.example.project01.activity.AddPostGroupActivity
 import com.example.project01.databinding.FragmentGroupsBinding
 import com.example.project01.modal.GroupRecyclerModal
 import com.google.firebase.firestore.FirebaseFirestore
@@ -66,10 +64,6 @@ class GroupsFragment : Fragment() {
         findNavController().navigate(R.id.addBlockFragment, bundle)
     }
 
-
-
-
-
     private fun fetchImages() {
         firestore.collection("group") // Adjust this path if needed
             .get()
@@ -94,7 +88,7 @@ class GroupsFragment : Fragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.action_add1 -> {
-                val intent = Intent(requireContext(), AddGroupActivity::class.java)
+                val intent = Intent(requireContext(), AddPostGroupActivity::class.java)
                 startActivity(intent)
                 true
             }

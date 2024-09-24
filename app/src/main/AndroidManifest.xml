@@ -34,10 +34,10 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".activity.AddHomeActivity"
+            android:name=".activity.AddPostHomeActivity"
             android:exported="false" />
         <activity
-            android:name=".activity.AddGroupActivity"
+            android:name=".activity.AddPostGroupActivity"
             android:exported="false" />
         <activity
             android:name=".activity.LoginActivity"

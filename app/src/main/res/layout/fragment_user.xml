@@ -12,7 +12,7 @@
         android:layout_height="?attr/actionBarSize"
         android:background="@color/white"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-        app:title="User"
+        app:title="@string/User_Title"
         app:titleTextColor="@color/black" />
 
     <LinearLayout
@@ -33,7 +33,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
-            android:text="Name"
+            android:text="@string/Name"
             android:textColor="@color/black"
             android:textSize="20dp"
             android:textStyle="bold" />
@@ -43,7 +43,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="15dp"
-            android:text="Email Address"
+            android:text="@string/Email"
             android:textColor="@color/black"
             android:textSize="18dp"
             android:textStyle="bold" />
@@ -65,7 +65,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
-            android:text="Edit Profile"
+            android:text="@string/Edit_Profile"
             android:textSize="20dp"
             android:textStyle="bold" />
     </LinearLayout>
@@ -87,7 +87,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
-            android:text="Change Password"
+            android:text="@string/Change_Password"
             android:textSize="20dp"
             android:textStyle="bold" />
     </LinearLayout>
@@ -108,7 +108,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
-            android:text="Logout"
+            android:text="@string/Logout"
             android:textSize="20dp"
             android:textStyle="bold" />
     </LinearLayout>

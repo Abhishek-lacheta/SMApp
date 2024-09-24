@@ -26,7 +26,7 @@
                 android:layout_height="match_parent"
                 android:layout_marginStart="10dp"
                 android:layout_marginTop="10dp"
-                android:text="Title"
+                android:text="@string/Title"
                 android:textSize="17dp"
                 android:textStyle="bold" />
 
@@ -37,7 +37,7 @@
                 android:layout_marginStart="10dp"
                 android:layout_marginTop="5dp"
 
-                android:text="description"
+                android:text="@string/Description"
                 android:textSize="15dp" />
 
 
