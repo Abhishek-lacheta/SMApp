@@ -37,7 +37,7 @@
             android:layout_height="match_parent"
             android:layout_marginTop="70dp"
             android:layout_marginStart="70dp"
-            android:background="@color/white"
+            android:background="@drawable/rounded_background"
             android:src="@drawable/ic_camera"
             />
          <!-- Added elevation for shadow effect -->
