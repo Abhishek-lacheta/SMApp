@@ -1,52 +1,51 @@
-package com.example.project01.fragments
+package com.example.project01.activity
 
 import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
-import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import android.widget.Toast
+import androidx.activity.enableEdgeToEdge
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import com.bumptech.glide.Glide
 import com.example.project01.R
-import com.example.project01.databinding.FragmentEditProfileBinding
+import com.example.project01.databinding.ActivityEditProfileBinding
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 
-
-class EditProfileFragment : Fragment() {
-
-    private lateinit var binding: FragmentEditProfileBinding
+class EditProfileActivity : AppCompatActivity() {
+    private lateinit var binding: ActivityEditProfileBinding
     private lateinit var auth: FirebaseAuth
     private val db = FirebaseFirestore.getInstance()
     private var profileImageUri: Uri? = null
     private val IMAGE_PICK_CODE = 1000
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? { 
-        binding = FragmentEditProfileBinding.inflate(inflater, container, false)
-        return binding.root
-    }
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        binding = ActivityEditProfileBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
         auth = FirebaseAuth.getInstance()
         loadUserData()
 
-        binding.buttonChangeImage.setOnClickListener {
+        binding.buttonEditProfile.setOnClickListener {
             pickImage()
         }
 
         binding.buttonSave.setOnClickListener {
             saveProfile()
         }
+
+        binding.edittoolbar.setTitle("Edit Profile")
+        binding.edittoolbar.setNavigationOnClickListener {
+            finish()
+        }
     }
+
 
     private fun loadUserData() {
         val currentUser = auth.currentUser
@@ -109,7 +108,7 @@ class EditProfileFragment : Fragment() {
 
             userRef.update("name", username, "email", email)
                 .addOnSuccessListener {
-                    Toast.makeText(requireContext(), "Profile updated", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "Profile updated", Toast.LENGTH_SHORT).show()
                     // Handle image upload if needed
                     profileImageUri?.let { uri ->
                         uploadImageToStorage(uri, userId)
@@ -139,5 +138,6 @@ class EditProfileFragment : Fragment() {
             .addOnFailureListener { e ->
                 Log.w("EditProfileFragment", "Error uploading image", e)
             }
+
     }
 }

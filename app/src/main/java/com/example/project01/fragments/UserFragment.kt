@@ -1,24 +1,19 @@
-package com.example.pr
+package com.example.project01.fragments
 
-
-import android.app.AlertDialog
-import android.app.Dialog
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.navigation.fragment.findNavController
+import androidx.appcompat.app.AlertDialog
+import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CircleCrop
-import com.example.project01.R
 import com.example.project01.activity.ChangePasswordActivity
-import com.example.project01.activity.ForgotPasswordActivity
+import com.example.project01.activity.EditProfileActivity
 import com.example.project01.activity.LoginActivity
 import com.example.project01.databinding.FragmentUserBinding
 import com.google.firebase.auth.FirebaseAuth
@@ -26,6 +21,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 
 
 class UserFragment : Fragment() {
+
     private lateinit var binding: FragmentUserBinding
     private lateinit var auth: FirebaseAuth
     private val db = FirebaseFirestore.getInstance()
@@ -50,12 +46,12 @@ class UserFragment : Fragment() {
         }
 
         binding.editProfileButton.setOnClickListener {
-            // Navigate to EditProfileFragment
-            findNavController().navigate(R.id.editProfileFragment)
+            val intent=Intent(requireContext(),EditProfileActivity::class.java)
+            startActivity(intent)
         }
 
         binding.ChangePassword.setOnClickListener {
-            val intent = Intent(requireContext(),ChangePasswordActivity::class.java)
+            val intent = Intent(requireContext(), ChangePasswordActivity::class.java)
             startActivity(intent)
 
         }
@@ -120,4 +116,6 @@ class UserFragment : Fragment() {
             activity?.finish()
         }, 1000)
     }
+
+
 }

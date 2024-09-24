@@ -16,11 +16,7 @@
         android:name="com.example.project01.fragments.FavoriteFragment"
         android:label="Favorite"
         tools:layout="@layout/fragment_favorite" />
-    <fragment
-        android:id="@+id/userFragment"
-        android:name="com.example.pr.UserFragment"
-        android:label="User"
-        tools:layout="@layout/fragment_user" />
+
     <fragment
         android:id="@+id/groupsFragment"
         android:name="GroupsFragment"
@@ -34,8 +30,9 @@
         tools:layout="@layout/fragment_add_bloack"
         android:label="AddBlockFragment" />
     <fragment
-        android:id="@+id/editProfileFragment"
-        android:name="com.example.project01.fragments.EditProfileFragment"
-        android:label="fragment_edit_profile"
-        tools:layout="@layout/fragment_edit_profile" />
+        android:id="@+id/userFragment"
+        android:name="com.example.project01.fragments.UserFragment"
+        tools:layout="@layout/fragment_user"
+        android:label="User" />
+
 </navigation>
