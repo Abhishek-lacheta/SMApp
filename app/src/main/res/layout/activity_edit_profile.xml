@@ -15,11 +15,11 @@
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
         app:titleTextColor="@color/black" />
 
-    <LinearLayout
+    <FrameLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="50dp"
         android:layout_marginBottom="16dp"
         android:orientation="vertical">
 
@@ -30,18 +30,18 @@
             android:background="@drawable/circle_border"
             android:src="@drawable/ic_defauluser" />
 
-        <Button
+
+        <ImageView
             android:id="@+id/buttonEditProfile"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:background="@drawable/round_button"
-            android:paddingHorizontal="16dp"
-            android:paddingVertical="8dp"
-            android:text="Edit Profile"
-            android:textColor="@android:color/white"
-            android:theme="@style/Theme.Button" /> <!-- Added elevation for shadow effect -->
-    </LinearLayout>
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="70dp"
+            android:layout_marginStart="70dp"
+            android:background="@color/white"
+            android:src="@drawable/ic_camera"
+            />
+         <!-- Added elevation for shadow effect -->
+    </FrameLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -81,11 +81,12 @@
 
         <Button
             android:id="@+id/buttonSave"
+            android:layout_marginTop="30dp"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
+            android:layout_height="60dp"
             android:background="@drawable/round_button"
-            android:text="Save Changes"
+            android:text="Change Password"
+            android:textColor="@color/white"
             android:theme="@style/Theme.Button" />
 
     </LinearLayout>

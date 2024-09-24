@@ -74,7 +74,7 @@
         android:id="@+id/ChangePassword"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp">
+        android:layout_marginTop="35dp">
 
         <ImageView
             android:layout_width="wrap_content"
@@ -87,7 +87,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
-            android:text="Change Password?"
+            android:text="Change Password"
             android:textSize="20dp"
             android:textStyle="bold" />
     </LinearLayout>
@@ -96,7 +96,7 @@
         android:id="@+id/logout_id"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp">
+        android:layout_marginTop="35dp">
 
         <ImageView
             android:layout_width="wrap_content"

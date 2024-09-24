@@ -33,7 +33,9 @@ class ChangePasswordActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityChangePasswordBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
+        binding.arrovBack.setOnClickListener {
+            finish()
+        }
         // Initialize Firebase Auth
         auth = FirebaseAuth.getInstance()
 
@@ -90,6 +92,7 @@ class ChangePasswordActivity : AppCompatActivity() {
         }, 1000)
 
     }
+
     private fun showSuccessDialog() {
         AlertDialog.Builder(this)
             .setTitle("Congratulations!!!")
