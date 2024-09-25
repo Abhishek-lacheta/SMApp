@@ -8,7 +8,6 @@ import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.example.project01.R
 import com.example.project01.databinding.ActivityChangePasswordBinding
@@ -17,8 +16,8 @@ import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 
 class ChangePasswordActivity : AppCompatActivity() {
-    private lateinit var binding: ActivityChangePasswordBinding
 
+    private lateinit var binding: ActivityChangePasswordBinding
     private lateinit var currentPasswordEditText: EditText
     private lateinit var newPasswordEditText: EditText
     private lateinit var changePasswordButton: Button
@@ -65,6 +64,7 @@ class ChangePasswordActivity : AppCompatActivity() {
                                 if (updateTask.isSuccessful) {
                                     DialogUtils.ChangegePassSuccessDialog(this){
                                         startActivity(Intent(this,ChangePasswordActivity::class.java))
+                                        finish()
                                     }
                                 } else {
                                     Toast.makeText(

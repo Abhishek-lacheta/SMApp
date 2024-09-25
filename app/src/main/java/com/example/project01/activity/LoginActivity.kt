@@ -2,10 +2,7 @@ package com.example.project01.activity
 
 import android.content.Intent
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.view.View
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.example.project01.databinding.ActivityLoginBinding
 import com.example.project01.dialogs.DialogUtils
@@ -31,43 +28,34 @@ class LoginActivity : AppCompatActivity() {
                 performLogin(email, password)
             }
         }
-
         binding.SendtoSinUp.setOnClickListener {
             startActivity(Intent(this, SignUPActivity::class.java))
         }
-
         binding.tvForgotPassword.setOnClickListener {
             startActivity(Intent(this, ForgotPasswordActivity::class.java))
         }
     }
-
     private fun validateInput(email: String, password: String): Boolean {
-
         return when {
             email.isEmpty() -> {
                 binding.loginEmail.error = "Enter email"
                 false
             }
-
             !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches() -> {
                 binding.loginEmail.error = "Enter a valid email"
                 false
             }
-
             password.isEmpty() -> {
                 binding.loginPassword.error = "Enter password"
                 false
             }
-
             password.isEmpty() || password.length < 6 -> {
                 binding.loginPassword.error = "Password must be at least 6 characters"
                 false
             }
-
             else -> true
         }
     }
-
     //TODO: handle onFailedlistener and manage loader
     private fun performLogin(email: String, password: String) {
         binding.loginLoader.visibility = View.VISIBLE
@@ -80,8 +68,6 @@ class LoginActivity : AppCompatActivity() {
                         finish()
                     }
                     binding.loginLoader.visibility = View.GONE
-
-
                 } else {
                     DialogUtils.loginFailureDialog(this)
                 }

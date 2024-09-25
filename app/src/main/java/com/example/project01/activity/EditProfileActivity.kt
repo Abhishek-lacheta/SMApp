@@ -42,8 +42,6 @@ class EditProfileActivity : AppCompatActivity() {
             finish()
         }
     }
-
-
     private fun loadUserData() {
         val currentUser = auth.currentUser
         if (currentUser != null) {
@@ -78,7 +76,6 @@ class EditProfileActivity : AppCompatActivity() {
         }
         startActivityForResult(intent, IMAGE_PICK_CODE)
     }
-
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == IMAGE_PICK_CODE && resultCode == Activity.RESULT_OK) {

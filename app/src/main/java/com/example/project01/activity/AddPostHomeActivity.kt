@@ -27,10 +27,9 @@ class AddPostHomeActivity : AppCompatActivity() {
     private val storage = FirebaseStorage.getInstance()
     private val PICK_IMAGE_REQUEST = 71
     private var imageUri: Uri? = null
-
     private lateinit var spinner: Spinner
     private val nameList = mutableListOf<String>()
-    private val idList =   mutableListOf<String>()
+    private val idList = mutableListOf<String>()
     private var selectedGroupId: String? = null  // To store the selected group ID
     private var isFavorite: Boolean = false
 
@@ -145,6 +144,7 @@ class AddPostHomeActivity : AppCompatActivity() {
         }, 1000)
 
     }
+
     private fun saveHomeData(homeMap: HashMap<String, Any>) {
         db.collection("home").document().set(homeMap)
             .addOnSuccessListener {

@@ -27,9 +27,7 @@ class SignUPActivity : AppCompatActivity() {
         binding.arrovBack.setOnClickListener {
             finish()
         }
-
         firebaseAuth = FirebaseAuth.getInstance()
-
         binding.signupButton1.setOnClickListener {
 
             val email = binding.singupEmail.text.toString()
@@ -39,34 +37,27 @@ class SignUPActivity : AppCompatActivity() {
             }
         }
     }
-
     private fun validateInput(email: String, password: String): Boolean {
-
         return when {
             email.isEmpty() -> {
                 binding.singupEmail.error = "Enter email"
                 false
             }
-
             !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches() -> {
                 binding.singupEmail.error = "Enter a valid email"
                 false
             }
-
             password.isEmpty() -> {
                 binding.signupPass.error = "Enter password"
                 false
             }
-
             password.isEmpty() || password.length < 6 -> {
                 binding.signupPass.error = "Password must be at least 6 characters"
                 false
             }
-
             else -> true
         }
     }
-
     //this is create user with eamil and password and store firebase
     private fun performSignUp(email: String, password: String) {
         binding.singnupLoader.visibility = View.VISIBLE
@@ -86,7 +77,6 @@ class SignUPActivity : AppCompatActivity() {
         }, 1000)
 
     }
-
     private fun showSuccessDialog() {
         AlertDialog.Builder(this)
             .setTitle("SignUp Successful")
@@ -98,7 +88,6 @@ class SignUPActivity : AppCompatActivity() {
             }
             .show()
     }
-
     private fun showFailureDialog() {
         AlertDialog.Builder(this)
             .setTitle("SignUp Failed")
@@ -108,7 +97,6 @@ class SignUPActivity : AppCompatActivity() {
             }
             .show()
     }
-
     //store data in user collection
     private fun performSignUp2(uid: String?) {
         if (uid == null) return

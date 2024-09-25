@@ -27,7 +27,6 @@ class AddPostGroupActivity : AppCompatActivity() {
         binding.Grouptoolbar.setNavigationOnClickListener {
             finish()
         }
-
         binding.selectImageButton.setOnClickListener {
             openImageChooser()
         }
