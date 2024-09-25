@@ -8,6 +8,7 @@ import android.view.View
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.example.project01.databinding.ActivityLoginBinding
+import com.example.project01.dialogs.DialogUtils
 import com.google.firebase.auth.FirebaseAuth
 
 class LoginActivity : AppCompatActivity() {
@@ -67,46 +68,25 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
-    private fun showSuccessDialog() {
-        AlertDialog.Builder(this)
-            .setTitle("Login Successful")
-            .setMessage("Welcome")
-            .setPositiveButton("OK") { dialog, _ ->
-                startActivity(Intent(this, MainActivity::class.java))
-                finish()
-                dialog.dismiss()
-            }
-            .show()
-    }
-
-    private fun showFailureDialog() {
-        AlertDialog.Builder(this)
-            .setTitle("Login Failed")
-            .setMessage("Incorrect email or password. Please try again.")
-            .setPositiveButton("OK") { dialog, _ ->
-                dialog.dismiss()
-            }
-            .show()
-    }
-
+    //TODO: handle onFailedlistener and manage loader
     private fun performLogin(email: String, password: String) {
         binding.loginLoader.visibility = View.VISIBLE
         binding.loginButton.visibility = View.GONE
         firebaseAuth.signInWithEmailAndPassword(email, password)
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
-                    showSuccessDialog()
+                    DialogUtils.loginSuccessDialog(this) {
+                        startActivity(Intent(this, MainActivity::class.java))
+                        finish()
+                    }
+                    binding.loginLoader.visibility = View.GONE
+
+
                 } else {
-                    showFailureDialog()
+                    DialogUtils.loginFailureDialog(this)
                 }
             }
-
-        Handler(Looper.getMainLooper()).postDelayed({
-
-            binding.loginLoader.visibility = View.GONE
-        }, 1000)
     }
-
 }
 
 

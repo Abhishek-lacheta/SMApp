@@ -44,12 +44,12 @@ class UserFragment : Fragment() {
         binding.logoutId.setOnClickListener {
             showLogoutConfirmationDialog()
         }
-
+        //Go to Edit profile Activity
         binding.editProfileButton.setOnClickListener {
             val intent = Intent(requireContext(), EditProfileActivity::class.java)
             startActivity(intent)
         }
-
+        //Go to ChangePassword Activity
         binding.ChangePassword.setOnClickListener {
             val intent = Intent(requireContext(), ChangePasswordActivity::class.java)
             startActivity(intent)
@@ -74,7 +74,6 @@ class UserFragment : Fragment() {
                         binding.userEmail.text = email ?: "No email"
                         binding.name.text = username ?: "No username"
 
-                        // Load profile image (optional)
                         profileImageUrl?.let {
                             Glide.with(this)
                                 .load(it)
@@ -89,7 +88,7 @@ class UserFragment : Fragment() {
         }
     }
 
-    private fun showLogoutConfirmationDialog() {
+     private fun showLogoutConfirmationDialog() {
         AlertDialog.Builder(requireContext())
             .setTitle("Confirm Logout")
             .setMessage("Are you sure you want to logout?")

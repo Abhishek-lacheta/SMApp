@@ -12,6 +12,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.example.project01.R
 import com.example.project01.databinding.ActivityChangePasswordBinding
+import com.example.project01.dialogs.DialogUtils
 import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 
@@ -62,7 +63,9 @@ class ChangePasswordActivity : AppCompatActivity() {
                         it.updatePassword(newPassword)
                             .addOnCompleteListener { updateTask ->
                                 if (updateTask.isSuccessful) {
-                                    showSuccessDialog()
+                                    DialogUtils.ChangegePassSuccessDialog(this){
+                                        startActivity(Intent(this,ChangePasswordActivity::class.java))
+                                    }
                                 } else {
                                     Toast.makeText(
                                         this,
@@ -85,15 +88,5 @@ class ChangePasswordActivity : AppCompatActivity() {
         }, 1000)
 
     }
-    private fun showSuccessDialog() {
-        AlertDialog.Builder(this)
-            .setTitle("Congratulations!!!")
-            .setMessage("Your Password Change Successfully")
-            .setPositiveButton("OK") { dialog, _ ->
-                startActivity(Intent(this, ChangePasswordActivity::class.java))
-                finish()
-                dialog.dismiss()
-            }
-            .show()
-    }
+
 }

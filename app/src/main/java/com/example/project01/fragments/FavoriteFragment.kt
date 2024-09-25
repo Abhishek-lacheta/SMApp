@@ -49,7 +49,7 @@ class FavoriteFragment : Fragment() {
                     for (document in result.documents) {
                         val item = document.toObject(HomeRecyclerModal::class.java)
                         item?.let {
-                            it.id=document.id
+                            it.id = document.id
                             dataList.add(it)
                         }
                     }
@@ -66,6 +66,7 @@ class FavoriteFragment : Fragment() {
             }
 
     }
+
     private fun setupRecyclerView() {
         adapter = HomeRecyclerAdaptor(dataList) { item ->
             toggleFavorite(item)
@@ -73,6 +74,7 @@ class FavoriteFragment : Fragment() {
         binding.recyclerview.adapter = adapter
     }
 
+    // toggleFavorite favorite ke click pr adaptor se chl rhe hai
     private fun toggleFavorite(item: HomeRecyclerModal) {
         val newFavoriteStatus = !item.isFavorite
         item.isFavorite = newFavoriteStatus // Update local state
