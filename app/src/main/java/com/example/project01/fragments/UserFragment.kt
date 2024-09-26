@@ -7,7 +7,6 @@ import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CircleCrop
@@ -16,15 +15,15 @@ import com.example.project01.activity.EditProfileActivity
 import com.example.project01.activity.LoginActivity
 import com.example.project01.databinding.FragmentUserBinding
 import com.example.project01.dialogs.DialogUtils
-import com.google.firebase.auth.FirebaseAuth
+import com.example.project01.firebase.FirebaseAuthManager
 import com.google.firebase.firestore.FirebaseFirestore
 
 
 class UserFragment : Fragment() {
 
     private lateinit var binding: FragmentUserBinding
-    private lateinit var auth: FirebaseAuth
     private val db = FirebaseFirestore.getInstance()
+    private var authManager = FirebaseAuthManager()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -37,12 +36,11 @@ class UserFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        auth = FirebaseAuth.getInstance()
-
+        authManager = FirebaseAuthManager()
         updateUI()
 
         binding.logoutId.setOnClickListener {
-            showLogoutConfirmationDialog()
+            logout()
         }
         //Go to Edit profile Activity
         binding.editProfileButton.setOnClickListener {
@@ -56,9 +54,8 @@ class UserFragment : Fragment() {
 
         }
     }
-
     private fun updateUI() {
-        val currentUser = auth.currentUser
+        val currentUser = authManager.getCurrentUser()
         if (currentUser != null) {
             val userId = currentUser.uid
             val userRef = db.collection("user").document(userId)
@@ -87,38 +84,23 @@ class UserFragment : Fragment() {
                 }
         }
     }
-
-     private fun showLogoutConfirmationDialog() {
-        AlertDialog.Builder(requireContext())
-            .setTitle("Confirm Logout")
-            .setMessage("Are you sure you want to logout?")
-            .setPositiveButton("Yes") { dialog, _ ->
-                logout()
-                dialog.dismiss()
-            }
-            .setNegativeButton("No") { dialog, _ -> dialog.dismiss() }
-            .create()
-            .show()
-    }
-
     private fun logout() {
         binding.logoutLoader.visibility = View.VISIBLE
         binding.logoutId.visibility = View.GONE
 
-        auth.signOut()
-
-        Handler(Looper.getMainLooper()).postDelayed({
-            binding.logoutLoader.visibility = View.GONE
-            context?.let {
-                DialogUtils.LogoutConfirmationDialog(it){
-                    val intent = Intent(activity, LoginActivity::class.java)
-                    startActivity(intent)
-                    activity?.finish()
+        authManager.signout {
+            Handler(Looper.getMainLooper()).postDelayed({
+                binding.logoutLoader.visibility = View.GONE
+                context?.let {
+                    DialogUtils.LogoutConfirmationDialog(it) {
+                        val intent = Intent(activity, LoginActivity::class.java)
+                        startActivity(intent)
+                        activity?.finish()
+                    }
                 }
-            }
 
-        }, 1000)
+            }, 1000)
+
+        }
     }
-
-
 }

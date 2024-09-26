@@ -3,16 +3,13 @@ package com.example.project01.fragments
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.project01.activity.AddPostHomeActivity
@@ -20,13 +17,14 @@ import com.example.project01.adaptor.HomeAdaptor
 import com.example.project01.modal.HomeRecyclerModal
 import com.example.project01.R
 import com.example.project01.databinding.FragmentHomeBinding
-import com.google.firebase.firestore.FirebaseFirestore
+import com.example.project01.firebase.FirebaseDatabaseManager
+
 
 class HomeFragment : Fragment() {
     private lateinit var adapter: HomeAdaptor
     private lateinit var binding: FragmentHomeBinding
     private var dataList = ArrayList<HomeRecyclerModal>()
-    private var db = FirebaseFirestore.getInstance()
+    private lateinit var firebaseDatabaseManager: FirebaseDatabaseManager
 
     @SuppressLint("MissingInflatedId")
     override fun onCreateView(
@@ -36,12 +34,16 @@ class HomeFragment : Fragment() {
         binding = FragmentHomeBinding.inflate(inflater, container, false)
         return binding.root
     }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        // Initialize FirebaseDatabaseManager
+        firebaseDatabaseManager = FirebaseDatabaseManager(requireContext())
+
         // Setup Toolbar
         val activity = activity as AppCompatActivity
-        val toolbar: Toolbar = binding.hometoolbar
+        val toolbar = binding.hometoolbar
         activity.setSupportActionBar(toolbar)
         setHasOptionsMenu(true)
 
@@ -49,32 +51,16 @@ class HomeFragment : Fragment() {
         binding.recyclerview.layoutManager = LinearLayoutManager(context)
 
         // Fetch Data from Firestore
-        fetchDataFromFirestore()
+        fetchHomeData()
     }
-    private fun fetchDataFromFirestore() {
-        db.collection("home").get()
-            .addOnSuccessListener { result ->
-                if (result.isEmpty) {
-                    Toast.makeText(context, "No data found", Toast.LENGTH_SHORT).show()
-                } else {
-                    dataList.clear() // Clear existing data
-                    for (document in result.documents) {
-                        val item = document.toObject(HomeRecyclerModal::class.java)
-                        item?.let {
-                            it.id = document.id // Set the document ID
-                            dataList.add(it)
-                        }
-                    }
-                    setupRecyclerView() // Initialize the adapter
-                }
-            }
-            .addOnFailureListener { exception ->
-                Toast.makeText(
-                    context,
-                    "Error fetching data: ${exception.message}",
-                    Toast.LENGTH_LONG
-                ).show()
-            }
+
+    private fun fetchHomeData() {
+        firebaseDatabaseManager.fetchDataHomeFromFireStore { data ->
+            if (data.isEmpty()) return@fetchDataHomeFromFireStore // Handle empty data
+            dataList.clear()
+            dataList.addAll(data)
+            setupRecyclerView() // Initialize the adapter
+        }
     }
 
     private fun setupRecyclerView() {
@@ -90,17 +76,9 @@ class HomeFragment : Fragment() {
 
         adapter.notifyDataSetChanged()
         // Update the Firestore document with the new favorite status
-        item.id?.let {
-            db.collection("home").document(it).update("isFavorite", newFavoriteStatus)
-                .addOnSuccessListener {
-                    Log.d("FavoriteStatus", "Favorite status updated successfully.")
-                }
-                .addOnFailureListener { e ->
-                    Log.e("FavoriteStatus", "Error updating favorite status", e)
-                }
-        }
-
+        firebaseDatabaseManager.FavoriteStatus(item, newFavoriteStatus)
     }
+
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.home_menu, menu)
         super.onCreateOptionsMenu(menu, inflater)
@@ -113,8 +91,8 @@ class HomeFragment : Fragment() {
                 startActivity(intent)
                 true
             }
-
             else -> super.onOptionsItemSelected(item)
         }
     }
 }
+

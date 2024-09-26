@@ -3,6 +3,7 @@ package com.example.project01.firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.EmailAuthProvider
+import com.google.firebase.firestore.FirebaseFirestore
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
@@ -10,15 +11,18 @@ import kotlin.coroutines.suspendCoroutine
 class FirebaseAuthManager {
 
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
-    private val database=FirebaseDatabaseManager()
+    private var database = FirebaseFirestore.getInstance()
+
+
 
     // SigUpActivity method Register a new user
-    suspend fun registerUser(name: String,email: String, password: String): AuthResult {
+    suspend fun registerUser(name: String, email: String, password: String): AuthResult {
+
         return suspendCoroutine { continuation ->
             auth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
-                        database.performSignUp2(task.result.user?.uid, name, email)
+                        performSignUp2(task.result.user?.uid, name, email)
                         continuation.resume(task.result!!)
                     } else {
                         continuation.resumeWithException(
@@ -28,6 +32,18 @@ class FirebaseAuthManager {
                 }
         }
     }
+
+
+    fun performSignUp2(uid: String?, name: String, email: String) {
+        if (uid == null) return
+
+        val userMap = hashMapOf(
+            "name" to name,
+            "email" to email
+        )
+        database.collection("user").document(uid).set(userMap)
+    }
+
     // Login Activity mrthod existing user
     suspend fun signInUser(email: String, password: String): AuthResult {
         return suspendCoroutine { continuation ->
@@ -44,12 +60,13 @@ class FirebaseAuthManager {
                 }
         }
     }
-//ForgotPassword Activity
-    suspend fun forgotpassword(email: String):AuthResult{
+
+    //ForgotPassword Activity
+    suspend fun forgotpassword(email: String): AuthResult {
         return suspendCoroutine { continuation ->
 
             auth.sendPasswordResetEmail(email)
-                .addOnCompleteListener{task->
+                .addOnCompleteListener { task ->
 
                     if (task.isSuccessful) {
                     } else {
@@ -62,7 +79,7 @@ class FirebaseAuthManager {
         }
     }
 
-    // Change user password
+    // ChangePasswordActivity Change user password
     suspend fun changePassword(currentPassword: String, newPassword: String): Boolean {
         val user = auth.currentUser ?: throw Exception("No user is currently signed in.")
         return suspendCoroutine { continuation ->
@@ -76,13 +93,27 @@ class FirebaseAuthManager {
                                 if (updateTask.isSuccessful) {
                                     continuation.resume(true)
                                 } else {
-                                    continuation.resumeWithException(updateTask.exception ?: Exception("Password update failed"))
+                                    continuation.resumeWithException(
+                                        updateTask.exception ?: Exception("Password update failed")
+                                    )
                                 }
                             }
                     } else {
-                        continuation.resumeWithException(task.exception ?: Exception("Reauthentication failed"))
+                        continuation.resumeWithException(
+                            task.exception ?: Exception("Reauthentication failed")
+                        )
                     }
                 }
         }
+    }
+
+    //CurrentUser get krne ka liye
+    fun getCurrentUser() = auth.currentUser
+
+    // logout ke liye
+    fun signout(onSignout: () -> Unit) {
+        auth.signOut()
+        onSignout()
+
     }
 }

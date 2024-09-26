@@ -1,13 +1,9 @@
 package com.example.project01.activity
 
 import android.os.Bundle
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.google.firebase.firestore.FirebaseFirestore
 import android.content.Intent
 import android.net.Uri
-import android.os.Handler
-import android.os.Looper
 import android.util.Log
 import android.view.View
 import android.widget.AdapterView
@@ -15,28 +11,26 @@ import android.widget.ArrayAdapter
 import android.widget.Spinner
 import com.example.project01.R
 import com.example.project01.databinding.ActivityAddPostHomeBinding
-import com.google.firebase.firestore.FieldValue
-import com.google.firebase.storage.FirebaseStorage
-import java.util.*
-import kotlin.collections.HashMap
+import com.example.project01.firebase.FirebaseDatabaseManager
 
 class AddPostHomeActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityAddPostHomeBinding
-    private val db = FirebaseFirestore.getInstance()
-    private val storage = FirebaseStorage.getInstance()
+    private lateinit var databaseManager: FirebaseDatabaseManager
     private val PICK_IMAGE_REQUEST = 71
     private var imageUri: Uri? = null
     private lateinit var spinner: Spinner
     private val nameList = mutableListOf<String>()
     private val idList = mutableListOf<String>()
-    private var selectedGroupId: String? = null  // To store the selected group ID
+    private var selectedGroupId: String? = null
     private var isFavorite: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityAddPostHomeBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        databaseManager = FirebaseDatabaseManager(this)
 
         binding.hometoolbar.setTitle("Add Post")
         binding.hometoolbar.setNavigationOnClickListener {
@@ -51,27 +45,24 @@ class AddPostHomeActivity : AppCompatActivity() {
         }
 
         binding.homeButtonId.setOnClickListener {
-
             if (imageUri != null) {
                 uploadImageAndSaveData()
             } else {
-                /*saveDataWithoutImage()*/
+                // Optionally handle saving without image
             }
         }
     }
 
     private fun fetchData() {
-        db.collection("group").get()
-            .addOnSuccessListener { documents ->
-                for (document in documents) {
-                    nameList.add(document.getString("name") ?: "")
-                    idList.add(document.id)
-                }
-                setupSpinner()
+        databaseManager.fetchGroupData { groups ->
+            nameList.clear()
+            idList.clear()
+            groups.forEach { (name, id) ->
+                nameList.add(name)
+                idList.add(id)
             }
-            .addOnFailureListener { exception ->
-                Log.w("MainActivity", "Error getting documents: ", exception)
-            }
+            setupSpinner()
+        }
     }
 
     private fun setupSpinner() {
@@ -80,14 +71,9 @@ class AddPostHomeActivity : AppCompatActivity() {
         spinner.adapter = adapter
 
         spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(
-                parent: AdapterView<*>,
-                view: View,
-                position: Int,
-                id: Long
-            ) {
-                selectedGroupId = idList[position]  // Store the selected group ID
-                Log.d("MainActivity", "Selected Group ID: $selectedGroupId")
+            override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
+                selectedGroupId = idList[position]
+                Log.d("AddPostHomeActivity", "Selected Group ID: $selectedGroupId")
             }
 
             override fun onNothingSelected(parent: AdapterView<*>) {}
@@ -117,42 +103,13 @@ class AddPostHomeActivity : AppCompatActivity() {
         val title = binding.homeTitleId.text.toString().trim()
         val desc = binding.homeDescId.text.toString().trim()
 
-        val homeMap = hashMapOf(
-            "title" to title,
-            "desc" to desc,
-            "created_at" to FieldValue.serverTimestamp(),
-            "groupId" to (selectedGroupId ?: ""), // Add groupId to the homeMap
-            "isFavorite" to isFavorite  // Add favorite status to homeMap
-        )
-        val storageRef = storage.reference
-        val imageRef = storageRef.child("images/${UUID.randomUUID()}.jpg")
-
         imageUri?.let { uri ->
-            imageRef.putFile(uri)
-                .addOnSuccessListener { taskSnapshot ->
-                    imageRef.downloadUrl.addOnSuccessListener { downloadUri ->
-                        homeMap["imageUrl"] = downloadUri.toString()
-                        saveHomeData(homeMap)
-                    }
-                }
-                .addOnFailureListener {
-                    Toast.makeText(this, "Failed to upload image", Toast.LENGTH_SHORT).show()
-                }
+            databaseManager.uploadImageAndSaveData(uri, title, desc, selectedGroupId, isFavorite) { success ->
+                binding.submitLoader.visibility = View.GONE
+                binding.homeButtonId.visibility = View.VISIBLE
+
+            }
         }
-        Handler(Looper.getMainLooper()).postDelayed({
-            binding.submitLoader.visibility = View.GONE
-        }, 1000)
-
-    }
-
-    private fun saveHomeData(homeMap: HashMap<String, Any>) {
-        db.collection("home").document().set(homeMap)
-            .addOnSuccessListener {
-                Toast.makeText(this, "Successfully Added Data", Toast.LENGTH_SHORT).show()
-            }
-            .addOnFailureListener {
-                Toast.makeText(this, "Failed to add data", Toast.LENGTH_SHORT).show()
-            }
     }
 }
 

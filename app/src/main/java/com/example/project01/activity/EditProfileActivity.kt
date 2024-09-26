@@ -10,13 +10,14 @@ import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
 import com.example.project01.R
 import com.example.project01.databinding.ActivityEditProfileBinding
+import com.example.project01.firebase.FirebaseAuthManager
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 
 class EditProfileActivity : AppCompatActivity() {
     private lateinit var binding: ActivityEditProfileBinding
-    private lateinit var auth: FirebaseAuth
+    private var authManager = FirebaseAuthManager()
     private val db = FirebaseFirestore.getInstance()
     private var profileImageUri: Uri? = null
     private val IMAGE_PICK_CODE = 1000
@@ -25,8 +26,7 @@ class EditProfileActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityEditProfileBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-        auth = FirebaseAuth.getInstance()
+        authManager = FirebaseAuthManager()
         loadUserData()
 
         binding.buttonEditProfile.setOnClickListener {
@@ -42,8 +42,9 @@ class EditProfileActivity : AppCompatActivity() {
             finish()
         }
     }
+
     private fun loadUserData() {
-        val currentUser = auth.currentUser
+        val currentUser = authManager.getCurrentUser()
         if (currentUser != null) {
             val userId = currentUser.uid
             val userRef = db.collection("user").document(userId)
@@ -70,12 +71,14 @@ class EditProfileActivity : AppCompatActivity() {
             }
         }
     }
+
     private fun pickImage() {
         val intent = Intent(Intent.ACTION_PICK).apply {
             type = "image/*"
         }
         startActivityForResult(intent, IMAGE_PICK_CODE)
     }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == IMAGE_PICK_CODE && resultCode == Activity.RESULT_OK) {
@@ -89,11 +92,12 @@ class EditProfileActivity : AppCompatActivity() {
             }
         }
     }
+
     private fun saveProfile() {
         val username = binding.editTextUsername.text.toString()
         val email = binding.editTextEmail.text.toString()
 
-        val currentUser = auth.currentUser
+        val currentUser = authManager.getCurrentUser()
         if (currentUser != null) {
             val userId = currentUser.uid
             val userRef = db.collection("user").document(userId)
@@ -111,6 +115,7 @@ class EditProfileActivity : AppCompatActivity() {
                 }
         }
     }
+
     private fun uploadImageToStorage(uri: Uri, userId: String) {
         val storageRef = FirebaseStorage.getInstance().reference.child("profile_images/$userId.jpg")
         storageRef.putFile(uri)

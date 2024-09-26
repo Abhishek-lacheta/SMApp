@@ -2,8 +2,6 @@ package com.example.project01.activity
 
 import android.content.Intent
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
@@ -14,8 +12,6 @@ import com.example.project01.R
 import com.example.project01.databinding.ActivityChangePasswordBinding
 import com.example.project01.dialogs.DialogUtils
 import com.example.project01.firebase.FirebaseAuthManager
-import com.google.firebase.auth.EmailAuthProvider
-import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
 
 class ChangePasswordActivity : AppCompatActivity() {
@@ -25,7 +21,6 @@ class ChangePasswordActivity : AppCompatActivity() {
     private lateinit var newPasswordEditText: EditText
     private lateinit var changePasswordButton: Button
     private val authManager = FirebaseAuthManager()
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
