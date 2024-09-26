@@ -31,7 +31,6 @@ class GroupsFragment : Fragment() {
         binding = FragmentGroupsBinding.inflate(inflater, container, false)
         return binding.root// Inflate the layout for this fragment
     }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -53,7 +52,6 @@ class GroupsFragment : Fragment() {
 
 
     }
-
     fun onItemClick(model: GroupRecyclerModal) {
 
         // Create a Bundle to pass the modal ID
@@ -63,7 +61,6 @@ class GroupsFragment : Fragment() {
         }
         findNavController().navigate(R.id.addBlockFragment, bundle)
     }
-
     private fun fetchImages() {
         firestore.collection("group") // Adjust this path if needed
             .get()

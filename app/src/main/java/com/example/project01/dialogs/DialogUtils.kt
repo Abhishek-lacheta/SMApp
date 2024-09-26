@@ -18,7 +18,6 @@ object DialogUtils {
             .create()
             .show()
     }
-
     fun loginFailureDialog(context: Context) {
         AlertDialog.Builder(context)
             .setTitle("Login Failed")
@@ -28,7 +27,6 @@ object DialogUtils {
             }
 
     }
-
     fun ChangegePassSuccessDialog(context: Context, onDismiss: (() -> Unit)? = null) {
         AlertDialog.Builder(context)
             .setTitle("Congratulations!!!")
@@ -39,7 +37,6 @@ object DialogUtils {
             }
             .show()
     }
-
     fun ForgotSuccessDialog(context: Context, onDismiss: (() -> Unit)? = null) {
         AlertDialog.Builder(context)
             .setTitle("Please check your email")
@@ -50,6 +47,20 @@ object DialogUtils {
             }
             .show()
     }
+
+    fun LogoutConfirmationDialog(context: Context, onDismiss: (() -> Unit)? = null) {
+        AlertDialog.Builder(context)
+            .setTitle("Confirm Logout")
+            .setMessage("Are you sure you want to logout?")
+            .setPositiveButton("Yes") { dialog, _ ->
+                onDismiss?.invoke()
+                dialog.dismiss()
+            }
+            .setNegativeButton("No") { dialog, _ -> dialog.dismiss() }
+            .create()
+            .show()
+    }
+
 
 
 }

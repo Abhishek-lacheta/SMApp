@@ -7,7 +7,6 @@ import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
@@ -16,6 +15,7 @@ import com.example.project01.activity.ChangePasswordActivity
 import com.example.project01.activity.EditProfileActivity
 import com.example.project01.activity.LoginActivity
 import com.example.project01.databinding.FragmentUserBinding
+import com.example.project01.dialogs.DialogUtils
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
@@ -109,10 +109,14 @@ class UserFragment : Fragment() {
 
         Handler(Looper.getMainLooper()).postDelayed({
             binding.logoutLoader.visibility = View.GONE
-            Toast.makeText(activity, "Logout successful", Toast.LENGTH_SHORT).show()
-            val intent = Intent(activity, LoginActivity::class.java)
-            startActivity(intent)
-            activity?.finish()
+            context?.let {
+                DialogUtils.LogoutConfirmationDialog(it){
+                    val intent = Intent(activity, LoginActivity::class.java)
+                    startActivity(intent)
+                    activity?.finish()
+                }
+            }
+
         }, 1000)
     }
 
