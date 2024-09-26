@@ -9,11 +9,14 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import com.example.project01.R
 import com.example.project01.databinding.ActivityChangePasswordBinding
 import com.example.project01.dialogs.DialogUtils
+import com.example.project01.firebase.FirebaseAuthManager
 import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.launch
 
 class ChangePasswordActivity : AppCompatActivity() {
 
@@ -21,7 +24,8 @@ class ChangePasswordActivity : AppCompatActivity() {
     private lateinit var currentPasswordEditText: EditText
     private lateinit var newPasswordEditText: EditText
     private lateinit var changePasswordButton: Button
-    private lateinit var auth: FirebaseAuth
+    private val authManager = FirebaseAuthManager()
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,7 +37,6 @@ class ChangePasswordActivity : AppCompatActivity() {
             finish()
         }
 
-        auth = FirebaseAuth.getInstance()
         currentPasswordEditText = findViewById(R.id.currentPasswordEditText)
         newPasswordEditText = findViewById(R.id.newPasswordEditText)
         changePasswordButton = findViewById(R.id.changePasswordButton)
@@ -43,50 +46,30 @@ class ChangePasswordActivity : AppCompatActivity() {
             val newPassword = newPasswordEditText.text.toString().trim()
 
             if (currentPassword.isNotEmpty() && newPassword.isNotEmpty()) {
-                changePassword(currentPassword, newPassword)
+                performChangePassword(currentPassword, newPassword)
             } else {
                 Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show()
             }
         }
     }
-    private fun changePassword(currentPassword: String, newPassword: String) {
-        val user = auth.currentUser
-        binding.changePassworLoader.visibility = View.VISIBLE
+    private fun performChangePassword(currentPassword: String, newPassword: String) {
+        binding.changePassworLoader.visibility=View.VISIBLE
         binding.changePasswordButton.visibility = View.GONE
-        user?.let {
-            val credential = EmailAuthProvider.getCredential(user.email!!, currentPassword)
 
-            it.reauthenticate(credential)
-                .addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
-                        it.updatePassword(newPassword)
-                            .addOnCompleteListener { updateTask ->
-                                if (updateTask.isSuccessful) {
-                                    DialogUtils.ChangegePassSuccessDialog(this){
-                                        startActivity(Intent(this,ChangePasswordActivity::class.java))
-                                        finish()
-                                    }
-                                } else {
-                                    Toast.makeText(
-                                        this,
-                                        "Error: ${updateTask.exception?.message}",
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                                }
-                            }
-                    } else {
-                        Toast.makeText(
-                            this,
-                            "Reauthentication failed: ${task.exception?.message}",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
+        lifecycleScope.launch {
+            try {
+                authManager.changePassword(currentPassword, newPassword)
+                DialogUtils.ChangegePassSuccessDialog(this@ChangePasswordActivity) {
+                    startActivity(Intent(this@ChangePasswordActivity, ChangePasswordActivity::class.java))
+                    finish()
                 }
+            } catch (e: Exception) {
+                Toast.makeText(this@ChangePasswordActivity, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
+            } finally {
+                binding.changePassworLoader.visibility=View.GONE
+                binding.changePasswordButton.visibility = View.VISIBLE
+            }
         }
-        Handler(Looper.getMainLooper()).postDelayed({
-            binding.changePassworLoader.visibility = View.GONE
-        }, 1000)
-
     }
 
 }

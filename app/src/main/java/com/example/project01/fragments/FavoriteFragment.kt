@@ -8,14 +8,14 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.project01.adaptor.HomeRecyclerAdaptor
+import com.example.project01.adaptor.HomeAdaptor
 import com.example.project01.databinding.FragmentFavoriteBinding
 import com.example.project01.modal.HomeRecyclerModal
 import com.google.firebase.firestore.FirebaseFirestore
 
 
 class FavoriteFragment : Fragment() {
-    private lateinit var adapter: HomeRecyclerAdaptor
+    private lateinit var adapter: HomeAdaptor
     private lateinit var binding: FragmentFavoriteBinding
     private var dataList = ArrayList<HomeRecyclerModal>()
     private var db = FirebaseFirestore.getInstance()
@@ -68,7 +68,7 @@ class FavoriteFragment : Fragment() {
     }
 
     private fun setupRecyclerView() {
-        adapter = HomeRecyclerAdaptor(dataList) { item ->
+        adapter = HomeAdaptor(dataList) { item ->
             toggleFavorite(item)
         }
         binding.recyclerview.adapter = adapter

@@ -2,26 +2,25 @@ package com.example.project01.activity
 
 import android.content.Intent
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import com.example.project01.databinding.ActivityForgotPasswordBinding
 import com.example.project01.dialogs.DialogUtils
-import com.google.firebase.auth.FirebaseAuth
+import com.example.project01.firebase.FirebaseAuthManager
+import kotlinx.coroutines.launch
 
 class ForgotPasswordActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityForgotPasswordBinding
-    private lateinit var auth: FirebaseAuth
+    private val authManager = FirebaseAuthManager()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityForgotPasswordBinding.inflate(layoutInflater)
         setContentView(binding.root)
         // Initialize Firebase Auth
-        auth = FirebaseAuth.getInstance()
 
         binding.resetPasswordButton.setOnClickListener {
             val email = binding.Email.text.toString().trim()
@@ -33,20 +32,19 @@ class ForgotPasswordActivity : AppCompatActivity() {
     private fun sendPasswordResetEmail(email: String) {
         binding.forgotPassworLoader.visibility = View.VISIBLE
         binding.resetPasswordButton.visibility = View.GONE
-        auth.sendPasswordResetEmail(email)
-            .addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    DialogUtils.ForgotSuccessDialog(this) {
-                        startActivity(Intent(this, ForgotPasswordActivity::class.java))
-                    }
-                } else {
-                    Toast.makeText(this, "Error: ${task.exception?.message}", Toast.LENGTH_SHORT)
-                        .show()
-                }
+        lifecycleScope.launch {
+            try {
+                authManager.forgotpassword(email)
+                DialogUtils.ForgotSuccessDialog(this@ForgotPasswordActivity)
+                startActivity(Intent(this@ForgotPasswordActivity, ForgotPasswordActivity::class.java))
+                finish()
+            } catch (e: Exception) {
+                Toast.makeText(this@ForgotPasswordActivity, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
+            } finally {
+                binding.forgotPassworLoader.visibility = View.GONE
+                binding.resetPasswordButton.visibility=View.VISIBLE
             }
-        Handler(Looper.getMainLooper()).postDelayed({
-            binding.forgotPassworLoader.visibility = View.GONE
-        }, 1000)
+        }
     }
     private fun validateInput(email: String): Boolean {
 

@@ -13,11 +13,11 @@ import com.example.project01.R
 import java.text.SimpleDateFormat
 import java.util.Locale
 
-class HomeRecyclerAdaptor(
+class HomeAdaptor(
 
     private val itemList: List<HomeRecyclerModal>,
     private val onFavClick: (HomeRecyclerModal) -> Unit
-) : RecyclerView.Adapter<HomeRecyclerAdaptor.ViewHolder>() {
+) : RecyclerView.Adapter<HomeAdaptor.ViewHolder>() {
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val titleTextView: TextView = itemView.findViewById(R.id.txttitel)

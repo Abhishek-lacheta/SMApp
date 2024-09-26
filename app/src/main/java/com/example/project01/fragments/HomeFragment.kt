@@ -16,14 +16,14 @@ import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.project01.activity.AddPostHomeActivity
-import com.example.project01.adaptor.HomeRecyclerAdaptor
+import com.example.project01.adaptor.HomeAdaptor
 import com.example.project01.modal.HomeRecyclerModal
 import com.example.project01.R
 import com.example.project01.databinding.FragmentHomeBinding
 import com.google.firebase.firestore.FirebaseFirestore
 
 class HomeFragment : Fragment() {
-    private lateinit var adapter: HomeRecyclerAdaptor
+    private lateinit var adapter: HomeAdaptor
     private lateinit var binding: FragmentHomeBinding
     private var dataList = ArrayList<HomeRecyclerModal>()
     private var db = FirebaseFirestore.getInstance()
@@ -78,7 +78,7 @@ class HomeFragment : Fragment() {
     }
 
     private fun setupRecyclerView() {
-        adapter = HomeRecyclerAdaptor(dataList) { item ->
+        adapter = HomeAdaptor(dataList) { item ->
             toggleFavorite(item)
         }
         binding.recyclerview.adapter = adapter

@@ -11,14 +11,14 @@ import android.widget.Toast
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.project01.adaptor.HomeRecyclerAdaptor
+import com.example.project01.adaptor.HomeAdaptor
 import com.example.project01.databinding.FragmentAddBloackBinding
 import com.example.project01.modal.HomeRecyclerModal
 import com.google.firebase.firestore.FirebaseFirestore
 
 
 class AddBlockFragment : Fragment() {
-private lateinit var adapter: HomeRecyclerAdaptor
+private lateinit var adapter: HomeAdaptor
     private lateinit var binding: FragmentAddBloackBinding
     private var dataList = ArrayList<HomeRecyclerModal>()
     private var db = FirebaseFirestore.getInstance()
@@ -84,7 +84,7 @@ private lateinit var adapter: HomeRecyclerAdaptor
     }
 
     private fun setupRecyclerView() {
-        adapter = HomeRecyclerAdaptor(dataList) { item ->
+        adapter = HomeAdaptor(dataList) { item ->
             toggleFavorite(item)
         }
         binding.recyclerview.adapter = adapter
