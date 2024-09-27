@@ -27,7 +27,7 @@
     <fragment
         android:id="@+id/addBlockFragment"
         android:name="com.example.project01.fragments.AddBlockFragment"
-        tools:layout="@layout/fragment_add_bloack"
+        tools:layout="@layout/fragment_multipal_group"
         android:label="AddBlockFragment" />
     <fragment
         android:id="@+id/userFragment"

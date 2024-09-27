@@ -6,18 +6,18 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.project01.R
-import com.example.project01.modal.GroupRecyclerModal
+import com.example.project01.modal.GroupModal
 
 class GroupRecyclerAdapter(
-    private val itemList: List<GroupRecyclerModal>,
-    private val onItemClick: (GroupRecyclerModal) -> Unit
+    private val itemList: List<GroupModal>,
+    private val onItemClick: (GroupModal) -> Unit
 ) :
     RecyclerView.Adapter<GroupRecyclerAdapter.GroupViewHolder>() {
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): GroupViewHolder {
         val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.group_title_description, parent, false)
+            .inflate(R.layout.item_group, parent, false)
         return GroupViewHolder(view)
     }
 

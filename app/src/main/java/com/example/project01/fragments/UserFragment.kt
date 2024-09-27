@@ -10,20 +10,21 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CircleCrop
+import com.example.project01.R
 import com.example.project01.activity.ChangePasswordActivity
 import com.example.project01.activity.EditProfileActivity
 import com.example.project01.activity.LoginActivity
 import com.example.project01.databinding.FragmentUserBinding
 import com.example.project01.dialogs.DialogUtils
 import com.example.project01.firebase.FirebaseAuthManager
-import com.google.firebase.firestore.FirebaseFirestore
+import com.example.project01.firebase.FirebaseDatabaseManager
 
 
 class UserFragment : Fragment() {
 
     private lateinit var binding: FragmentUserBinding
-    private val db = FirebaseFirestore.getInstance()
     private var authManager = FirebaseAuthManager()
+    private lateinit var firebaseDatabaseManager: FirebaseDatabaseManager
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -35,55 +36,48 @@ class UserFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        authManager = FirebaseAuthManager()
+        firebaseDatabaseManager = FirebaseDatabaseManager(requireContext())
         updateUI()
 
         binding.logoutId.setOnClickListener {
             logout()
         }
-        //Go to Edit profile Activity
+
+        // Go to Edit Profile Activity
         binding.editProfileButton.setOnClickListener {
             val intent = Intent(requireContext(), EditProfileActivity::class.java)
             startActivity(intent)
         }
-        //Go to ChangePassword Activity
+
+        // Go to Change Password Activity
         binding.ChangePassword.setOnClickListener {
             val intent = Intent(requireContext(), ChangePasswordActivity::class.java)
             startActivity(intent)
-
         }
     }
+
     private fun updateUI() {
         val currentUser = authManager.getCurrentUser()
         if (currentUser != null) {
             val userId = currentUser.uid
-            val userRef = db.collection("user").document(userId)
 
-            userRef.get()
-                .addOnSuccessListener { document ->
-                    if (document != null && document.exists()) {
-                        val username = document.getString("name")
-                        val email = document.getString("email")
-                        val profileImageUrl = document.getString("profileImageUrl")
+            // Use FirebaseDataManager to fetch user data
+            firebaseDatabaseManager.getUserData(userId) { username, email, profileImageUrl ->
+                binding.userEmail.text = email ?: "No email"
+                binding.name.text = username ?: "No username"
 
-                        // Display the retrieved values
-                        binding.userEmail.text = email ?: "No email"
-                        binding.name.text = username ?: "No username"
-
-                        profileImageUrl?.let {
-                            Glide.with(this)
-                                .load(it)
-                                .transform(CircleCrop())
-                                .into(binding.profileImageView)
-                        }
-                    } else {
-                        binding.userEmail.text = currentUser.email ?: "No email"
-                        binding.name.text = "No username"
-                    }
+                profileImageUrl?.let {
+                    Glide.with(this)
+                        .load(it)
+                        .transform(CircleCrop())
+                        .into(binding.profileImageView)
+                } ?: run {
+                    binding.profileImageView.setImageResource(R.drawable.ic_defauluser) // Set default image
                 }
+            }
         }
     }
+
     private fun logout() {
         binding.logoutLoader.visibility = View.VISIBLE
         binding.logoutId.visibility = View.GONE
@@ -98,9 +92,7 @@ class UserFragment : Fragment() {
                         activity?.finish()
                     }
                 }
-
             }, 1000)
-
         }
     }
 }

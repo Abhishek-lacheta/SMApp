@@ -8,15 +8,16 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.example.project01.modal.HomeRecyclerModal
+import com.example.project01.modal.HomeModal
 import com.example.project01.R
 import java.text.SimpleDateFormat
 import java.util.Locale
 
 class HomeAdaptor(
-
-    private val itemList: List<HomeRecyclerModal>,
-    private val onFavClick: (HomeRecyclerModal) -> Unit
+    private val itemList: List<HomeModal>,
+    private val onFavClick: (HomeModal) -> Unit,
+    private val onShowPopupMenu: (View, HomeModal) -> Unit = {v, m -> },//{v,m->} default value
+    private val currentUserId: String?
 ) : RecyclerView.Adapter<HomeAdaptor.ViewHolder>() {
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -25,11 +26,12 @@ class HomeAdaptor(
         val imageView: ImageView = itemView.findViewById(R.id.image_view)
         val dateTextView: TextView = itemView.findViewById(R.id.dateTextView)
         val favorite: ImageView = itemView.findViewById(R.id.likeButton)
+        val showPopupMenu: ImageView = itemView.findViewById(R.id.showPopupMenu)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.home_title_description, parent, false)
+            .inflate(R.layout.item_comman, parent, false)
         return ViewHolder(view)
     }
 
@@ -45,17 +47,27 @@ class HomeAdaptor(
         } ?: run {
             holder.dateTextView.text = "Date not available"
         }
-
+        if (currentUserId == item.userId) {
+            holder.showPopupMenu.visibility = View.VISIBLE
+        } else {
+            holder.showPopupMenu.visibility = View.GONE
+        }
         // Load image using Glide
         Glide.with(holder.itemView.context)
             .load(item.imageUrl)
             .into(holder.imageView)
+
         holder.favorite.setImageResource(
             if (item.isFavorite) R.drawable.ic_fav else R.drawable.icon_favorite
         )
-        holder.favorite.setOnClickListener {
 
+        holder.favorite.setOnClickListener {
             onFavClick(item)
+        }
+
+        holder.showPopupMenu.setOnClickListener {
+            // Check if the user is authorized to show the popup
+                onShowPopupMenu(holder.showPopupMenu, item) // Show the popup menu
         }
     }
 

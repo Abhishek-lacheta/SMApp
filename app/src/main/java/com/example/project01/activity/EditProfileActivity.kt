@@ -7,18 +7,16 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContentProviderCompat.requireContext
 import com.bumptech.glide.Glide
 import com.example.project01.R
 import com.example.project01.databinding.ActivityEditProfileBinding
-import com.example.project01.firebase.FirebaseAuthManager
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.storage.FirebaseStorage
+import com.example.project01.firebase.FirebaseDatabaseManager
+
 
 class EditProfileActivity : AppCompatActivity() {
     private lateinit var binding: ActivityEditProfileBinding
-    private var authManager = FirebaseAuthManager()
-    private val db = FirebaseFirestore.getInstance()
+    private lateinit var firebaseDatabaseManager: FirebaseDatabaseManager
     private var profileImageUri: Uri? = null
     private val IMAGE_PICK_CODE = 1000
 
@@ -26,7 +24,8 @@ class EditProfileActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityEditProfileBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        authManager = FirebaseAuthManager()
+
+        firebaseDatabaseManager = FirebaseDatabaseManager(this)
         loadUserData()
 
         binding.buttonEditProfile.setOnClickListener {
@@ -44,30 +43,18 @@ class EditProfileActivity : AppCompatActivity() {
     }
 
     private fun loadUserData() {
-        val currentUser = authManager.getCurrentUser()
-        if (currentUser != null) {
-            val userId = currentUser.uid
-            val userRef = db.collection("user").document(userId)
+        firebaseDatabaseManager.loadUserData { username, email, imageUrl ->
+            binding.editTextUsername.setText(username)
+            binding.editTextEmail.setText(email)
 
-            userRef.get().addOnSuccessListener { document ->
-                if (document != null && document.exists()) {
-                    val username = document.getString("name")
-                    val email = document.getString("email")
-                    val imageUrl = document.getString("profileImageUrl")
-
-                    binding.editTextUsername.setText(username)
-                    binding.editTextEmail.setText(email)
-
-                    // Load profile image if available or set a default image
-                    if (imageUrl.isNullOrEmpty()) {
-                        binding.profileImageView.setImageResource(R.drawable.ic_defauluser) // Default image
-                    } else {
-                        Glide.with(this)
-                            .load(imageUrl)
-                            .circleCrop() // Make image circular
-                            .into(binding.profileImageView)
-                    }
-                }
+            // Load profile image if available or set a default image
+            if (imageUrl.isNullOrEmpty()) {
+                binding.profileImageView.setImageResource(R.drawable.ic_defauluser) // Default image
+            } else {
+                Glide.with(this)
+                    .load(imageUrl)
+                    .circleCrop() // Make image circular
+                    .into(binding.profileImageView)
             }
         }
     }
@@ -97,42 +84,14 @@ class EditProfileActivity : AppCompatActivity() {
         val username = binding.editTextUsername.text.toString()
         val email = binding.editTextEmail.text.toString()
 
-        val currentUser = authManager.getCurrentUser()
-        if (currentUser != null) {
-            val userId = currentUser.uid
-            val userRef = db.collection("user").document(userId)
-
-            userRef.update("name", username, "email", email)
-                .addOnSuccessListener {
-                    Toast.makeText(this, "Profile updated", Toast.LENGTH_SHORT).show()
-                    // Handle image upload if needed
-                    profileImageUri?.let { uri ->
-                        uploadImageToStorage(uri, userId)
-                    }
-                }
-                .addOnFailureListener { e ->
-                    Log.w("EditProfileFragment", "Error updating profile", e)
-                }
-        }
-    }
-
-    private fun uploadImageToStorage(uri: Uri, userId: String) {
-        val storageRef = FirebaseStorage.getInstance().reference.child("profile_images/$userId.jpg")
-        storageRef.putFile(uri)
-            .addOnSuccessListener {
-                storageRef.downloadUrl.addOnSuccessListener { downloadUri ->
-                    val userRef = db.collection("user").document(userId)
-                    userRef.update("profileImageUrl", downloadUri.toString())
-                        .addOnSuccessListener {
-                            Log.d("EditProfileFragment", "Profile image updated")
-                        }
-                        .addOnFailureListener { e ->
-                            Log.w("EditProfileFragment", "Error updating profile image", e)
-                        }
-                }
+        firebaseDatabaseManager.saveProfile(username, email, profileImageUri,
+            onSuccess = {
+                Toast.makeText(this, "Profile updated", Toast.LENGTH_SHORT).show()
+            },
+            onFailure = { e ->
+                Log.w("EditProfileActivity", "Error updating profile", e)
+                Toast.makeText(this, "Error updating profile", Toast.LENGTH_SHORT).show()
             }
-            .addOnFailureListener { e ->
-                Log.w("EditProfileFragment", "Error uploading image", e)
-            }
+        )
     }
 }

@@ -9,22 +9,27 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.PopupMenu
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.project01.activity.AddPostHomeActivity
 import com.example.project01.adaptor.HomeAdaptor
-import com.example.project01.modal.HomeRecyclerModal
+import com.example.project01.modal.HomeModal
 import com.example.project01.R
 import com.example.project01.databinding.FragmentHomeBinding
+import com.example.project01.firebase.FirebaseAuthManager
 import com.example.project01.firebase.FirebaseDatabaseManager
 
 
 class HomeFragment : Fragment() {
     private lateinit var adapter: HomeAdaptor
     private lateinit var binding: FragmentHomeBinding
-    private var dataList = ArrayList<HomeRecyclerModal>()
+    private var dataList = ArrayList<HomeModal>()
     private lateinit var firebaseDatabaseManager: FirebaseDatabaseManager
+    private val authManager = FirebaseAuthManager()
+
 
     @SuppressLint("MissingInflatedId")
     override fun onCreateView(
@@ -62,15 +67,7 @@ class HomeFragment : Fragment() {
             setupRecyclerView() // Initialize the adapter
         }
     }
-
-    private fun setupRecyclerView() {
-        adapter = HomeAdaptor(dataList) { item ->
-            toggleFavorite(item)
-        }
-        binding.recyclerview.adapter = adapter
-    }
-
-    private fun toggleFavorite(item: HomeRecyclerModal) {
+    private fun toggleFavorite(item: HomeModal) {
         val newFavoriteStatus = !item.isFavorite
         item.isFavorite = newFavoriteStatus // Update local state
 
@@ -94,5 +91,15 @@ class HomeFragment : Fragment() {
             else -> super.onOptionsItemSelected(item)
         }
     }
+    private fun setupRecyclerView() {
+        val currentUserId = authManager.getCurrentUser()?.uid // Get the current user's UID
+        adapter = HomeAdaptor(
+            itemList = dataList,
+            onFavClick = { item -> toggleFavorite(item) },
+            currentUserId = currentUserId
+        )
+        binding.recyclerview.adapter = adapter
+    }
+
 }
 

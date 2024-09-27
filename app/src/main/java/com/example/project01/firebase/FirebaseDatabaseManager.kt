@@ -4,8 +4,8 @@ import android.content.Context
 import android.net.Uri
 import android.util.Log
 import android.widget.Toast
-import com.example.project01.modal.GroupRecyclerModal
-import com.example.project01.modal.HomeRecyclerModal
+import com.example.project01.modal.GroupModal
+import com.example.project01.modal.HomeModal
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
@@ -14,18 +14,19 @@ import java.util.UUID
 class FirebaseDatabaseManager(private val context: Context) {
     private val database = FirebaseFirestore.getInstance()
     private val storage = FirebaseStorage.getInstance()
+    private var authManager = FirebaseAuthManager()
 
     //Home fragment fetch home collection
-    fun fetchDataHomeFromFireStore(callback: (List<HomeRecyclerModal>) -> Unit) {
+    fun fetchDataHomeFromFireStore(callback: (List<HomeModal>) -> Unit) {
         database.collection("home").get()
             .addOnSuccessListener { result ->
-                val dataList = ArrayList<HomeRecyclerModal>()
+                val dataList = ArrayList<HomeModal>()
                 if (result.isEmpty) {
                     Toast.makeText(context, "No data found", Toast.LENGTH_SHORT).show()
                     callback(dataList)
                 } else {
                     for (document in result.documents) {
-                        val item = document.toObject(HomeRecyclerModal::class.java)
+                        val item = document.toObject(HomeModal::class.java)
                         item?.let {
                             it.id = document.id // Set the document ID
                             dataList.add(it)
@@ -45,7 +46,7 @@ class FirebaseDatabaseManager(private val context: Context) {
     }
 
     // Update result from fragment this is commen function
-    fun FavoriteStatus(item: HomeRecyclerModal, newFavoriteStatus: Boolean) {
+    fun FavoriteStatus(item: HomeModal, newFavoriteStatus: Boolean) {
         item.id?.let {
             database.collection("home").document(it).update("isFavorite", newFavoriteStatus)
                 .addOnSuccessListener {
@@ -58,12 +59,12 @@ class FirebaseDatabaseManager(private val context: Context) {
     }
 
     //Group Fragment fetch group collection
-    fun fetchDataGroupFromeFireStore(callback: (List<GroupRecyclerModal>) -> Unit) {
-        database.collection("group").get()
+    fun fetchDataGroupFromeFireStore(callback: (List<GroupModal>) -> Unit) {
+        database.collection("group").whereEqualTo("userId", authManager.getCurrentUser()?.uid).get()
             .addOnSuccessListener { result ->
-                val dataList = ArrayList<GroupRecyclerModal>()
+                val dataList = ArrayList<GroupModal>()
                 for (document in result.documents) {
-                    val item = document.toObject(GroupRecyclerModal::class.java)
+                    val item = document.toObject(GroupModal::class.java)
                     item?.id = document.id
                     item?.let { dataList.add(it) }
                 }
@@ -81,14 +82,14 @@ class FirebaseDatabaseManager(private val context: Context) {
 
 
     // favrate Fragment fetch home data
-    fun fetchFavoriteItemsFromFirebase(callback: (List<HomeRecyclerModal>) -> Unit) {
+    fun fetchFavoriteItemsFromFirebase(callback: (List<HomeModal>) -> Unit) {
         database.collection("home")
-            .whereEqualTo("isFavorite", true) // Filter for favorites
+            .whereEqualTo("isFavorite", true)
             .get()
             .addOnSuccessListener { result ->
-                val dataList = ArrayList<HomeRecyclerModal>()
+                val dataList = ArrayList<HomeModal>()
                 for (document in result.documents) {
-                    val item = document.toObject(HomeRecyclerModal::class.java)
+                    val item = document.toObject(HomeModal::class.java)
                     item?.id = document.id
                     item?.let { dataList.add(it) }
                 }
@@ -105,14 +106,15 @@ class FirebaseDatabaseManager(private val context: Context) {
     }
 
     //MultipalGroupFragment fetch data groupById
-    fun fetchDataByGroupId(groupId: String, callback: (List<HomeRecyclerModal>) -> Unit) {
+    fun fetchDataByGroupId(groupId: String, callback: (List<HomeModal>) -> Unit) {
         database.collection("home")
             .whereEqualTo("groupId", groupId)
+            .whereEqualTo("userId", authManager.getCurrentUser()?.uid)
             .get()
             .addOnSuccessListener { result ->
-                val dataList = ArrayList<HomeRecyclerModal>()
+                val dataList = ArrayList<HomeModal>()
                 for (document in result.documents) {
-                    val item = document.toObject(HomeRecyclerModal::class.java)
+                    val item = document.toObject(HomeModal::class.java)
                     item?.id = document.id
                     item?.let { dataList.add(it) }
                 }
@@ -127,10 +129,24 @@ class FirebaseDatabaseManager(private val context: Context) {
                 callback(emptyList())
             }
     }
+    // MultipalGroupFragment Delete a document
+    fun deleteData(documentId: String, callback: (Boolean) -> Unit) {
+        database.collection("home")
+            .document(documentId)
+            .delete()
+            .addOnSuccessListener {
+                callback(true)
+            }
+            .addOnFailureListener { e ->
+                Toast.makeText(context, "Error deleting document: ${e.message}", Toast.LENGTH_LONG).show()
+                callback(false)
+            }
+    }
+
 
     // AddPostGroupActivity image upload and save data
     fun uploadImageAndSaveData(imageUri: Uri, name: String, callback: (Boolean) -> Unit) {
-        val homeMap = hashMapOf("name" to name)
+        val homeMap = hashMapOf("name" to name, "userId" to authManager.getCurrentUser()?.uid)
         val storageRef = storage.reference
         val imageRef = storageRef.child("images/${UUID.randomUUID()}.jpg")
 
@@ -148,7 +164,7 @@ class FirebaseDatabaseManager(private val context: Context) {
     }
 
     //AddPostGroup Activity save data in group collection
-    private fun saveGroupData(homeMap: HashMap<String, String>, callback: (Boolean) -> Unit) {
+    private fun saveGroupData(homeMap: HashMap<String, String?>, callback: (Boolean) -> Unit) {
         database.collection("group").document().set(homeMap)
             .addOnSuccessListener {
                 Toast.makeText(context, "Successfully Added Data", Toast.LENGTH_SHORT).show()
@@ -193,7 +209,8 @@ class FirebaseDatabaseManager(private val context: Context) {
             "desc" to desc,
             "created_at" to FieldValue.serverTimestamp(),
             "groupId" to (selectedGroupId ?: ""), // Add groupId to the homeMap
-            "isFavorite" to isFavorite // Add favorite status to homeMap,
+            "isFavorite" to isFavorite ,
+            "userId" to authManager.getCurrentUser()?.uid
         )
         val storageRef = storage.reference
         val imageRef = storageRef.child("images/${UUID.randomUUID()}.jpg")
@@ -212,7 +229,7 @@ class FirebaseDatabaseManager(private val context: Context) {
     }
 
     //AddPostHomeActivity save data
-    private fun saveHomeData(homeMap: HashMap<String, Any>, callback: (Boolean) -> Unit) {
+    private fun saveHomeData(homeMap: HashMap<String, Any?>, callback: (Boolean) -> Unit) {
         database.collection("home").document().set(homeMap)
             .addOnSuccessListener {
                 Toast.makeText(context, "Successfully Added Data", Toast.LENGTH_SHORT).show()
@@ -222,6 +239,89 @@ class FirebaseDatabaseManager(private val context: Context) {
                 Toast.makeText(context, "Failed to add data", Toast.LENGTH_SHORT).show()
                 callback(false) // Notify failure
             }
+    }
+
+    //EditProfileActivity
+    fun loadUserData(onDataLoaded: (username: String?, email: String?, imageUrl: String?) -> Unit) {
+        val currentUser = authManager.getCurrentUser()
+        if (currentUser != null) {
+            val userId = currentUser.uid
+            val userRef = database.collection("user").document(userId)
+
+            userRef.get().addOnSuccessListener { document ->
+                if (document != null && document.exists()) {
+                    val username = document.getString("name")
+                    val email = document.getString("email")
+                    val imageUrl = document.getString("profileImageUrl")
+                    onDataLoaded(username, email, imageUrl)
+                }
+            }
+        }
+    }
+
+    //EditProfileActivity
+    fun saveProfile(
+        username: String,
+        email: String,
+        profileImageUri: Uri?,
+        onSuccess: () -> Unit,
+        onFailure: (Exception) -> Unit
+    ) {
+        val currentUser = authManager.getCurrentUser()
+        if (currentUser != null) {
+            val userId = currentUser.uid
+            val userRef = database.collection("user").document(userId)
+
+            userRef.update("name", username, "email", email)
+                .addOnSuccessListener {
+                    onSuccess()
+                    profileImageUri?.let { uri ->
+                        uploadImageToStorage(uri, userId)
+                    }
+                }
+                .addOnFailureListener { e ->
+                    onFailure(e)
+                }
+        }
+    }
+
+    //EditProfileActivity
+    private fun uploadImageToStorage(uri: Uri, userId: String) {
+        val storageRef = FirebaseStorage.getInstance().reference.child("profile_images/$userId.jpg")
+        storageRef.putFile(uri)
+            .addOnSuccessListener {
+                storageRef.downloadUrl.addOnSuccessListener { downloadUri ->
+                    val userRef = database.collection("user").document(userId)
+                    userRef.update("profileImageUrl", downloadUri.toString())
+                        .addOnSuccessListener {
+                            Log.d("FirebaseDataManager", "Profile image updated")
+                        }
+                        .addOnFailureListener { e ->
+                            Log.w("FirebaseDataManager", "Error updating profile image", e)
+                        }
+                }
+            }
+    }
+
+    //UserFragment
+    fun getUserData(
+        userId: String,
+        onDataLoaded: (username: String?, email: String?, profileImageUrl: String?) -> Unit
+    ) {
+        val userRef = database.collection("user").document(userId)
+        userRef.get().addOnSuccessListener { document ->
+            if (document != null && document.exists()) {
+                val username = document.getString("name")
+                val email = document.getString("email")
+                val profileImageUrl = document.getString("profileImageUrl")
+                onDataLoaded(username, email, profileImageUrl)
+            } else {
+                onDataLoaded(null, null, null)
+            }
+        }.addOnFailureListener { e ->
+            Log.w("FirebaseDataManager", "Error getting user data", e)
+            onDataLoaded(null, null, null)
+        }
     }
 }
 

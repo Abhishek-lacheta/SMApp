@@ -15,13 +15,13 @@ import com.example.project01.R
 import com.example.project01.activity.AddPostGroupActivity
 import com.example.project01.databinding.FragmentGroupsBinding
 import com.example.project01.firebase.FirebaseDatabaseManager
-import com.example.project01.modal.GroupRecyclerModal
+import com.example.project01.modal.GroupModal
 
 class GroupsFragment : Fragment() {
 
     private lateinit var binding: FragmentGroupsBinding
     private lateinit var groupRecyclerAdapter: GroupRecyclerAdapter
-    private val itemList = mutableListOf<GroupRecyclerModal>()
+    private val itemList = mutableListOf<GroupModal>()
     private lateinit var databaseManager: FirebaseDatabaseManager
 
     override fun onCreateView(
@@ -52,7 +52,7 @@ class GroupsFragment : Fragment() {
         fetchGroupData()
     }
 
-    fun onItemClick(model: GroupRecyclerModal) {
+    fun onItemClick(model: GroupModal) {
         // Create a Bundle to pass the modal ID
         val bundle = Bundle().apply {
             putString("modalId", model.id)

@@ -9,15 +9,18 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.project01.adaptor.HomeAdaptor
 import com.example.project01.databinding.FragmentFavoriteBinding
+import com.example.project01.firebase.FirebaseAuthManager
 import com.example.project01.firebase.FirebaseDatabaseManager
-import com.example.project01.modal.HomeRecyclerModal
+import com.example.project01.modal.HomeModal
 
 
 class FavoriteFragment : Fragment() {
     private lateinit var adapter: HomeAdaptor
     private lateinit var binding: FragmentFavoriteBinding
-    private var dataList = ArrayList<HomeRecyclerModal>()
+    private var dataList = ArrayList<HomeModal>()
     private lateinit var databaseManager: FirebaseDatabaseManager
+    private val authManager = FirebaseAuthManager()
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -47,18 +50,23 @@ class FavoriteFragment : Fragment() {
             }
         }
     }
-
-    private fun setupRecyclerView() {
-        adapter = HomeAdaptor(dataList) { item -> toggleFavorite(item) }
-        binding.recyclerview.adapter = adapter
-    }
-
-    private fun toggleFavorite(item: HomeRecyclerModal) {
+    private fun toggleFavorite(item: HomeModal) {
         val newFavoriteStatus = !item.isFavorite
         item.isFavorite = newFavoriteStatus // Update local state
 
         adapter.notifyDataSetChanged()
         // Update the Firestore document with the new favorite status
         databaseManager.FavoriteStatus(item, newFavoriteStatus)
+    }
+
+
+    private fun setupRecyclerView() {
+        val currentUserId = authManager.getCurrentUser()?.uid // Get the current user's UID
+        adapter = HomeAdaptor(
+            itemList = dataList,
+            onFavClick = { item -> toggleFavorite(item) },
+            currentUserId = currentUserId
+        )
+        binding.recyclerview.adapter = adapter
     }
 }
