@@ -16,6 +16,8 @@ class FirebaseDatabaseManager(private val context: Context) {
     private val storage = FirebaseStorage.getInstance()
     private var authManager = FirebaseAuthManager()
 
+
+    // Fetch home collection data
     //Home fragment fetch home collection
     fun fetchDataHomeFromFireStore(callback: (List<HomeModal>) -> Unit) {
         database.collection("home").get()
@@ -44,20 +46,37 @@ class FirebaseDatabaseManager(private val context: Context) {
                 callback(emptyList())
             }
     }
+    // Toggle like status like funcnality
+    fun toggleLike(postId: String, userId: String, isLiked: Boolean, callback: (Boolean) -> Unit) {
+        val postRef = database.collection("home").document(postId)
 
-    // Update result from fragment this is commen function
-    fun FavoriteStatus(item: HomeModal, newFavoriteStatus: Boolean) {
-        item.id?.let {
-            database.collection("home").document(it).update("isFavorite", newFavoriteStatus)
-                .addOnSuccessListener {
-                    Log.d("FavoriteStatus", "Favorite status updated successfully.")
+        postRef.get().addOnSuccessListener { document ->
+            if (document.exists()) {
+                val homeModal = document.toObject(HomeModal::class.java)
+                homeModal?.let {
+                    if (isLiked) {
+                        // Add user to likedBy list and increment likeCount
+                        it.likedBy = it.likedBy + userId
+                        it.likeCount += 1
+                    } else {
+                        // Remove user from likedBy list and decrement likeCount
+                        it.likedBy = it.likedBy.filter { id -> id != userId }
+                        it.likeCount -= 1
+                    }
+                    // Update the Firestore document
+                    postRef.set(it).addOnSuccessListener {
+                        callback(true)
+                    }.addOnFailureListener { e ->
+                        Log.e("LikePost", "Error updating like status", e)
+                        callback(false)
+                    }
                 }
-                .addOnFailureListener { e ->
-                    Log.e("FavoriteStatus", "Error updating favorite status", e)
-                }
+            }
+        }.addOnFailureListener { e ->
+            Log.e("LikePost", "Error fetching post", e)
+            callback(false)
         }
     }
-
     //Group Fragment fetch group collection
     fun fetchDataGroupFromeFireStore(callback: (List<GroupModal>) -> Unit) {
         database.collection("group").whereEqualTo("userId", authManager.getCurrentUser()?.uid).get()
@@ -84,7 +103,7 @@ class FirebaseDatabaseManager(private val context: Context) {
     // favrate Fragment fetch home data
     fun fetchFavoriteItemsFromFirebase(callback: (List<HomeModal>) -> Unit) {
         database.collection("home")
-            .whereEqualTo("isFavorite", true)
+            .whereEqualTo("likedByCurrentUser", true)
             .get()
             .addOnSuccessListener { result ->
                 val dataList = ArrayList<HomeModal>()
@@ -129,6 +148,7 @@ class FirebaseDatabaseManager(private val context: Context) {
                 callback(emptyList())
             }
     }
+
     // MultipalGroupFragment Delete a document
     fun deleteData(documentId: String, callback: (Boolean) -> Unit) {
         database.collection("home")
@@ -138,7 +158,8 @@ class FirebaseDatabaseManager(private val context: Context) {
                 callback(true)
             }
             .addOnFailureListener { e ->
-                Toast.makeText(context, "Error deleting document: ${e.message}", Toast.LENGTH_LONG).show()
+                Toast.makeText(context, "Error deleting document: ${e.message}", Toast.LENGTH_LONG)
+                    .show()
                 callback(false)
             }
     }
@@ -209,7 +230,7 @@ class FirebaseDatabaseManager(private val context: Context) {
             "desc" to desc,
             "created_at" to FieldValue.serverTimestamp(),
             "groupId" to (selectedGroupId ?: ""), // Add groupId to the homeMap
-            "isFavorite" to isFavorite ,
+            "isFavorite" to isFavorite,
             "userId" to authManager.getCurrentUser()?.uid
         )
         val storageRef = storage.reference

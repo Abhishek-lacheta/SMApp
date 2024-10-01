@@ -8,8 +8,8 @@ import android.util.Log
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
-import android.widget.EditText
 import android.widget.Spinner
+import android.widget.Toast
 import com.example.project01.R
 import com.example.project01.databinding.ActivityAddPostHomeBinding
 import com.example.project01.firebase.FirebaseDatabaseManager
@@ -26,7 +26,6 @@ class AddPostHomeActivity : AppCompatActivity() {
     private var selectedGroupId: String? = null
     private var isFavorite: Boolean = false
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityAddPostHomeBinding.inflate(layoutInflater)
@@ -34,13 +33,12 @@ class AddPostHomeActivity : AppCompatActivity() {
 
         databaseManager = FirebaseDatabaseManager(this)
 
-
         // Retrieve the passed data
         val itemTitle = intent.getStringExtra("itemtitle")
         val itemDescription = intent.getStringExtra("itemdes")
 
         // Set the data to EditTexts
-      binding.homeTitleId.setText(itemTitle)
+        binding.homeTitleId.setText(itemTitle)
         binding.homeDescId.setText(itemDescription)
 
         binding.hometoolbar.setTitle("Add Post")
@@ -104,7 +102,6 @@ class AddPostHomeActivity : AppCompatActivity() {
             binding.imageView.visibility = View.VISIBLE
         }
     }
-
     private fun uploadImageAndSaveData() {
         binding.submitLoader.visibility = View.VISIBLE
         binding.homeButtonId.visibility = View.GONE
@@ -116,7 +113,6 @@ class AddPostHomeActivity : AppCompatActivity() {
             databaseManager.uploadImageAndSaveData(uri, title, desc, selectedGroupId, isFavorite) { success ->
                 binding.submitLoader.visibility = View.GONE
                 binding.homeButtonId.visibility = View.VISIBLE
-
             }
         }
     }

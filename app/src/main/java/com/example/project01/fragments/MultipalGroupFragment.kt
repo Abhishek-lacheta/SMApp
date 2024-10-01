@@ -19,6 +19,7 @@ import com.example.project01.databinding.FragmentMultipalGroupBinding
 import com.example.project01.firebase.FirebaseAuthManager
 import com.example.project01.firebase.FirebaseDatabaseManager
 import com.example.project01.modal.HomeModal
+import com.google.firebase.auth.FirebaseAuth
 
 class AddBlockFragment : Fragment() {
     private lateinit var adapter: HomeAdaptor
@@ -71,25 +72,41 @@ class AddBlockFragment : Fragment() {
             }
         }
     }
-    private fun toggleFavorite(item: HomeModal) {
-        val newFavoriteStatus = !item.isFavorite
-        item.isFavorite = newFavoriteStatus // Update local state
 
-        adapter.notifyDataSetChanged()
-        // Update the Firestore document with the new favorite status
-        databaseManager.FavoriteStatus(item, newFavoriteStatus)
+    private fun toggleLike(item: HomeModal) {
+        val currentUserId = FirebaseAuth.getInstance().currentUser?.uid ?: return
+        val newLikedStatus = !item.isLikedByCurrentUser // Toggle the like status
+
+        databaseManager.toggleLike(item.id!!, currentUserId, newLikedStatus) { success ->
+            if (success) {
+                // Update local state based on newLikedStatus
+                if (newLikedStatus) {
+                    // User just liked the post
+                    item.likedBy = item.likedBy + currentUserId
+                    item.likeCount += 1
+                } else {
+                    // User just unliked the post
+                    item.likedBy = item.likedBy.filter { id -> id != currentUserId }
+                    item.likeCount -= 1
+                }
+                adapter.notifyItemChanged(dataList.indexOf(item)) // Notify adapter of changes
+            } else {
+                Toast.makeText(context, "Failed to update like", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 
     private fun setupRecyclerView() {
         val currentUserId = authManager.getCurrentUser()?.uid // Get the current user's UID
         adapter = HomeAdaptor(
             itemList = dataList,
-            onFavClick = { item -> toggleFavorite(item) },
             onShowPopupMenu = { view, item -> showPopupMenu(view, item) },
-            currentUserId = currentUserId
+            currentUserId = currentUserId,
+            onLikeClick = { item -> toggleLike(item) } // Pass the like click handler
         )
         binding.recyclerview.adapter = adapter
     }
+
 
     private fun deleteItem(item: HomeModal): Boolean {
         item.id?.let { documentId ->
@@ -108,6 +125,7 @@ class AddBlockFragment : Fragment() {
 
         return true
     }
+
     private fun showPopupMenu(view: View, item: HomeModal) {
         val popupMenu = PopupMenu(requireContext(), view)
         popupMenu.menuInflater.inflate(R.menu.popup_menu, popupMenu.menu)
@@ -117,20 +135,19 @@ class AddBlockFragment : Fragment() {
                 R.id.confirm_delete -> deleteItem(item)
                 R.id.update -> {
                     val intent = Intent(requireContext(), AddPostHomeActivity::class.java).apply {
-                        putExtra("id",item.id)
-                        putExtra("itemtitle",item.title)
-                        putExtra("itemdes",item.desc)
+                        putExtra("id", item.id)
+                        putExtra("itemtitle", item.title)
+                        putExtra("itemdes", item.desc)
                     }
                     startActivity(intent)
                     true
                 }
+
                 else -> false
             }
         }
 
         popupMenu.show()
     }
-
-
 }
 

@@ -15,9 +15,9 @@ import java.util.Locale
 
 class HomeAdaptor(
     private val itemList: List<HomeModal>,
-    private val onFavClick: (HomeModal) -> Unit,
-    private val onShowPopupMenu: (View, HomeModal) -> Unit = {v, m -> },//{v,m->} default value
-    private val currentUserId: String?
+    private val onShowPopupMenu: (View, HomeModal) -> Unit = { v, m -> },
+    private val currentUserId: String?,
+    private val onLikeClick: (HomeModal) -> Unit // Added parameter for like click
 ) : RecyclerView.Adapter<HomeAdaptor.ViewHolder>() {
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -26,6 +26,7 @@ class HomeAdaptor(
         val imageView: ImageView = itemView.findViewById(R.id.image_view)
         val dateTextView: TextView = itemView.findViewById(R.id.dateTextView)
         val favorite: ImageView = itemView.findViewById(R.id.likeButton)
+        val likeCount: TextView = itemView.findViewById(R.id.likesCount)
         val showPopupMenu: ImageView = itemView.findViewById(R.id.showPopupMenu)
     }
 
@@ -37,8 +38,10 @@ class HomeAdaptor(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = itemList[position]
+
         holder.titleTextView.text = item.title
         holder.descTextView.text = item.desc
+        holder.likeCount.text = "${item.likeCount} likes" // Set like count text
 
         item.created_at?.let {
             val date = it.toDate()
@@ -47,6 +50,7 @@ class HomeAdaptor(
         } ?: run {
             holder.dateTextView.text = "Date not available"
         }
+
         if (currentUserId == item.userId) {
             holder.showPopupMenu.visibility = View.VISIBLE
         } else {
@@ -57,19 +61,25 @@ class HomeAdaptor(
             .load(item.imageUrl)
             .into(holder.imageView)
 
+        // Update like button based on whether the user liked the post
         holder.favorite.setImageResource(
-            if (item.isFavorite) R.drawable.ic_fav else R.drawable.icon_favorite
+            if (item.isLikedByCurrentUser) R.drawable.ic_fav else R.drawable.icon_favorite
         )
 
+        // Handle like button click
         holder.favorite.setOnClickListener {
-            onFavClick(item)
+            onLikeClick(item)
         }
 
+        // Show popup menu on click
         holder.showPopupMenu.setOnClickListener {
-            // Check if the user is authorized to show the popup
-                onShowPopupMenu(holder.showPopupMenu, item) // Show the popup menu
+            onShowPopupMenu(holder.showPopupMenu, item)
         }
     }
 
     override fun getItemCount(): Int = itemList.size
 }
+
+
+
+
