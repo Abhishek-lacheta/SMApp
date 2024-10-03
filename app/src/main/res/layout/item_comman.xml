@@ -42,14 +42,22 @@
                     android:textSize="17sp"
                     android:textStyle="bold" />
 
+                <ImageButton
+                    android:id="@+id/Comment"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_marginEnd="20dp"
+                    android:background="?attr/selectableItemBackground"
+                    android:src="@drawable/baseline_comment_24" />
+
                 <TextView
                     android:id="@+id/likesCount"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="0 likes"
                     android:layout_marginEnd="10dp"
-                    android:textSize="17sp"
-                    android:textColor="@color/black"/>
+                    android:text="0 likes"
+                    android:textColor="@color/black"
+                    android:textSize="17sp" />
 
                 <ImageButton
                     android:id="@+id/likeButton"
@@ -58,6 +66,7 @@
                     android:layout_marginEnd="20dp"
                     android:background="?attr/selectableItemBackground"
                     android:src="@drawable/icon_favorite" />
+
                 <TextView
                     android:id="@+id/dateTextView"
                     android:layout_width="wrap_content"
@@ -72,7 +81,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="10dp"
-                    android:src="@drawable/ic_navbutton"/>
+                    android:src="@drawable/ic_navbutton" />
             </LinearLayout>
 
             <TextView
@@ -83,6 +92,8 @@
                 android:layout_marginTop="5dp"
                 android:text="@string/Description"
                 android:textSize="15dp" />
+
+
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 </LinearLayout>

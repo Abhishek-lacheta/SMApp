@@ -34,5 +34,10 @@
         android:name="com.example.project01.fragments.UserFragment"
         tools:layout="@layout/fragment_user"
         android:label="User" />
+    <fragment
+        android:id="@+id/bottomSeatFragment"
+        android:name="com.example.project01.fragments.BottomSeatFragment"
+        android:label="fragment_bottom_seat"
+        tools:layout="@layout/bottom_seat_dialog" />
 
 </navigation>

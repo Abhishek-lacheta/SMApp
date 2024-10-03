@@ -61,6 +61,12 @@ class AddBlockFragment : Fragment() {
         }
     }
 
+    fun Oncomment(modal: HomeModal){
+        findNavController().navigate(R.id.bottomSeatFragment)
+
+
+    }
+
     private fun fetchDataFromFirestore() {
         databaseManager.fetchDataByGroupId(modalId) { fetchedList ->
             if (fetchedList.isEmpty()) {
@@ -102,7 +108,8 @@ class AddBlockFragment : Fragment() {
             itemList = dataList,
             onShowPopupMenu = { view, item -> showPopupMenu(view, item) },
             currentUserId = currentUserId,
-            onLikeClick = { item -> toggleLike(item) } // Pass the like click handler
+            onLikeClick = { item -> toggleLike(item) } ,// Pass the like click handler
+            Oncomment={item-> Oncomment(item)}
         )
         binding.recyclerview.adapter = adapter
     }

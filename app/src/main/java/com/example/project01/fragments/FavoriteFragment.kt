@@ -6,7 +6,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.project01.R
 import com.example.project01.adaptor.HomeAdaptor
 import com.example.project01.databinding.FragmentFavoriteBinding
 import com.example.project01.firebase.FirebaseAuthManager
@@ -39,6 +41,13 @@ class FavoriteFragment : Fragment() {
 
         fetchFavoriteData()
     }
+
+    fun Oncomment(modal: HomeModal){
+        findNavController().navigate(R.id.bottomSeatFragment)
+
+
+    }
+
 
     private fun fetchFavoriteData() {
         databaseManager.fetchFavoriteItemsFromFirebase { fetchedList ->
@@ -80,7 +89,8 @@ class FavoriteFragment : Fragment() {
             itemList = dataList,
             onShowPopupMenu = { view, item -> /* Handle popup menu */ },
             currentUserId = currentUserId,
-            onLikeClick = { item -> toggleLike(item) } // Pass the like click handler
+            onLikeClick = { item -> toggleLike(item) },// Pass the like click handler
+            Oncomment={item-> Oncomment(item)}
         )
         binding.recyclerview.adapter = adapter
     }

@@ -1,6 +1,5 @@
 package com.example.project01.adaptor
 
-
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,6 +14,7 @@ import java.util.Locale
 
 class HomeAdaptor(
     private val itemList: List<HomeModal>,
+    private val Oncomment: (HomeModal) -> Unit,
     private val onShowPopupMenu: (View, HomeModal) -> Unit = { v, m -> },
     private val currentUserId: String?,
     private val onLikeClick: (HomeModal) -> Unit // Added parameter for like click
@@ -28,6 +28,7 @@ class HomeAdaptor(
         val favorite: ImageView = itemView.findViewById(R.id.likeButton)
         val likeCount: TextView = itemView.findViewById(R.id.likesCount)
         val showPopupMenu: ImageView = itemView.findViewById(R.id.showPopupMenu)
+        val comment:ImageView=itemView.findViewById(R.id.Comment)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -60,23 +61,24 @@ class HomeAdaptor(
         Glide.with(holder.itemView.context)
             .load(item.imageUrl)
             .into(holder.imageView)
-
         // Update like button based on whether the user liked the post
         holder.favorite.setImageResource(
             if (item.isLikedByCurrentUser) R.drawable.ic_fav else R.drawable.icon_favorite
         )
-
         // Handle like button click
         holder.favorite.setOnClickListener {
             onLikeClick(item)
         }
-
         // Show popup menu on click
         holder.showPopupMenu.setOnClickListener {
             onShowPopupMenu(holder.showPopupMenu, item)
         }
-    }
 
+        holder.comment.setOnClickListener {
+            Oncomment(item)
+        }
+
+    }
     override fun getItemCount(): Int = itemList.size
 }
 

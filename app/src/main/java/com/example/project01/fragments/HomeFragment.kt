@@ -12,12 +12,14 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.project01.activity.AddPostHomeActivity
 import com.example.project01.adaptor.HomeAdaptor
 import com.example.project01.modal.HomeModal
 import com.example.project01.R
 import com.example.project01.databinding.FragmentHomeBinding
+import com.example.project01.dialogs.BottomSeatFragment
 import com.example.project01.firebase.FirebaseAuthManager
 import com.example.project01.firebase.FirebaseDatabaseManager
 import com.google.firebase.auth.FirebaseAuth
@@ -51,12 +53,24 @@ class HomeFragment : Fragment() {
         val toolbar = binding.hometoolbar
         activity.setSupportActionBar(toolbar)
         setHasOptionsMenu(true)
-
         // Setup RecyclerView
         binding.recyclerview.layoutManager = LinearLayoutManager(context)
 
         // Fetch Data from Firestore
         fetchHomeData()
+    }
+
+    fun Oncomment(modal: HomeModal) {
+
+        val bundle = Bundle().apply {
+
+            putString("postId", modal.id)
+        }
+        val bottomSheet = BottomSeatFragment().apply {
+            arguments = bundle
+        }
+
+        bottomSheet.show(parentFragmentManager, bottomSheet.tag)
     }
 
     private fun fetchHomeData() {
@@ -67,6 +81,7 @@ class HomeFragment : Fragment() {
             setupRecyclerView() // Initialize the adapter
         }
     }
+
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.home_menu, menu)
         super.onCreateOptionsMenu(menu, inflater)
@@ -79,9 +94,11 @@ class HomeFragment : Fragment() {
                 startActivity(intent)
                 true
             }
+
             else -> super.onOptionsItemSelected(item)
         }
     }
+
     private fun toggleLike(item: HomeModal) {
         val currentUserId = FirebaseAuth.getInstance().currentUser?.uid ?: return
         val newLikedStatus = !item.isLikedByCurrentUser // Toggle the like status
@@ -110,7 +127,8 @@ class HomeFragment : Fragment() {
         adapter = HomeAdaptor(
             itemList = dataList,
             currentUserId = currentUserId,
-            onLikeClick = { item -> toggleLike(item) } // Pass the like click handler
+            onLikeClick = { item -> toggleLike(item) },// like click handler
+            Oncomment = { item -> Oncomment(item) }
         )
         binding.recyclerview.adapter = adapter
     }

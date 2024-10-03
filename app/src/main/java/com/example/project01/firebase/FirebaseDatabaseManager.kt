@@ -16,7 +16,6 @@ class FirebaseDatabaseManager(private val context: Context) {
     private val storage = FirebaseStorage.getInstance()
     private var authManager = FirebaseAuthManager()
 
-
     // Fetch home collection data
     //Home fragment fetch home collection
     fun fetchDataHomeFromFireStore(callback: (List<HomeModal>) -> Unit) {
