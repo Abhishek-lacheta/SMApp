@@ -6,12 +6,26 @@
     android:gravity="center"
     android:orientation="vertical">
 
+
+    <TextView
+        android:id="@+id/username"
+        android:layout_marginTop="20dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="username"
+        android:textSize="14dp"
+        android:textStyle="normal" />
+
+
     <TextView
         android:id="@+id/Commentshow"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:text="comment"
         android:textSize="16dp"
-        android:textStyle="italic"
+        android:textStyle="normal"
         />
+
+
 
 </LinearLayout>

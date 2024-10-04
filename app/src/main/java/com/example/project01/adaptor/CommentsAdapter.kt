@@ -6,35 +6,42 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.project01.R
+import com.example.project01.modal.Comment
 
 class CommentsAdapter(
-    private val comments: MutableList<String>) :
-    RecyclerView.Adapter<CommentsAdapter.CommentViewHolder>() {
+    private val comments: MutableList<Comment>
+) : RecyclerView.Adapter<CommentsAdapter.CommentViewHolder>() {
 
     class CommentViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val commentText: TextView = itemView.findViewById(R.id.Commentshow) // Change this ID based on your layout
+        val commentText: TextView = itemView.findViewById(R.id.Commentshow) // Comment text view
+        val userNameText: TextView = itemView.findViewById(R.id.username) // User name text view
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CommentViewHolder {
         val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_bottom_seat, parent, false) // Use your custom layout if necessary
+            .inflate(R.layout.item_bottom_seat, parent, false) // Your custom layout
         return CommentViewHolder(view)
     }
 
     override fun onBindViewHolder(holder: CommentViewHolder, position: Int) {
-        holder.commentText.text = comments[position]
+        val comment = comments[position]
+        holder.commentText.text = comment.text
+        holder.userNameText.text = comment.userName // Display the user's name
     }
 
     override fun getItemCount(): Int = comments.size
 
-    fun addComment(comment: String) {
+    fun addComment(comment: Comment) {
         comments.add(comment)
         notifyItemInserted(comments.size - 1)
     }
 
-    fun setComments(newComments: List<String>) {
+    fun setComments(newComments: List<Comment>) {
         comments.clear()
         comments.addAll(newComments)
         notifyDataSetChanged()
     }
 }
+
+
+

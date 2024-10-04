@@ -3,6 +3,7 @@ package com.example.project01.adaptor
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
@@ -25,7 +26,7 @@ class HomeAdaptor(
         val descTextView: TextView = itemView.findViewById(R.id.txtdes)
         val imageView: ImageView = itemView.findViewById(R.id.image_view)
         val dateTextView: TextView = itemView.findViewById(R.id.dateTextView)
-        val favorite: ImageView = itemView.findViewById(R.id.likeButton)
+        val favorite: ImageButton = itemView.findViewById(R.id.likeButton)
         val likeCount: TextView = itemView.findViewById(R.id.likesCount)
         val showPopupMenu: ImageView = itemView.findViewById(R.id.showPopupMenu)
         val comment:ImageView=itemView.findViewById(R.id.Comment)
