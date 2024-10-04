@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.project01.R
 import com.example.project01.adaptor.HomeAdaptor
 import com.example.project01.databinding.FragmentFavoriteBinding
+import com.example.project01.dialogs.BottomSeatFragment
 import com.example.project01.firebase.FirebaseAuthManager
 import com.example.project01.firebase.FirebaseDatabaseManager
 import com.example.project01.modal.HomeModal
@@ -42,10 +43,18 @@ class FavoriteFragment : Fragment() {
         fetchFavoriteData()
     }
 
-    fun Oncomment(modal: HomeModal){
-        findNavController().navigate(R.id.bottomSeatFragment)
+    //comment ke liye
+    fun Oncomment(modal: HomeModal) {
 
+        val bundle = Bundle().apply {
 
+            putString("postId", modal.id)
+        }
+        val bottomSheet = BottomSeatFragment().apply {
+            arguments = bundle
+        }
+
+        bottomSheet.show(parentFragmentManager, bottomSheet.tag)
     }
 
 
@@ -56,10 +65,11 @@ class FavoriteFragment : Fragment() {
             } else {
                 dataList.clear()
                 dataList.addAll(fetchedList)
-               setupRecyclerView()
+                setupRecyclerView()
             }
         }
     }
+
     private fun toggleLike(item: HomeModal) {
         val currentUserId = FirebaseAuth.getInstance().currentUser?.uid ?: return
         val newLikedStatus = !item.isLikedByCurrentUser // Toggle the like status
@@ -90,7 +100,7 @@ class FavoriteFragment : Fragment() {
             onShowPopupMenu = { view, item -> /* Handle popup menu */ },
             currentUserId = currentUserId,
             onLikeClick = { item -> toggleLike(item) },// Pass the like click handler
-            Oncomment={item-> Oncomment(item)}
+            Oncomment = { item -> Oncomment(item) }
         )
         binding.recyclerview.adapter = adapter
     }

@@ -17,10 +17,8 @@ import com.example.project01.modal.Comment
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.firestore
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 
 open class BottomSeatFragment : BottomSheetDialogFragment() {
     private lateinit var binding: BottomSeatDialogBinding
@@ -64,60 +62,53 @@ open class BottomSeatFragment : BottomSheetDialogFragment() {
             }
         }
 
-        //loadComments()
+        loadComments()
     }
 
     private fun addComment(comment: String) {
         val currentUser = authManager.getCurrentUser()
         currentUser?.let { user ->
-            // Retrieve the user's name from the Firestore or another source
             db.collection("user").document(user.uid).get()
                 .addOnSuccessListener { document ->
                     val userName = document.getString("name") ?: "Unknown User" // Default name
-                    val currentDate = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(
-                        Date()
-                    )
+                    val currentTimeMillis = System.currentTimeMillis() // Get current time in milliseconds
 
                     val commentData = hashMapOf(
                         "text" to comment,
                         "userId" to user.uid,
                         "userName" to userName,
-                        "date" to currentDate
+                        "timestamp" to currentTimeMillis // Store timestamp
                     )
                     db.collection("home").document(postId).collection("comments")
                         .add(commentData)
-                        .addOnSuccessListener {
+                        .addOnSuccessListener { documentReference ->
                             commentsAdapter.addComment(
                                 Comment(
-                                    comment,
-                                    userName,
-                                    currentDate
+                                    text = comment,
+                                    userName = userName,
+                                    timestamp = currentTimeMillis // Pass timestamp
                                 )
-                            ) // Pass the Comment object
+                            )
                         }
                 }
         }
     }
 
-    /*private fun loadComments() {
+    private fun loadComments() {
         db.collection("home").document(postId).collection("comments")
+            .orderBy("timestamp", Query.Direction.ASCENDING)
             .get()
-            .addOnSuccessListener { result ->
-                val comments = mutableListOf<Comment>() // Use the Comment data class
-                for (document in result) {
-                    val commentText = document.getString("text")
-                    val commentUser = document.getString("userName")
+            .addOnSuccessListener { documents ->
+                val comments = mutableListOf<Comment>()
+                for (document in documents) {
+                    val text = document.getString("text") ?: ""
+                    val userName = document.getString("userName") ?: "Unknown User"
+                    val timestamp = document.getLong("timestamp") ?: 0L
 
-                    // Ensure both fields are not null before adding
-                    if (commentText != null && commentUser != null) {
-                        comments.add(Comment(commentText, commentUser)) // Create Comment object
-                    }
+                    comments.add(Comment(text, userName, timestamp))
                 }
-                commentsAdapter.setComments(comments) // Pass the list of Comment objects
+                commentsAdapter.setComments(comments)
             }
-            .addOnFailureListener { e ->
-                // Handle the error
-            }
-    }*/
+    }
 }
 

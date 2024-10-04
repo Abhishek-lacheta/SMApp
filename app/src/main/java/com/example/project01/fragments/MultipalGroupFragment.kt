@@ -16,6 +16,7 @@ import com.example.project01.R
 import com.example.project01.activity.AddPostHomeActivity
 import com.example.project01.adaptor.HomeAdaptor
 import com.example.project01.databinding.FragmentMultipalGroupBinding
+import com.example.project01.dialogs.BottomSeatFragment
 import com.example.project01.firebase.FirebaseAuthManager
 import com.example.project01.firebase.FirebaseDatabaseManager
 import com.example.project01.modal.HomeModal
@@ -61,10 +62,18 @@ class AddBlockFragment : Fragment() {
         }
     }
 
-    fun Oncomment(modal: HomeModal){
-        findNavController().navigate(R.id.bottomSeatFragment)
+    //Comment ke liye
+    fun Oncomment(modal: HomeModal) {
 
+        val bundle = Bundle().apply {
 
+            putString("postId", modal.id)
+        }
+        val bottomSheet = BottomSeatFragment().apply {
+            arguments = bundle
+        }
+
+        bottomSheet.show(parentFragmentManager, bottomSheet.tag)
     }
 
     private fun fetchDataFromFirestore() {
@@ -108,8 +117,8 @@ class AddBlockFragment : Fragment() {
             itemList = dataList,
             onShowPopupMenu = { view, item -> showPopupMenu(view, item) },
             currentUserId = currentUserId,
-            onLikeClick = { item -> toggleLike(item) } ,// Pass the like click handler
-            Oncomment={item-> Oncomment(item)}
+            onLikeClick = { item -> toggleLike(item) },// Pass the like click handler
+            Oncomment = { item -> Oncomment(item) }
         )
         binding.recyclerview.adapter = adapter
     }

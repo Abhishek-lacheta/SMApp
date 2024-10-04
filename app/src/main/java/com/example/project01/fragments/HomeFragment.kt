@@ -60,6 +60,7 @@ class HomeFragment : Fragment() {
         fetchHomeData()
     }
 
+    //comment ke liye
     fun Oncomment(modal: HomeModal) {
 
         val bundle = Bundle().apply {
