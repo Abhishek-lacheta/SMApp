@@ -13,6 +13,7 @@ import com.example.project01.R
 import com.example.project01.adaptor.CommentsAdapter
 import com.example.project01.databinding.BottomSeatDialogBinding
 import com.example.project01.firebase.FirebaseAuthManager
+import com.example.project01.fragments.HomeFragment
 import com.example.project01.modal.Comment
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.firebase.Firebase
@@ -64,7 +65,6 @@ open class BottomSeatFragment : BottomSheetDialogFragment() {
 
         loadComments()
     }
-
     private fun addComment(comment: String) {
         val currentUser = authManager.getCurrentUser()
         currentUser?.let { user ->
@@ -89,11 +89,12 @@ open class BottomSeatFragment : BottomSheetDialogFragment() {
                                     timestamp = currentTimeMillis // Pass timestamp
                                 )
                             )
+                            (parentFragment as? HomeFragment)?.updateCommentCount(postId, 1)
+
                         }
                 }
         }
     }
-
     private fun loadComments() {
         db.collection("home").document(postId).collection("comments")
             .orderBy("timestamp", Query.Direction.ASCENDING)
@@ -104,7 +105,6 @@ open class BottomSeatFragment : BottomSheetDialogFragment() {
                     val text = document.getString("text") ?: ""
                     val userName = document.getString("userName") ?: "Unknown User"
                     val timestamp = document.getLong("timestamp") ?: 0L
-
                     comments.add(Comment(text, userName, timestamp))
                 }
                 commentsAdapter.setComments(comments)

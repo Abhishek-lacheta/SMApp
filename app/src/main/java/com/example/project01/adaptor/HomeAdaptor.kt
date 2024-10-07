@@ -15,10 +15,10 @@ import java.util.Locale
 
 class HomeAdaptor(
     private val itemList: List<HomeModal>,
-    private val Oncomment: (HomeModal) -> Unit,
+    private val onComment: (HomeModal) -> Unit,
     private val onShowPopupMenu: (View, HomeModal) -> Unit = { v, m -> },
     private val currentUserId: String?,
-    private val onLikeClick: (HomeModal) -> Unit // Added parameter for like click
+    private val onLikeClick: (HomeModal) -> Unit
 ) : RecyclerView.Adapter<HomeAdaptor.ViewHolder>() {
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -29,7 +29,8 @@ class HomeAdaptor(
         val favorite: ImageButton = itemView.findViewById(R.id.likeButton)
         val likeCount: TextView = itemView.findViewById(R.id.likesCount)
         val showPopupMenu: ImageView = itemView.findViewById(R.id.showPopupMenu)
-        val comment:ImageView=itemView.findViewById(R.id.Comment)
+        val comment: ImageView = itemView.findViewById(R.id.Comment)
+        val commentcount: TextView = itemView.findViewById(R.id.commentcount)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -44,6 +45,7 @@ class HomeAdaptor(
         holder.titleTextView.text = item.title
         holder.descTextView.text = item.desc
         holder.likeCount.text = "${item.likeCount} likes" // Set like count text
+        holder.commentcount.text = "${item.commentcount} comments" // Bind comment count
 
         item.created_at?.let {
             val date = it.toDate()
@@ -53,33 +55,30 @@ class HomeAdaptor(
             holder.dateTextView.text = "Date not available"
         }
 
-        if (currentUserId == item.userId) {
-            holder.showPopupMenu.visibility = View.VISIBLE
-        } else {
-            holder.showPopupMenu.visibility = View.GONE
-        }
+        holder.showPopupMenu.visibility = if (currentUserId == item.userId) View.VISIBLE else View.GONE
+
         // Load image using Glide
         Glide.with(holder.itemView.context)
             .load(item.imageUrl)
             .into(holder.imageView)
-        // Update like button based on whether the user liked the post
+
         holder.favorite.setImageResource(
             if (item.isLikedByCurrentUser) R.drawable.ic_fav else R.drawable.icon_favorite
         )
-        // Handle like button click
+
         holder.favorite.setOnClickListener {
             onLikeClick(item)
         }
-        // Show popup menu on click
+
         holder.showPopupMenu.setOnClickListener {
             onShowPopupMenu(holder.showPopupMenu, item)
         }
 
         holder.comment.setOnClickListener {
-            Oncomment(item)
+            onComment(item)
         }
-
     }
+
     override fun getItemCount(): Int = itemList.size
 }
 

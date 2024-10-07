@@ -12,6 +12,7 @@ data class HomeModal(
     val created_at: Timestamp? = null,
     var id: String? = null,
     var likeCount: Int = 0,
+    var commentcount:Int=0,
     var userId: String? = null,
     var groupId: String?=null,
     var likedBy: List<String> = listOf()

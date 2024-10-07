@@ -44,7 +44,7 @@ class FavoriteFragment : Fragment() {
     }
 
     //comment ke liye
-    fun Oncomment(modal: HomeModal) {
+    fun onComment(modal: HomeModal) {
 
         val bundle = Bundle().apply {
 
@@ -100,7 +100,7 @@ class FavoriteFragment : Fragment() {
             onShowPopupMenu = { view, item -> /* Handle popup menu */ },
             currentUserId = currentUserId,
             onLikeClick = { item -> toggleLike(item) },// Pass the like click handler
-            Oncomment = { item -> Oncomment(item) }
+            onComment = { item -> onComment(item) }
         )
         binding.recyclerview.adapter = adapter
     }

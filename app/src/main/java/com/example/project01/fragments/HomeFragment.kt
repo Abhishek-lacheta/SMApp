@@ -3,6 +3,7 @@ package com.example.project01.fragments
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
@@ -23,6 +24,7 @@ import com.example.project01.dialogs.BottomSeatFragment
 import com.example.project01.firebase.FirebaseAuthManager
 import com.example.project01.firebase.FirebaseDatabaseManager
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 
 
 class HomeFragment : Fragment() {
@@ -31,7 +33,6 @@ class HomeFragment : Fragment() {
     private var dataList = ArrayList<HomeModal>()
     private lateinit var firebaseDatabaseManager: FirebaseDatabaseManager
     private val authManager = FirebaseAuthManager()
-
 
     @SuppressLint("MissingInflatedId")
     override fun onCreateView(
@@ -53,6 +54,7 @@ class HomeFragment : Fragment() {
         val toolbar = binding.hometoolbar
         activity.setSupportActionBar(toolbar)
         setHasOptionsMenu(true)
+
         // Setup RecyclerView
         binding.recyclerview.layoutManager = LinearLayoutManager(context)
 
@@ -60,17 +62,14 @@ class HomeFragment : Fragment() {
         fetchHomeData()
     }
 
-    //comment ke liye
-    fun Oncomment(modal: HomeModal) {
-
+    // Comment method
+    fun onComment(modal: HomeModal) {
         val bundle = Bundle().apply {
-
             putString("postId", modal.id)
         }
         val bottomSheet = BottomSeatFragment().apply {
             arguments = bundle
         }
-
         bottomSheet.show(parentFragmentManager, bottomSheet.tag)
     }
 
@@ -79,8 +78,33 @@ class HomeFragment : Fragment() {
             if (data.isEmpty()) return@fetchDataHomeFromFireStore // Handle empty data
             dataList.clear()
             dataList.addAll(data)
+
+            // Fetch comment counts for each post
+            dataList.forEach { item ->
+                item.id?.let { getCommentCountForPost(it) }
+            }
+
             setupRecyclerView() // Initialize the adapter
         }
+    }
+
+    private fun getCommentCountForPost(postId: String) {
+        val db = FirebaseFirestore.getInstance()
+
+        db.collection("home").document(postId).collection("comments")
+            .get()
+            .addOnSuccessListener { querySnapshot ->
+                val commentCount = querySnapshot.size()
+                // Update the comment count for the post
+                val post = dataList.find { it.id == postId }
+                post?.let {
+                    it.commentcount = commentCount
+                    adapter.notifyItemChanged(dataList.indexOf(it)) // Notify adapter of changes
+                }
+            }
+            .addOnFailureListener { exception ->
+                Log.w("HomeFragment", "Error getting comments: ", exception)
+            }
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -95,7 +119,6 @@ class HomeFragment : Fragment() {
                 startActivity(intent)
                 true
             }
-
             else -> super.onOptionsItemSelected(item)
         }
     }
@@ -108,11 +131,9 @@ class HomeFragment : Fragment() {
             if (success) {
                 // Update local state based on newLikedStatus
                 if (newLikedStatus) {
-                    // User just liked the post
                     item.likedBy = item.likedBy + currentUserId
                     item.likeCount += 1
                 } else {
-                    // User just unliked the post
                     item.likedBy = item.likedBy.filter { id -> id != currentUserId }
                     item.likeCount -= 1
                 }
@@ -128,10 +149,19 @@ class HomeFragment : Fragment() {
         adapter = HomeAdaptor(
             itemList = dataList,
             currentUserId = currentUserId,
-            onLikeClick = { item -> toggleLike(item) },// like click handler
-            Oncomment = { item -> Oncomment(item) }
+            onLikeClick = { item -> toggleLike(item) }, // Like click handler
+            onComment = { item -> onComment(item) }
         )
         binding.recyclerview.adapter = adapter
     }
 
+    // Method to update comment count from bottom sheet (if needed)
+    fun updateCommentCount(postId: String, newCount: Int) {
+        val post = dataList.find { it.id == postId }
+        post?.let {
+            it.commentcount += newCount // Update the count
+            adapter.notifyItemChanged(dataList.indexOf(it)) // Notify adapter of changes
+        }
+    }
 }
+
