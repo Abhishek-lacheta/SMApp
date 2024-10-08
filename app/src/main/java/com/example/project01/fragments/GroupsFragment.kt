@@ -6,6 +6,8 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.PopupMenu
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
@@ -13,20 +15,21 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.project01.R
 import com.example.project01.activity.AddPostGroupActivity
+import com.example.project01.activity.AddPostHomeActivity
 import com.example.project01.databinding.FragmentGroupsBinding
 import com.example.project01.firebase.FirebaseDatabaseManager
 import com.example.project01.modal.GroupModal
+import com.example.project01.modal.HomeModal
 
 class GroupsFragment : Fragment() {
 
     private lateinit var binding: FragmentGroupsBinding
-    private lateinit var groupRecyclerAdapter: GroupRecyclerAdapter
+    private lateinit var groupRecyclerAdapteradaptor: GroupRecyclerAdapter
     private val itemList = mutableListOf<GroupModal>()
     private lateinit var databaseManager: FirebaseDatabaseManager
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View? {
         binding = FragmentGroupsBinding.inflate(inflater, container, false)
         return binding.root // Inflate the layout for this fragment
@@ -45,13 +48,65 @@ class GroupsFragment : Fragment() {
 
         // Set up RecyclerView
         binding.groupRecyclerview.layoutManager = GridLayoutManager(context, 2)
-        groupRecyclerAdapter = GroupRecyclerAdapter(itemList, ::onItemClick)
-        binding.groupRecyclerview.adapter = groupRecyclerAdapter
 
         // Fetch data from Firestore
         fetchGroupData()
     }
 
+    //SetUp RecyclerView
+    private fun setupRecyclerView() {
+        groupRecyclerAdapteradaptor = GroupRecyclerAdapter(
+            itemList = itemList,
+            onGroupPopupMenu = { view, item -> showPopupMenu(view, item) },
+            onItemClick = { itemList -> onItemClick(itemList) },
+        )
+        binding.groupRecyclerview.adapter = groupRecyclerAdapteradaptor
+    }
+
+    //delete data
+    private fun deleteItem(item: GroupModal): Boolean {
+        item.id?.let { documentId ->
+            databaseManager.deleteGroupData(documentId) { success ->
+                if (success) {
+                    itemList.remove(item)
+                    groupRecyclerAdapteradaptor.notifyDataSetChanged()
+                    Toast.makeText(context, "Item deleted successfully", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(context, "Failed to delete item", Toast.LENGTH_SHORT).show()
+                }
+            }
+        } ?: run {
+            Toast.makeText(context, "Item ID is null", Toast.LENGTH_SHORT).show()
+        }
+
+        return true
+    }
+
+    //showPopumMenu
+    private fun showPopupMenu(view: View, item: GroupModal) {
+        val popupMenu = PopupMenu(requireContext(), view)
+        popupMenu.menuInflater.inflate(R.menu.popup_menu, popupMenu.menu)
+
+        popupMenu.setOnMenuItemClickListener { menuItem ->
+            when (menuItem.itemId) {
+                R.id.confirm_delete -> deleteItem(item)
+                R.id.update -> {
+                    val intent = Intent(requireContext(), AddPostGroupActivity::class.java).apply {
+                        putExtra("group", item)
+                    }
+                    startActivity(intent)
+                    true
+                }
+
+                else -> false
+            }
+        }
+
+        popupMenu.show()
+    }
+
+
+    //Navigate to AddBloackFragment
     fun onItemClick(model: GroupModal) {
         // Create a Bundle to pass the modal ID
         val bundle = Bundle().apply {
@@ -61,11 +116,12 @@ class GroupsFragment : Fragment() {
         findNavController().navigate(R.id.addBlockFragment, bundle)
     }
 
+    //Fetch GroupData
     private fun fetchGroupData() {
         databaseManager.fetchDataGroupFromeFireStore { fetchedList ->
             itemList.clear()
             itemList.addAll(fetchedList)
-            groupRecyclerAdapter.notifyDataSetChanged()
+            setupRecyclerView()
         }
     }
 
@@ -81,6 +137,7 @@ class GroupsFragment : Fragment() {
                 startActivity(intent)
                 true
             }
+
             else -> super.onOptionsItemSelected(item)
         }
     }

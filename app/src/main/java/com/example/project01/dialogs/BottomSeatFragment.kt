@@ -71,7 +71,8 @@ open class BottomSeatFragment : BottomSheetDialogFragment() {
             db.collection("user").document(user.uid).get()
                 .addOnSuccessListener { document ->
                     val userName = document.getString("name") ?: "Unknown User" // Default name
-                    val currentTimeMillis = System.currentTimeMillis() // Get current time in milliseconds
+                    val currentTimeMillis =
+                        System.currentTimeMillis() // Get current time in milliseconds
 
                     val commentData = hashMapOf(
                         "text" to comment,
@@ -81,7 +82,20 @@ open class BottomSeatFragment : BottomSheetDialogFragment() {
                     )
                     db.collection("home").document(postId).collection("comments")
                         .add(commentData)
-                        .addOnSuccessListener { documentReference ->
+                        .addOnSuccessListener {
+                            // After successfully adding the comment, fetch the new count
+                            db.collection("home").document(postId).collection("comments")
+                                .get()
+                                .addOnSuccessListener { querySnapshot ->
+                                    val newCount = querySnapshot.size()
+                                    // Update comment count in the parent fragment
+                                    (parentFragment as? HomeFragment)?.updateCommentCount(
+                                        postId,
+                                        newCount
+                                    )
+                                }
+
+                            // Update commentsAdapter with the new comment
                             commentsAdapter.addComment(
                                 Comment(
                                     text = comment,
@@ -89,8 +103,6 @@ open class BottomSeatFragment : BottomSheetDialogFragment() {
                                     timestamp = currentTimeMillis // Pass timestamp
                                 )
                             )
-                            (parentFragment as? HomeFragment)?.updateCommentCount(postId, 1)
-
                         }
                 }
         }

@@ -151,9 +151,7 @@ class AddBlockFragment : Fragment() {
                 R.id.confirm_delete -> deleteItem(item)
                 R.id.update -> {
                     val intent = Intent(requireContext(), AddPostHomeActivity::class.java).apply {
-                        putExtra("id", item.id)
-                        putExtra("itemtitle", item.title)
-                        putExtra("itemdes", item.desc)
+                        putExtra("post", item)
                     }
                     startActivity(intent)
                     true

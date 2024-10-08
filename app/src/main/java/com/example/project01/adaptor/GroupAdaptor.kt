@@ -10,6 +10,7 @@ import com.example.project01.modal.GroupModal
 
 class GroupRecyclerAdapter(
     private val itemList: List<GroupModal>,
+    private val onGroupPopupMenu: (View, GroupModal) -> Unit = { v, m -> },
     private val onItemClick: (GroupModal) -> Unit
 ) :
     RecyclerView.Adapter<GroupRecyclerAdapter.GroupViewHolder>() {
@@ -31,11 +32,15 @@ class GroupRecyclerAdapter(
         holder.itemView.setOnClickListener {
             onItemClick(item)
         }
+        holder.grouppopupmenu.setOnClickListener{
+            onGroupPopupMenu(holder.grouppopupmenu,item)
+        }
     }
 
     class GroupViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val imageView: ImageView = itemView.findViewById(R.id.image_view)
         val textView: TextView = itemView.findViewById(R.id.text_view)
+        val grouppopupmenu:ImageView=itemView.findViewById(R.id.groupPopupMenu)
 
     }
 

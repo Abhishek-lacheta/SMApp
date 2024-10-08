@@ -16,7 +16,6 @@ class FirebaseDatabaseManager(private val context: Context) {
     private val storage = FirebaseStorage.getInstance()
     private var authManager = FirebaseAuthManager()
 
-    // Fetch home collection data
     //Home fragment fetch home collection
     fun fetchDataHomeFromFireStore(callback: (List<HomeModal>) -> Unit) {
         database.collection("home").get()
@@ -45,6 +44,7 @@ class FirebaseDatabaseManager(private val context: Context) {
                 callback(emptyList())
             }
     }
+
     // Toggle like status like funcnality
     fun toggleLike(postId: String, userId: String, isLiked: Boolean, callback: (Boolean) -> Unit) {
         val postRef = database.collection("home").document(postId)
@@ -76,6 +76,20 @@ class FirebaseDatabaseManager(private val context: Context) {
             callback(false)
         }
     }
+
+    //Get Comment Count
+    fun getCommentCountForPost(postId: String, callback: (Int) -> Unit) {
+        database.collection("home").document(postId).collection("comments")
+            .get()
+            .addOnSuccessListener { querySnapshot ->
+                callback(querySnapshot.size())
+            }
+            .addOnFailureListener { e ->
+                Log.e("GetCommentCount", "Error getting comments", e)
+                callback(0)
+            }
+    }
+
     //Group Fragment fetch group collection
     fun fetchDataGroupFromeFireStore(callback: (List<GroupModal>) -> Unit) {
         database.collection("group").whereEqualTo("userId", authManager.getCurrentUser()?.uid).get()
@@ -163,6 +177,21 @@ class FirebaseDatabaseManager(private val context: Context) {
             }
     }
 
+    //GropFragment delele dacument
+    fun deleteGroupData(documentId: String, callback: (Boolean) -> Unit) {
+        database.collection("group")
+            .document(documentId)
+            .delete()
+            .addOnSuccessListener {
+                callback(true)
+            }
+            .addOnFailureListener { e ->
+                Toast.makeText(context, "Error deleting document: ${e.message}", Toast.LENGTH_LONG)
+                    .show()
+                callback(false)
+            }
+    }
+
 
     // AddPostGroupActivity image upload and save data
     fun uploadImageAndSaveData(imageUri: Uri, name: String, callback: (Boolean) -> Unit) {
@@ -179,6 +208,26 @@ class FirebaseDatabaseManager(private val context: Context) {
             }
             .addOnFailureListener {
                 Toast.makeText(context, "Failed to upload image", Toast.LENGTH_SHORT).show()
+                callback(false)
+            }
+    }
+    fun updateGroupData(
+        groupId: String,
+        name: String,
+        callback: (Boolean) -> Unit
+    ) {
+        val groupUpdate = mapOf(
+            "name" to name
+        )
+        // Assuming you are using Firestore
+        database.collection("group").document(groupId)
+            .update(groupUpdate)
+            .addOnSuccessListener {
+
+                callback(true)
+            }
+            .addOnFailureListener { e ->
+                Log.w("FirebaseDatabaseManager", "Error updating document", e)
                 callback(false)
             }
     }
@@ -260,6 +309,32 @@ class FirebaseDatabaseManager(private val context: Context) {
                 callback(false) // Notify failure
             }
     }
+
+    // Update Data in Home collection  From Group Fragments
+    fun updateData(
+        postId: String,
+        title: String,
+        description: String,
+        callback: (Boolean) -> Unit
+    ) {
+        val postUpdates = mapOf(
+            "title" to title,
+            "desc" to description
+        )
+
+        // Assuming you are using Firestore
+        database.collection("home").document(postId)
+            .update(postUpdates)
+            .addOnSuccessListener {
+
+                callback(true)
+            }
+            .addOnFailureListener { e ->
+                Log.w("FirebaseDatabaseManager", "Error updating document", e)
+                callback(false)
+            }
+    }
+
 
     //EditProfileActivity
     fun loadUserData(onDataLoaded: (username: String?, email: String?, imageUrl: String?) -> Unit) {

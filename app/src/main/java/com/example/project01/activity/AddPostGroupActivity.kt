@@ -4,9 +4,11 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.project01.databinding.ActivityAddPostGroupBinding
 import com.example.project01.firebase.FirebaseDatabaseManager
+import com.example.project01.modal.GroupModal
 
 class AddPostGroupActivity : AppCompatActivity() {
 
@@ -14,6 +16,7 @@ class AddPostGroupActivity : AppCompatActivity() {
     private lateinit var databaseManager: FirebaseDatabaseManager
     private val PICK_IMAGE_REQUEST = 71
     private var imageUri: Uri? = null
+    private var group: GroupModal? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -21,8 +24,17 @@ class AddPostGroupActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         databaseManager = FirebaseDatabaseManager(this)
+        group = intent.getParcelableExtra("group")
 
-        binding.Grouptoolbar.setTitle("Add Post")
+        group?.let {
+            binding.nameId.setText(it.name)
+        }
+
+        if (group?.name.isNullOrEmpty()) {
+            binding.Grouptoolbar.setTitle("Add Group")
+        } else {
+            binding.Grouptoolbar.setTitle("Edit Group")
+        }
         binding.Grouptoolbar.setNavigationOnClickListener {
             finish()
         }
@@ -30,17 +42,58 @@ class AddPostGroupActivity : AppCompatActivity() {
             openImageChooser()
         }
         binding.buttonId.setOnClickListener {
+            val name = binding.nameId.text.toString().trim()
+
             if (imageUri != null) {
-                val name = binding.nameId.text.toString().trim()
-                databaseManager.uploadImageAndSaveData(imageUri!!, name) { success ->
-                    if (success) {
-                        // Handle success if needed
+                if (name.isNotEmpty()) {
+                    if (group == null) {
+                        saveData()
+                    } else {
+                        group!!.id?.let { it2 -> updateGroupInFirebase(it2, name) }
                     }
+                } else {
+                    Toast.makeText(this, "Please enter a name.", Toast.LENGTH_SHORT).show()
                 }
+            } else {
+                Toast.makeText(this, "Please select an image.", Toast.LENGTH_SHORT).show()
             }
         }
     }
 
+    //Save data in Group Collection
+    private fun saveData() {
+        binding.submitLoader.visibility = View.VISIBLE
+        binding.buttonId.visibility = View.GONE
+
+        val name = binding.nameId.text.toString().trim()
+
+        imageUri?.let { uri ->
+            databaseManager.uploadImageAndSaveData(uri, name) { success ->
+                binding.submitLoader.visibility = View.GONE
+                binding.buttonId.visibility = View.VISIBLE
+            }
+        }
+    }
+
+    //Update Group Collection
+    private fun updateGroupInFirebase(
+        groupId: String,
+        name: String,
+    ) {
+        binding.submitLoader.visibility = View.VISIBLE
+        binding.buttonId.visibility = View.GONE
+
+        databaseManager.updateGroupData(groupId, name) { success ->
+            binding.submitLoader.visibility = View.GONE
+            binding.buttonId.visibility = View.VISIBLE
+            if (success) {
+                Toast.makeText(this, "Data updated successfully", Toast.LENGTH_SHORT).show()
+                finish() // Close the activity after successful update
+            } else {
+                Toast.makeText(this, "Failed to update data", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
     private fun openImageChooser() {
         val intent = Intent()
         intent.type = "image/*"
