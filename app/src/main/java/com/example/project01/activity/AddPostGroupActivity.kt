@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.bumptech.glide.Glide
 import com.example.project01.databinding.ActivityAddPostGroupBinding
 import com.example.project01.firebase.FirebaseDatabaseManager
 import com.example.project01.modal.GroupModal
@@ -28,6 +29,12 @@ class AddPostGroupActivity : AppCompatActivity() {
 
         group?.let {
             binding.nameId.setText(it.name)
+            // Load image with Glide if it's a valid URL
+            it.imageUrl?.let { urlString ->
+                Glide.with(this)
+                    .load(urlString) // Load the image URL
+                    .into(binding.imageView) // Set the image to ImageView
+            }
         }
 
         if (group?.name.isNullOrEmpty()) {
@@ -43,13 +50,20 @@ class AddPostGroupActivity : AppCompatActivity() {
         }
         binding.buttonId.setOnClickListener {
             val name = binding.nameId.text.toString().trim()
+            val image = binding.imageView.setImageURI(imageUri)
 
             if (imageUri != null) {
                 if (name.isNotEmpty()) {
                     if (group == null) {
                         saveData()
                     } else {
-                        group!!.id?.let { it2 -> updateGroupInFirebase(it2, name) }
+                        group!!.id?.let { it2 ->
+                            updateGroupInFirebase(
+                                it2,
+                                name,
+                                image.toString()
+                            )
+                        }
                     }
                 } else {
                     Toast.makeText(this, "Please enter a name.", Toast.LENGTH_SHORT).show()
@@ -60,12 +74,13 @@ class AddPostGroupActivity : AppCompatActivity() {
         }
     }
 
-    //Save data in Group Collection
+    // Save data in Group Collection
     private fun saveData() {
         binding.submitLoader.visibility = View.VISIBLE
         binding.buttonId.visibility = View.GONE
 
         val name = binding.nameId.text.toString().trim()
+        val image = binding.imageView.setImageURI(imageUri)
 
         imageUri?.let { uri ->
             databaseManager.uploadImageAndSaveData(uri, name) { success ->
@@ -79,11 +94,12 @@ class AddPostGroupActivity : AppCompatActivity() {
     private fun updateGroupInFirebase(
         groupId: String,
         name: String,
+        imageUrl: String
     ) {
         binding.submitLoader.visibility = View.VISIBLE
         binding.buttonId.visibility = View.GONE
 
-        databaseManager.updateGroupData(groupId, name) { success ->
+        databaseManager.updateGroupData(groupId, name, imageUrl) { success ->
             binding.submitLoader.visibility = View.GONE
             binding.buttonId.visibility = View.VISIBLE
             if (success) {
@@ -94,6 +110,7 @@ class AddPostGroupActivity : AppCompatActivity() {
             }
         }
     }
+
     private fun openImageChooser() {
         val intent = Intent()
         intent.type = "image/*"

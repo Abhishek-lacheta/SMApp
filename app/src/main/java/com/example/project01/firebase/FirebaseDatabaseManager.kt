@@ -211,26 +211,6 @@ class FirebaseDatabaseManager(private val context: Context) {
                 callback(false)
             }
     }
-    fun updateGroupData(
-        groupId: String,
-        name: String,
-        callback: (Boolean) -> Unit
-    ) {
-        val groupUpdate = mapOf(
-            "name" to name
-        )
-        // Assuming you are using Firestore
-        database.collection("group").document(groupId)
-            .update(groupUpdate)
-            .addOnSuccessListener {
-
-                callback(true)
-            }
-            .addOnFailureListener { e ->
-                Log.w("FirebaseDatabaseManager", "Error updating document", e)
-                callback(false)
-            }
-    }
 
     //AddPostGroup Activity save data in group collection
     private fun saveGroupData(homeMap: HashMap<String, String?>, callback: (Boolean) -> Unit) {
@@ -241,6 +221,33 @@ class FirebaseDatabaseManager(private val context: Context) {
             }
             .addOnFailureListener {
                 Toast.makeText(context, "Failed to add data", Toast.LENGTH_SHORT).show()
+                callback(false)
+            }
+    }
+
+    //Update group Data
+    fun updateGroupData(
+        groupId: String,
+        name: String,
+        imageUrl: String?, // New parameter for image URL
+        callback: (Boolean) -> Unit
+    ) {
+        val groupUpdate = mutableMapOf<String, Any>(
+            "name" to name,
+
+            )
+        imageUrl?.let {
+            groupUpdate["imageUrl"] = it
+        }
+
+        // Update the group in Firestore
+        database.collection("group").document(groupId)
+            .update(groupUpdate)
+            .addOnSuccessListener {
+                callback(true)
+            }
+            .addOnFailureListener { e ->
+                Log.w("FirebaseDatabaseManager", "Error updating document", e)
                 callback(false)
             }
     }
