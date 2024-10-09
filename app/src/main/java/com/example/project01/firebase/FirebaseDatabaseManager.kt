@@ -55,7 +55,8 @@ class FirebaseDatabaseManager(private val context: Context) {
                 homeModal?.let {
                     if (isLiked) {
                         // Add user to likedBy list and increment likeCount
-                        it.likedBy = it.likedBy + userIdit.likeCount += 1
+                        it.likedBy = it.likedBy + userId
+                        it.likeCount += 1
                     } else {
                         // Remove user from likedBy list and decrement likeCount
                         it.likedBy = it.likedBy.filter { id -> id != userId }
@@ -334,7 +335,7 @@ class FirebaseDatabaseManager(private val context: Context) {
             }
     }
 
-    // Update Data in Home collection  From AddHomeGroupActivity
+    // Update Data in Home collection  From AddGroupActivity
     fun updateData(
         postId: String,
         imageUri: Uri,

@@ -1,5 +1,6 @@
 package com.example.project01.adaptor
 
+import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.project01.modal.HomeModal
 import com.example.project01.R
+import com.example.project01.activity.UserProfileActivity
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -18,7 +20,7 @@ class HomeAdaptor(
     private val onComment: (HomeModal) -> Unit,
     private val onShowPopupMenu: (View, HomeModal) -> Unit = { v, m -> },
     private val currentUserId: String?,
-    private val onLikeClick: (HomeModal) -> Unit
+    private val onLikeClick: (HomeModal) -> Unit,
 ) : RecyclerView.Adapter<HomeAdaptor.ViewHolder>() {
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -31,6 +33,7 @@ class HomeAdaptor(
         val showPopupMenu: ImageView = itemView.findViewById(R.id.showPopupMenu)
         val comment: ImageView = itemView.findViewById(R.id.Comment)
         val commentcount: TextView = itemView.findViewById(R.id.commentcount)
+        val userprofile:ImageView=itemView.findViewById(R.id.userImageView)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -76,6 +79,12 @@ class HomeAdaptor(
 
         holder.comment.setOnClickListener {
             onComment(item)
+        }
+        holder.userprofile.setOnClickListener {
+            val context = holder.itemView.context
+            val intent = Intent(context, UserProfileActivity::class.java).apply {
+            }
+            context.startActivity(intent)
         }
     }
 

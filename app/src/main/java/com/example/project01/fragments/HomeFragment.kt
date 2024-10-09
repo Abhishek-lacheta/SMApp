@@ -100,6 +100,8 @@ class HomeFragment : Fragment() {
         binding.recyclerview.adapter = adapter
     }
 
+
+
     private fun toggleLike(item: HomeModal) {
         val currentUserId = FirebaseAuth.getInstance().currentUser?.uid ?: return
         val newLikedStatus = !item.isLikedByCurrentUser // Toggle the like status
