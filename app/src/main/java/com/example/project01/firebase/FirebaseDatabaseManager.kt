@@ -55,8 +55,7 @@ class FirebaseDatabaseManager(private val context: Context) {
                 homeModal?.let {
                     if (isLiked) {
                         // Add user to likedBy list and increment likeCount
-                        it.likedBy = it.likedBy + userId
-                        it.likeCount += 1
+                        it.likedBy = it.likedBy + userIdit.likeCount += 1
                     } else {
                         // Remove user from likedBy list and decrement likeCount
                         it.likedBy = it.likedBy.filter { id -> id != userId }
@@ -225,52 +224,6 @@ class FirebaseDatabaseManager(private val context: Context) {
             }
     }
 
-    //Update group Data
-    fun updateGroupData(
-        groupId: String,
-        name: String,
-        imageUrl: String?, // New parameter for image URL
-        callback: (Boolean) -> Unit
-    ) {
-        val groupUpdate = mutableMapOf<String, Any>(
-            "name" to name,
-
-            )
-        imageUrl?.let {
-            groupUpdate["imageUrl"] = it
-        }
-
-        // Update the group in Firestore
-        database.collection("group").document(groupId)
-            .update(groupUpdate)
-            .addOnSuccessListener {
-                callback(true)
-            }
-            .addOnFailureListener { e ->
-                Log.w("FirebaseDatabaseManager", "Error updating document", e)
-                callback(false)
-            }
-    }
-
-    //AddPostHomeActivity Fetch group data
-    fun fetchGroupData(callback: (List<Pair<String, String>>) -> Unit) {
-        val nameList = mutableListOf<String>()
-        val idList = mutableListOf<String>()
-
-        database.collection("group").get()
-            .addOnSuccessListener { documents ->
-                for (document in documents) {
-                    nameList.add(document.getString("name") ?: "")
-                    idList.add(document.id)
-                }
-                callback(nameList.zip(idList)) // Combine names and IDs into pairs
-            }
-            .addOnFailureListener { exception ->
-                Log.w("FirebaseDB", "Error getting documents: ", exception)
-                callback(emptyList()) // Return empty list on failure
-            }
-    }
-
     // AddPostHomeActivity Upload image and save home data
     fun uploadImageAndSaveData(
         imageUri: Uri,
@@ -317,19 +270,58 @@ class FirebaseDatabaseManager(private val context: Context) {
             }
     }
 
-    // Update Data in Home collection  From Group Fragments
-    fun updateData(
-        postId: String,
-        title: String,
-        description: String,
+
+    // Update group collection from AddpostGroupActivity
+    fun updateGroupData(
+        groupId: String,
+        name: String,
+        imageUri: Uri,
         callback: (Boolean) -> Unit
     ) {
-        val postUpdates = mapOf(
-            "title" to title,
-            "desc" to description
+        val groupUpdate = hashMapOf<String, Any>(
+            "name" to name,
         )
 
-        // Assuming you are using Firestore
+        val storageRef = storage.reference
+        val imageRef = storageRef.child("images/${UUID.randomUUID()}.jpg")
+        imageRef.putFile(imageUri)
+            .addOnSuccessListener {
+                imageRef.downloadUrl.addOnSuccessListener { downloadUri ->
+                    groupUpdate["imageUrl"] = downloadUri.toString()
+                    // Pass groupId along with groupUpdate
+                    saveData(groupId, groupUpdate, callback)
+                }
+            }
+            .addOnFailureListener {
+                Toast.makeText(context, "Failed to upload image", Toast.LENGTH_SHORT).show()
+                callback(false) // Notify failure
+            }
+    }
+
+    // sava update groupData
+    private fun saveData(
+        groupId: String,
+        groupUpdate: HashMap<String, Any>,
+        callback: (Boolean) -> Unit
+    ) {
+        // Reference the specific document using the groupId
+        database.collection("group").document(groupId)
+            .update(groupUpdate)
+            .addOnSuccessListener {
+                callback(true)
+            }
+            .addOnFailureListener { e ->
+                Log.w("FirebaseDatabaseManager", "Error updating document", e)
+                callback(false)
+            }
+    }
+
+    //save updated Home Data
+    private fun saveUpdateData(
+        postId: String,
+        postUpdates: HashMap<String, Any>,
+        callback: (Boolean) -> Unit
+    ) {
         database.collection("home").document(postId)
             .update(postUpdates)
             .addOnSuccessListener {
@@ -342,6 +334,54 @@ class FirebaseDatabaseManager(private val context: Context) {
             }
     }
 
+    // Update Data in Home collection  From AddHomeGroupActivity
+    fun updateData(
+        postId: String,
+        imageUri: Uri,
+        title: String,
+        description: String,
+
+        callback: (Boolean) -> Unit
+    ) {
+        val postUpdates = hashMapOf<String, Any>(
+            "title" to title,
+            "desc" to description
+        )
+
+        val storageRef = storage.reference
+        val imageRef = storageRef.child("images/${UUID.randomUUID()}.jpg")
+        imageRef.putFile(imageUri)
+            .addOnSuccessListener {
+                imageRef.downloadUrl.addOnSuccessListener { downloadUri ->
+                    postUpdates["imageUrl"] = downloadUri.toString()
+                    // Pass groupId along with groupUpdate
+                    saveUpdateData(postId, postUpdates, callback)
+                }
+            }
+            .addOnFailureListener {
+                Toast.makeText(context, "Failed to upload image", Toast.LENGTH_SHORT).show()
+                callback(false) // Notify failure
+            }
+    }
+
+    //AddPostHomeActivity Fetch group data
+    fun fetchGroupData(callback: (List<Pair<String, String>>) -> Unit) {
+        val nameList = mutableListOf<String>()
+        val idList = mutableListOf<String>()
+
+        database.collection("group").get()
+            .addOnSuccessListener { documents ->
+                for (document in documents) {
+                    nameList.add(document.getString("name") ?: "")
+                    idList.add(document.id)
+                }
+                callback(nameList.zip(idList)) // Combine names and IDs into pairs
+            }
+            .addOnFailureListener { exception ->
+                Log.w("FirebaseDB", "Error getting documents: ", exception)
+                callback(emptyList()) // Return empty list on failure
+            }
+    }
 
     //EditProfileActivity
     fun loadUserData(onDataLoaded: (username: String?, email: String?, imageUrl: String?) -> Unit) {

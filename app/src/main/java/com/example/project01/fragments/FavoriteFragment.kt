@@ -92,7 +92,15 @@ class FavoriteFragment : Fragment() {
             }
         }
     }
-
+    //new comment count
+    fun updateCommentCount(postId: String, newCount: Int) {
+        val post = dataList.find { it.id == postId }
+        post?.let {
+            it.commentcount = newCount
+            adapter.notifyItemChanged(dataList.indexOf(it)) // Notify adapter of changes
+        }
+    }
+    
     private fun setupRecyclerView() {
         val currentUserId = authManager.getCurrentUser()?.uid // Get the current user's UID
         adapter = HomeAdaptor(

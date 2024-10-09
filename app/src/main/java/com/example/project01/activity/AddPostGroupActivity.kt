@@ -26,14 +26,12 @@ class AddPostGroupActivity : AppCompatActivity() {
 
         databaseManager = FirebaseDatabaseManager(this)
         group = intent.getParcelableExtra("group")
-
+        //Set Update Data
         group?.let {
             binding.nameId.setText(it.name)
-            // Load image with Glide if it's a valid URL
+            binding.imageView.visibility = View.VISIBLE
             it.imageUrl?.let { urlString ->
-                Glide.with(this)
-                    .load(urlString) // Load the image URL
-                    .into(binding.imageView) // Set the image to ImageView
+                Glide.with(this).load(urlString).into(binding.imageView)
             }
         }
 
@@ -50,19 +48,16 @@ class AddPostGroupActivity : AppCompatActivity() {
         }
         binding.buttonId.setOnClickListener {
             val name = binding.nameId.text.toString().trim()
-            val image = binding.imageView.setImageURI(imageUri)
 
             if (imageUri != null) {
                 if (name.isNotEmpty()) {
                     if (group == null) {
                         saveData()
                     } else {
-                        group!!.id?.let { it2 ->
-                            updateGroupInFirebase(
-                                it2,
-                                name,
-                                image.toString()
-                            )
+                        group!!.id?.let { groupId ->
+                            updateGroupInFirebase(groupId)
+                        } ?: run {
+                            Toast.makeText(this, "Group ID is null.", Toast.LENGTH_SHORT).show()
                         }
                     }
                 } else {
@@ -80,7 +75,6 @@ class AddPostGroupActivity : AppCompatActivity() {
         binding.buttonId.visibility = View.GONE
 
         val name = binding.nameId.text.toString().trim()
-        val image = binding.imageView.setImageURI(imageUri)
 
         imageUri?.let { uri ->
             databaseManager.uploadImageAndSaveData(uri, name) { success ->
@@ -91,33 +85,29 @@ class AddPostGroupActivity : AppCompatActivity() {
     }
 
     //Update Group Collection
-    private fun updateGroupInFirebase(
-        groupId: String,
-        name: String,
-        imageUrl: String
-    ) {
+    private fun updateGroupInFirebase(groupId: String) {
         binding.submitLoader.visibility = View.VISIBLE
         binding.buttonId.visibility = View.GONE
-
-        databaseManager.updateGroupData(groupId, name, imageUrl) { success ->
-            binding.submitLoader.visibility = View.GONE
-            binding.buttonId.visibility = View.VISIBLE
-            if (success) {
-                Toast.makeText(this, "Data updated successfully", Toast.LENGTH_SHORT).show()
-                finish() // Close the activity after successful update
-            } else {
-                Toast.makeText(this, "Failed to update data", Toast.LENGTH_SHORT).show()
+        val name = binding.nameId.text.toString().trim()
+        imageUri?.let { uri ->
+            databaseManager.updateGroupData(groupId, name, uri) { success ->
+                binding.submitLoader.visibility = View.GONE
+                binding.buttonId.visibility = View.VISIBLE
+                if (success) {
+                    Toast.makeText(this, "Data updated successfully", Toast.LENGTH_SHORT).show()
+                    finish() // Close the activity after successful update
+                } else {
+                    Toast.makeText(this, "Failed to update data", Toast.LENGTH_SHORT).show()
+                }
             }
         }
     }
-
     private fun openImageChooser() {
         val intent = Intent()
         intent.type = "image/*"
         intent.action = Intent.ACTION_GET_CONTENT
         startActivityForResult(Intent.createChooser(intent, "Select Image"), PICK_IMAGE_REQUEST)
     }
-
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.data != null) {

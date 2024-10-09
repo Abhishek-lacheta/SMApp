@@ -10,6 +10,7 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Spinner
 import android.widget.Toast
+import com.bumptech.glide.Glide
 import com.example.project01.R
 import com.example.project01.databinding.ActivityAddPostHomeBinding
 import com.example.project01.firebase.FirebaseDatabaseManager
@@ -41,6 +42,14 @@ class AddPostHomeActivity : AppCompatActivity() {
         post?.let {
             binding.homeTitleId.setText(it.title)
             binding.homeDescId.setText(it.desc)
+            binding.spinner.visibility=View.GONE
+            binding.imageView.visibility=View.VISIBLE
+
+            it.imageUrl?.let { urlString ->
+                Glide.with(this)
+                    .load(urlString)
+                    .into(binding.imageView)
+            }
         }
 
         if (post?.title.isNullOrEmpty() && post?.desc.isNullOrEmpty()) {
@@ -70,7 +79,10 @@ class AddPostHomeActivity : AppCompatActivity() {
                         uploadImageAndSaveData()
                     } else {
                         // Update existing post
-                        post!!.id?.let { it1 -> updateDataInFirebase(it1, title, description) }
+
+                        post!!.id?.let { postId ->
+                            updateDataInFirebase(postId)
+                        }
                     }
                 } else {
                     Toast.makeText(
@@ -85,20 +97,59 @@ class AddPostHomeActivity : AppCompatActivity() {
         }
     }
 
+    private fun setupSpinner() {
+        val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, nameList)
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        spinner.adapter = adapter
+
+        spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(
+                parent: AdapterView<*>, view: View, position: Int, id: Long
+            ) {
+                selectedGroupId = idList[position]
+                Log.d("AddPostHomeActivity", "Selected Group ID: $selectedGroupId")
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>) {}
+        }
+    }
+
+    private fun fetchData() {
+        databaseManager.fetchGroupData { groups ->
+            nameList.clear()
+            idList.clear()
+            groups.forEach { (name, id) ->
+                nameList.add(name)
+                idList.add(id)
+            }
+
+            setupSpinner()
+
+
+        }
+    }
+
     // Update Home Collection
-    private fun updateDataInFirebase(postId: String, title: String, description: String) {
+    private fun updateDataInFirebase(postId: String) {
         binding.submitLoader.visibility = View.VISIBLE
         binding.homeButtonId.visibility = View.GONE
 
-        databaseManager.updateData(postId, title, description) { success ->
-            binding.submitLoader.visibility = View.GONE
-            binding.homeButtonId.visibility = View.VISIBLE
-            if (success) {
-                Toast.makeText(this, "Data updated successfully", Toast.LENGTH_SHORT).show()
-                finish() // Close the activity after successful update
-            } else {
-                Toast.makeText(this, "Failed to update data", Toast.LENGTH_SHORT).show()
+        val title = binding.homeTitleId.text.toString().trim()
+        val description = binding.homeDescId.text.toString().trim()
+        imageUri.let { uri ->
+            if (uri != null) {
+                databaseManager.updateData(postId, uri, title, description) { success ->
+                    binding.submitLoader.visibility = View.GONE
+                    binding.homeButtonId.visibility = View.VISIBLE
+                    if (success) {
+                        Toast.makeText(this, "Data updated successfully", Toast.LENGTH_SHORT).show()
+                        finish() // Close the activity after successful update
+                    } else {
+                        Toast.makeText(this, "Failed to update data", Toast.LENGTH_SHORT).show()
+                    }
+                }
             }
+
         }
     }
 
@@ -117,37 +168,6 @@ class AddPostHomeActivity : AppCompatActivity() {
                 binding.submitLoader.visibility = View.GONE
                 binding.homeButtonId.visibility = View.VISIBLE
             }
-        }
-    }
-    private fun fetchData() {
-        databaseManager.fetchGroupData { groups ->
-            nameList.clear()
-            idList.clear()
-            groups.forEach { (name, id) ->
-                nameList.add(name)
-                idList.add(id)
-            }
-
-                    setupSpinner()
-
-
-        }
-    }
-
-    private fun setupSpinner() {
-        val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, nameList)
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        spinner.adapter = adapter
-
-        spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(
-                parent: AdapterView<*>, view: View, position: Int, id: Long
-            ) {
-                selectedGroupId = idList[position]
-                Log.d("AddPostHomeActivity", "Selected Group ID: $selectedGroupId")
-            }
-
-            override fun onNothingSelected(parent: AdapterView<*>) {}
         }
     }
 

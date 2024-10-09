@@ -93,7 +93,7 @@ class HomeFragment : Fragment() {
         val currentUserId = authManager.getCurrentUser()?.uid // Get the current user's UID
         adapter = HomeAdaptor(
             itemList = dataList,
-            currentUserId = currentUserId,
+            currentUserId = null,
             onLikeClick = { item -> toggleLike(item) },
             onComment = { item -> onComment(item) }
         )
