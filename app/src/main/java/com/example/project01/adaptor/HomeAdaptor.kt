@@ -1,19 +1,20 @@
 package com.example.project01.adaptor
 
-import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.bitmap.CircleCrop
 import com.example.project01.modal.HomeModal
 import com.example.project01.R
-import com.example.project01.activity.UserProfileActivity
 import java.text.SimpleDateFormat
 import java.util.Locale
+import java.util.Date
 
 class HomeAdaptor(
     private val itemList: List<HomeModal>,
@@ -21,6 +22,7 @@ class HomeAdaptor(
     private val onShowPopupMenu: (View, HomeModal) -> Unit = { v, m -> },
     private val currentUserId: String?,
     private val onLikeClick: (HomeModal) -> Unit,
+    private val onItemClick: (HomeModal) -> Unit
 ) : RecyclerView.Adapter<HomeAdaptor.ViewHolder>() {
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -31,9 +33,11 @@ class HomeAdaptor(
         val favorite: ImageButton = itemView.findViewById(R.id.likeButton)
         val likeCount: TextView = itemView.findViewById(R.id.likesCount)
         val showPopupMenu: ImageView = itemView.findViewById(R.id.showPopupMenu)
-        val comment: ImageView = itemView.findViewById(R.id.Comment)
+        val comment: LinearLayout = itemView.findViewById(R.id.Comment)
         val commentcount: TextView = itemView.findViewById(R.id.commentcount)
-        val userprofile:ImageView=itemView.findViewById(R.id.userImageView)
+        val userprofile: LinearLayout = itemView.findViewById(R.id.userImageView)
+        val userImage: ImageView = itemView.findViewById(R.id.userImage)
+        val userName: TextView = itemView.findViewById(R.id.userName)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -47,6 +51,7 @@ class HomeAdaptor(
 
         holder.titleTextView.text = item.title
         holder.descTextView.text = item.desc
+        holder.userName.text = item.userName
         holder.likeCount.text = "${item.likeCount} likes" // Set like count text
         holder.commentcount.text = "${item.commentcount} comments" // Bind comment count
 
@@ -58,12 +63,16 @@ class HomeAdaptor(
             holder.dateTextView.text = "Date not available"
         }
 
-        holder.showPopupMenu.visibility = if (currentUserId == item.userId) View.VISIBLE else View.GONE
+        holder.showPopupMenu.visibility =
+            if (currentUserId == item.userId) View.VISIBLE else View.GONE
 
         // Load image using Glide
         Glide.with(holder.itemView.context)
             .load(item.imageUrl)
             .into(holder.imageView)
+//Get UserProfileImage
+        Glide.with(holder.itemView.context).load(item.image).transform(CircleCrop())
+            .into(holder.userImage)
 
         holder.favorite.setImageResource(
             if (item.isLikedByCurrentUser) R.drawable.ic_fav else R.drawable.icon_favorite
@@ -80,12 +89,11 @@ class HomeAdaptor(
         holder.comment.setOnClickListener {
             onComment(item)
         }
+
         holder.userprofile.setOnClickListener {
-            val context = holder.itemView.context
-            val intent = Intent(context, UserProfileActivity::class.java).apply {
-            }
-            context.startActivity(intent)
+            onItemClick(item)
         }
+
     }
 
     override fun getItemCount(): Int = itemList.size

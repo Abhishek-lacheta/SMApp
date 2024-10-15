@@ -33,10 +33,11 @@
 
         <ImageView
             android:id="@+id/buttonEditProfile"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
             android:layout_marginTop="70dp"
             android:layout_marginStart="70dp"
+            android:padding="6dp"
             android:background="@drawable/rounded_background"
             android:src="@drawable/ic_camera"
             />
@@ -85,7 +86,7 @@
             android:layout_width="match_parent"
             android:layout_height="60dp"
             android:background="@drawable/round_button"
-            android:text="@string/Change_Password"
+            android:text="@string/Edit_Profile"
             android:textColor="@color/white"
             android:theme="@style/Theme.Button" />
 

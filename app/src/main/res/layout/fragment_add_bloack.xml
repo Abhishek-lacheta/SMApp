@@ -9,14 +9,13 @@
     tools:context=".activity.MainActivity">
 
     <androidx.appcompat.widget.Toolbar
-        android:id="@+id/hometoolbar"
+        android:id="@+id/AddBlocktoolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="@color/white"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-        app:title="Favorite"
+        app:navigationIcon="@drawable/ic_arrovback"
         app:titleTextColor="@color/black" />
-
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerview"
@@ -42,7 +41,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:text="No Favorite Post Here!!"
+            android:text="No Post Here!!"
             android:textSize="20sp"
             android:textColor="@android:color/darker_gray"
             android:textStyle="bold"
@@ -51,13 +50,10 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Please select favorite post."
+            android:text="Please add some post."
             android:textSize="14sp"
             android:textColor="@android:color/darker_gray"
             android:layout_marginTop="8dp"
             android:layout_gravity="center"/>
     </LinearLayout>
-
-
-
 </LinearLayout>

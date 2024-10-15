@@ -1,5 +1,6 @@
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
@@ -15,11 +16,10 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.project01.R
 import com.example.project01.activity.AddPostGroupActivity
-import com.example.project01.activity.AddPostHomeActivity
 import com.example.project01.databinding.FragmentGroupsBinding
+import com.example.project01.firebase.FirebaseAuthManager
 import com.example.project01.firebase.FirebaseDatabaseManager
 import com.example.project01.modal.GroupModal
-import com.example.project01.modal.HomeModal
 
 class GroupsFragment : Fragment() {
 
@@ -27,6 +27,8 @@ class GroupsFragment : Fragment() {
     private lateinit var groupRecyclerAdapteradaptor: GroupRecyclerAdapter
     private val itemList = mutableListOf<GroupModal>()
     private lateinit var databaseManager: FirebaseDatabaseManager
+    private var authManager = FirebaseAuthManager()
+    private lateinit var noDataLayout: View
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -48,7 +50,7 @@ class GroupsFragment : Fragment() {
 
         // Set up RecyclerView
         binding.groupRecyclerview.layoutManager = GridLayoutManager(context, 2)
-
+        noDataLayout = binding.noDataLayout
         // Fetch data from Firestore
         fetchGroupData()
     }
@@ -59,6 +61,7 @@ class GroupsFragment : Fragment() {
             itemList = itemList,
             onGroupPopupMenu = { view, item -> showPopupMenu(view, item) },
             onItemClick = { itemList -> onItemClick(itemList) },
+            isPopupMenuVisible = true
         )
         binding.groupRecyclerview.adapter = groupRecyclerAdapteradaptor
     }
@@ -86,7 +89,6 @@ class GroupsFragment : Fragment() {
     private fun showPopupMenu(view: View, item: GroupModal) {
         val popupMenu = PopupMenu(requireContext(), view)
         popupMenu.menuInflater.inflate(R.menu.popup_menu, popupMenu.menu)
-
         popupMenu.setOnMenuItemClickListener { menuItem ->
             when (menuItem.itemId) {
                 R.id.confirm_delete -> deleteItem(item)
@@ -105,13 +107,16 @@ class GroupsFragment : Fragment() {
         popupMenu.show()
     }
 
-
     //Navigate to AddBloackFragment
     fun onItemClick(model: GroupModal) {
-        // Create a Bundle to pass the modal ID
         val bundle = Bundle().apply {
             putString("modalId", model.id)
             putString("name", model.name)
+            putString("userId", authManager.getCurrentUser()?.uid)
+            Log.d(
+                "groupFragment",
+                "Item clicked: ${model.id}, ${model.name},${authManager.getCurrentUser()?.uid}"
+            )
         }
         findNavController().navigate(R.id.addBlockFragment, bundle)
     }
@@ -119,9 +124,17 @@ class GroupsFragment : Fragment() {
     //Fetch GroupData
     private fun fetchGroupData() {
         databaseManager.fetchDataGroupFromeFireStore { fetchedList ->
-            itemList.clear()
-            itemList.addAll(fetchedList)
-            setupRecyclerView()
+            if (fetchedList.isEmpty()){
+                noDataLayout.visibility=View.VISIBLE
+                binding.groupRecyclerview.visibility=View.GONE
+            }else{
+                noDataLayout.visibility=View.GONE
+                binding.groupRecyclerview.visibility=View.VISIBLE
+                itemList.clear()
+                itemList.addAll(fetchedList)
+                setupRecyclerView()
+            }
+
         }
     }
 

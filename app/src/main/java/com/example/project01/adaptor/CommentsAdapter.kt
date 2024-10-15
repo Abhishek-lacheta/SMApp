@@ -3,8 +3,11 @@ package com.example.project01.adaptor
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.bitmap.CircleCrop
 import com.example.project01.R
 import com.example.project01.modal.Comment
 
@@ -16,6 +19,7 @@ class CommentsAdapter(
         val commentText: TextView = itemView.findViewById(R.id.Commentshow)
         val userNameText: TextView = itemView.findViewById(R.id.username)
         val commentDateText: TextView = itemView.findViewById(R.id.commentDate) // Add date TextView
+        val profilePicture:ImageView=itemView.findViewById(R.id.profilePicture)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CommentViewHolder {
@@ -29,6 +33,10 @@ class CommentsAdapter(
         holder.commentText.text = comment.text
         holder.userNameText.text = comment.userName
         holder.commentDateText.text = getTimeAgo(comment.timestamp) // Display relative time
+
+        Glide.with(holder.itemView.context).load(comment.profileImageUrl).transform(CircleCrop())
+            .into(holder.profilePicture)
+
     }
 
     override fun getItemCount(): Int = comments.size

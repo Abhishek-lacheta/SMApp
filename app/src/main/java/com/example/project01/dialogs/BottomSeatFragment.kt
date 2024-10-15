@@ -65,20 +65,23 @@ open class BottomSeatFragment : BottomSheetDialogFragment() {
 
         loadComments()
     }
+
     private fun addComment(comment: String) {
         val currentUser = authManager.getCurrentUser()
         currentUser?.let { user ->
             db.collection("user").document(user.uid).get()
                 .addOnSuccessListener { document ->
-                    val userName = document.getString("name") ?: "Unknown User" // Default name
+                    val userName = document.getString("name") ?: "Unknown User"
+                    val image = document.getString("profileImageUrl")
+
                     val currentTimeMillis =
                         System.currentTimeMillis() // Get current time in milliseconds
-
                     val commentData = hashMapOf(
                         "text" to comment,
                         "userId" to user.uid,
                         "userName" to userName,
-                        "timestamp" to currentTimeMillis // Store timestamp
+                        "timestamp" to currentTimeMillis,
+                        "image" to image
                     )
                     db.collection("home").document(postId).collection("comments")
                         .add(commentData)
@@ -101,12 +104,14 @@ open class BottomSeatFragment : BottomSheetDialogFragment() {
                                     text = comment,
                                     userName = userName,
                                     timestamp = currentTimeMillis // Pass timestamp
+
                                 )
                             )
                         }
                 }
         }
     }
+
     private fun loadComments() {
         db.collection("home").document(postId).collection("comments")
             .orderBy("timestamp", Query.Direction.ASCENDING)
@@ -116,11 +121,16 @@ open class BottomSeatFragment : BottomSheetDialogFragment() {
                 for (document in documents) {
                     val text = document.getString("text") ?: ""
                     val userName = document.getString("userName") ?: "Unknown User"
+                    val profileImageUrl = document.getString("image") // Retrieve the image URL
                     val timestamp = document.getLong("timestamp") ?: 0L
-                    comments.add(Comment(text, userName, timestamp))
+
+                    // Add the profileImageUrl to the Comment instance
+                    comments.add(Comment(text, userName, timestamp,profileImageUrl))
                 }
+                // Set the comments in the adapter
                 commentsAdapter.setComments(comments)
             }
     }
+
 }
 

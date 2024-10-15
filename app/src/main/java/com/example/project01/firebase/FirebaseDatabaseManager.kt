@@ -21,19 +21,16 @@ class FirebaseDatabaseManager(private val context: Context) {
         database.collection("home").get()
             .addOnSuccessListener { result ->
                 val dataList = ArrayList<HomeModal>()
-                if (result.isEmpty) {
-                    Toast.makeText(context, "No data found", Toast.LENGTH_SHORT).show()
-                    callback(dataList)
-                } else {
-                    for (document in result.documents) {
-                        val item = document.toObject(HomeModal::class.java)
-                        item?.let {
-                            it.id = document.id // Set the document ID
-                            dataList.add(it)
-                        }
+
+                for (document in result.documents) {
+                    val item = document.toObject(HomeModal::class.java)
+                    item?.let {
+                        it.id = document.id // Set the document ID
+                        dataList.add(it)
                     }
-                    callback(dataList)
                 }
+                callback(dataList)
+
             }
             .addOnFailureListener { exception ->
                 Toast.makeText(
@@ -92,7 +89,8 @@ class FirebaseDatabaseManager(private val context: Context) {
 
     //Group Fragment fetch group collection
     fun fetchDataGroupFromeFireStore(callback: (List<GroupModal>) -> Unit) {
-        database.collection("group").whereEqualTo("userId", authManager.getCurrentUser()?.uid).get()
+        database.collection("group")
+            .whereEqualTo("userId", authManager.getCurrentUser()?.uid).get()
             .addOnSuccessListener { result ->
                 val dataList = ArrayList<GroupModal>()
                 for (document in result.documents) {
@@ -109,6 +107,21 @@ class FirebaseDatabaseManager(private val context: Context) {
                     Toast.LENGTH_LONG
                 ).show()
                 callback(emptyList())
+            }
+    }
+
+    // fetch group data on the basis of userId in UserProfileActivity
+    fun fetchDataGroupFromeFireStore1(userId: String, callback: (List<GroupModal>) -> Unit) {
+        database.collection("group").whereEqualTo("userId", userId)
+            .get()
+            .addOnSuccessListener { result ->
+                val dataList = ArrayList<GroupModal>()
+                for (document in result.documents) {
+                    val item = document.toObject(GroupModal::class.java)
+                    item?.id = document.id
+                    item?.let { dataList.add(it) }
+                }
+                callback(dataList)
             }
     }
 
@@ -137,11 +150,12 @@ class FirebaseDatabaseManager(private val context: Context) {
             }
     }
 
+
     //MultipalGroupFragment fetch data groupById
-    fun fetchDataByGroupId(groupId: String, callback: (List<HomeModal>) -> Unit) {
+    fun fetchDataByGroupId(userId: String, groupId: String, callback: (List<HomeModal>) -> Unit) {
         database.collection("home")
+            .whereEqualTo("userId", userId)
             .whereEqualTo("groupId", groupId)
-            .whereEqualTo("userId", authManager.getCurrentUser()?.uid)
             .get()
             .addOnSuccessListener { result ->
                 val dataList = ArrayList<HomeModal>()
@@ -234,29 +248,47 @@ class FirebaseDatabaseManager(private val context: Context) {
         isFavorite: Boolean,
         callback: (Boolean) -> Unit
     ) {
-        val homeMap = hashMapOf(
-            "title" to title,
-            "desc" to desc,
-            "created_at" to FieldValue.serverTimestamp(),
-            "groupId" to (selectedGroupId ?: ""), // Add groupId to the homeMap
-            "isFavorite" to isFavorite,
-            "userId" to authManager.getCurrentUser()?.uid
-        )
-        val storageRef = storage.reference
-        val imageRef = storageRef.child("images/${UUID.randomUUID()}.jpg")
+        val currentUser = authManager.getCurrentUser()
+        currentUser?.let { user ->
+            database.collection("user").document(user.uid).get()
+                .addOnSuccessListener { document ->
+                    val userName = document.getString("name") ?: "Unknown User" // Default name
+                    val image = document.getString("profileImageUrl")
+                    val homeMap = hashMapOf(
+                        "title" to title,
+                        "desc" to desc,
+                        "created_at" to FieldValue.serverTimestamp(),
+                        "groupId" to (selectedGroupId ?: ""),
+                        "isFavorite" to isFavorite,
+                        "userId" to user.uid,
+                        "userName" to userName,
+                        "image" to image
+                    )
 
-        imageRef.putFile(imageUri)
-            .addOnSuccessListener {
-                imageRef.downloadUrl.addOnSuccessListener { downloadUri ->
-                    homeMap["imageUrl"] = downloadUri.toString()
-                    saveHomeData(homeMap, callback)
+                    val storageRef = storage.reference
+                    val imageRef = storageRef.child("images/${UUID.randomUUID()}.jpg")
+
+                    imageRef.putFile(imageUri)
+                        .addOnSuccessListener {
+                            imageRef.downloadUrl.addOnSuccessListener { downloadUri ->
+                                homeMap["imageUrl"] = downloadUri.toString()
+                                saveHomeData(homeMap, callback)
+                            }
+                        }
+                        .addOnFailureListener {
+                            Toast.makeText(context, "Failed to upload image", Toast.LENGTH_SHORT)
+                                .show()
+                            callback(false) // Notify failure
+                        }
                 }
-            }
-            .addOnFailureListener {
-                Toast.makeText(context, "Failed to upload image", Toast.LENGTH_SHORT).show()
-                callback(false) // Notify failure
-            }
+                .addOnFailureListener {
+                    Toast.makeText(context, "Failed to retrieve user data", Toast.LENGTH_SHORT)
+                        .show()
+                    callback(false) // Notify failure
+                }
+        }
     }
+
 
     //AddPostHomeActivity save data
     private fun saveHomeData(homeMap: HashMap<String, Any?>, callback: (Boolean) -> Unit) {
@@ -348,7 +380,6 @@ class FirebaseDatabaseManager(private val context: Context) {
             "title" to title,
             "desc" to description
         )
-
         val storageRef = storage.reference
         val imageRef = storageRef.child("images/${UUID.randomUUID()}.jpg")
         imageRef.putFile(imageUri)
@@ -464,6 +495,23 @@ class FirebaseDatabaseManager(private val context: Context) {
         }.addOnFailureListener { e ->
             Log.w("FirebaseDataManager", "Error getting user data", e)
             onDataLoaded(null, null, null)
+        }
+    }
+
+    //fetch user data on userProfileActivity
+    fun loadUserData(
+        userId: String,
+        onDataLoaded: (username: String?, email: String?, imageUrl: String?) -> Unit
+    ) {
+        val userRef = database.collection("user").document(userId)
+
+        userRef.get().addOnSuccessListener { document ->
+            if (document != null && document.exists()) {
+                val username = document.getString("name")
+                val email = document.getString("email")
+                val imageUrl = document.getString("profileImageUrl")
+                onDataLoaded(username, email, imageUrl)
+            }
         }
     }
 }

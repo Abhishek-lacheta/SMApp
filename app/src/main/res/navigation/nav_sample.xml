@@ -27,7 +27,7 @@
     <fragment
         android:id="@+id/addBlockFragment"
         android:name="com.example.project01.fragments.AddBlockFragment"
-        tools:layout="@layout/fragment_multipal_group"
+        tools:layout="@layout/fragment_add_bloack"
         android:label="AddBlockFragment" />
     <fragment
         android:id="@+id/userFragment"
@@ -36,8 +36,14 @@
         android:label="User" />
     <fragment
         android:id="@+id/bottomSeatFragment"
-        android:name="com.example.project01.fragments.BottomSeatFragment"
-        android:label="fragment_bottom_seat"
-        tools:layout="@layout/bottom_seat_dialog" />
+        android:name="com.example.project01.dialogs.BottomSeatFragment"
+        tools:layout="@layout/bottom_seat_dialog"
+        android:label="BottomSeatFragment" />
+
+    <fragment
+        android:id="@+id/userProfileFragment"
+        android:name="com.example.project01.fragments.UserProfileFragment"
+        tools:layout="@layout/fragment_user_profile"
+        android:label="UserProfileFragment" />
 
 </navigation>

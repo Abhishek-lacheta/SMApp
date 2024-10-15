@@ -24,7 +24,7 @@ class FavoriteFragment : Fragment() {
     private var dataList = ArrayList<HomeModal>()
     private lateinit var databaseManager: FirebaseDatabaseManager
     private val authManager = FirebaseAuthManager()
-
+    private lateinit var noDataLayout: View
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -39,6 +39,7 @@ class FavoriteFragment : Fragment() {
 
         databaseManager = FirebaseDatabaseManager(requireContext())
         binding.recyclerview.layoutManager = LinearLayoutManager(context)
+        noDataLayout = binding.noDataLayout
 
         fetchFavoriteData()
     }
@@ -61,8 +62,11 @@ class FavoriteFragment : Fragment() {
     private fun fetchFavoriteData() {
         databaseManager.fetchFavoriteItemsFromFirebase { fetchedList ->
             if (fetchedList.isEmpty()) {
-                Toast.makeText(context, "No data found", Toast.LENGTH_SHORT).show()
+                noDataLayout.visibility = View.VISIBLE
+                binding.recyclerview.visibility = View.GONE
             } else {
+                noDataLayout.visibility = View.GONE
+                binding.recyclerview.visibility = View.VISIBLE
                 dataList.clear()
                 dataList.addAll(fetchedList)
                 setupRecyclerView()
@@ -92,6 +96,7 @@ class FavoriteFragment : Fragment() {
             }
         }
     }
+
     //new comment count
     fun updateCommentCount(postId: String, newCount: Int) {
         val post = dataList.find { it.id == postId }
@@ -100,16 +105,24 @@ class FavoriteFragment : Fragment() {
             adapter.notifyItemChanged(dataList.indexOf(it)) // Notify adapter of changes
         }
     }
-    
+
     private fun setupRecyclerView() {
         val currentUserId = authManager.getCurrentUser()?.uid // Get the current user's UID
         adapter = HomeAdaptor(
             itemList = dataList,
             onShowPopupMenu = { view, item -> /* Handle popup menu */ },
-            currentUserId = currentUserId,
+            currentUserId = null,
             onLikeClick = { item -> toggleLike(item) },// Pass the like click handler
-            onComment = { item -> onComment(item) }
+            onComment = { item -> onComment(item) },
+            onItemClick = { item -> onItemClick(item) }
         )
         binding.recyclerview.adapter = adapter
+    }
+
+    fun onItemClick(modal: HomeModal) {
+        val bundle = Bundle().apply {
+            putString("userId", modal.userId)
+        }
+        findNavController().navigate(R.id.userProfileFragment, bundle)
     }
 }

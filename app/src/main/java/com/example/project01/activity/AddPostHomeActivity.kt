@@ -167,10 +167,15 @@ class AddPostHomeActivity : AppCompatActivity() {
             ) { success ->
                 binding.submitLoader.visibility = View.GONE
                 binding.homeButtonId.visibility = View.VISIBLE
+
+                if (success) {
+                    Toast.makeText(this, "Upload successful", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(this, "Upload failed", Toast.LENGTH_SHORT).show()
+                }
             }
         }
     }
-
     private fun openImageChooser() {
         val intent = Intent()
         intent.type = "image/*"

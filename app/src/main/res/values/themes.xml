@@ -11,4 +11,9 @@
         <item name="colorPrimary">@color/my_blue</item>
 
     </style>
+
+    <style name="Theme.Collapse" parent="Theme.Project01">
+        <item name="colorPrimary">@color/my_blue</item>
+
+    </style>
 </resources>

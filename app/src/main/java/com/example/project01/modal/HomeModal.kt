@@ -4,7 +4,6 @@ import android.os.Parcelable
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.parcelize.Parcelize
-import org.w3c.dom.Comment
 
 
 @Parcelize
@@ -18,6 +17,8 @@ import org.w3c.dom.Comment
     var commentcount:Int=0,
     var userId: String? = null,
     var groupId: String?=null,
+    var userName:String?=null,
+    val image:String?=null,
     var likedBy: List<String> = listOf()
 ):Parcelable {
     val isLikedByCurrentUser: Boolean

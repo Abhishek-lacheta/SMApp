@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:padding="8dp">
 
@@ -11,21 +11,22 @@
         android:layout_height="200dp"
         android:layout_marginTop="20dp">
 
-
-        <ImageView
+        <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/image_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:scaleType="centerCrop"
-            android:background="@drawable/rounded_corners" />
+            app:shapeAppearanceOverlay="@style/RoundedImage"
+            android:scaleType="centerCrop" />
+
         <ImageView
             android:id="@+id/groupPopupMenu"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:padding="10dp"
-            android:src="@drawable/ic_navbutton"
             android:layout_gravity="top|end"
-            android:layout_margin="8dp" />
+            android:layout_margin="8dp"
+            android:background="@drawable/rounded_background"
+            android:padding="10dp"
+            android:src="@drawable/ic_navbutton" />
 
     </FrameLayout>
 

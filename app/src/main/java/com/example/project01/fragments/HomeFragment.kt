@@ -12,6 +12,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.project01.activity.AddPostHomeActivity
 import com.example.project01.adaptor.HomeAdaptor
@@ -23,18 +24,17 @@ import com.example.project01.firebase.FirebaseAuthManager
 import com.example.project01.firebase.FirebaseDatabaseManager
 import com.google.firebase.auth.FirebaseAuth
 
-
 class HomeFragment : Fragment() {
     private lateinit var adapter: HomeAdaptor
     private lateinit var binding: FragmentHomeBinding
     private var dataList = ArrayList<HomeModal>()
     private lateinit var firebaseDatabaseManager: FirebaseDatabaseManager
     private val authManager = FirebaseAuthManager()
+    private lateinit var noDataLayout:View
 
     @SuppressLint("MissingInflatedId")
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View? {
         binding = FragmentHomeBinding.inflate(inflater, container, false)
         return binding.root
@@ -45,7 +45,6 @@ class HomeFragment : Fragment() {
 
         // Initialize FirebaseDatabaseManager
         firebaseDatabaseManager = FirebaseDatabaseManager(requireContext())
-
         // Setup Toolbar
         val activity = activity as AppCompatActivity
         val toolbar = binding.hometoolbar
@@ -54,6 +53,7 @@ class HomeFragment : Fragment() {
 
         // Setup RecyclerView
         binding.recyclerview.layoutManager = LinearLayoutManager(context)
+       noDataLayout= binding.noDataLayout
 
         // Fetch Data from Firestore
         fetchHomeData()
@@ -61,10 +61,17 @@ class HomeFragment : Fragment() {
 
     //fetch home data
     private fun fetchHomeData() {
-        firebaseDatabaseManager.fetchDataHomeFromFireStore { data ->
-            if (data.isEmpty()) return@fetchDataHomeFromFireStore // Handle empty data
-            dataList.clear()
-            dataList.addAll(data)
+        firebaseDatabaseManager.fetchDataHomeFromFireStore { fetchedList ->
+          if (fetchedList.isEmpty()){
+              noDataLayout.visibility=View.VISIBLE
+              binding.recyclerview.visibility=View.GONE
+
+          }else{
+              noDataLayout.visibility=View.GONE
+              binding.recyclerview.visibility=View.VISIBLE
+              dataList.clear()
+              dataList.addAll(fetchedList)
+          }
 
             // Fetch comment counts for each post
             dataList.forEach { item ->
@@ -75,9 +82,21 @@ class HomeFragment : Fragment() {
                     }
                 }
             }
-
             setupRecyclerView() // Initialize the adapter
         }
+    }
+
+    // Comment method
+    private fun onComment(modal: HomeModal) {
+        val bundle = Bundle().apply {
+            putString("postId", modal.id)
+
+        }
+        val bottomSheet = BottomSeatFragment().apply {
+            arguments = bundle
+        }
+
+        bottomSheet.show(childFragmentManager, bottomSheet.tag)
     }
 
     //new comment count
@@ -91,16 +110,20 @@ class HomeFragment : Fragment() {
 
     private fun setupRecyclerView() {
         val currentUserId = authManager.getCurrentUser()?.uid // Get the current user's UID
-        adapter = HomeAdaptor(
-            itemList = dataList,
+        adapter = HomeAdaptor(itemList = dataList,
             currentUserId = null,
             onLikeClick = { item -> toggleLike(item) },
-            onComment = { item -> onComment(item) }
-        )
+            onComment = { item -> onComment(item) },
+            onItemClick = { item -> onItemClick(item) })
         binding.recyclerview.adapter = adapter
     }
 
-
+    fun onItemClick(modal: HomeModal) {
+        val bundle = Bundle().apply {
+            putString("userId", modal.userId)
+        }
+        findNavController().navigate(R.id.userProfileFragment, bundle)
+    }
 
     private fun toggleLike(item: HomeModal) {
         val currentUserId = FirebaseAuth.getInstance().currentUser?.uid ?: return
@@ -123,18 +146,6 @@ class HomeFragment : Fragment() {
         }
     }
 
-    // Comment method
-    private fun onComment(modal: HomeModal) {
-        val bundle = Bundle().apply {
-            putString("postId", modal.id)
-        }
-        val bottomSheet = BottomSeatFragment().apply {
-            arguments = bundle
-        }
-
-        bottomSheet.show(childFragmentManager, bottomSheet.tag)
-    }
-
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.home_menu, menu)
         super.onCreateOptionsMenu(menu, inflater)
@@ -151,8 +162,6 @@ class HomeFragment : Fragment() {
             else -> super.onOptionsItemSelected(item)
         }
     }
-
-
 }
 
 
