@@ -111,7 +111,6 @@ open class BottomSeatFragment : BottomSheetDialogFragment() {
                 }
         }
     }
-
     private fun loadComments() {
         db.collection("home").document(postId).collection("comments")
             .orderBy("timestamp", Query.Direction.ASCENDING)

@@ -1,5 +1,4 @@
-<androidx.coordinatorlayout.widget.CoordinatorLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -7,20 +6,23 @@
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
+
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="55dp">
+
             <ImageView
                 android:id="@+id/arrov_back"
                 android:layout_width="60dp"
                 android:layout_height="60dp"
-                android:padding="15dp"
-                android:layout_marginTop="10dp"
                 android:layout_marginStart="10dp"
+                android:layout_marginTop="10dp"
+                android:padding="15dp"
                 android:src="@drawable/ic_arrovback" />
         </LinearLayout>
 
     </com.google.android.material.appbar.AppBarLayout>
+
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -57,6 +59,7 @@
                 android:text="This is a sample bio."
                 android:textColor="@android:color/darker_gray"
                 android:textSize="16dp" />
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -71,7 +74,7 @@
                     android:gravity="center">
 
                     <TextView
-                        android:id="@+id/postsCountTextView"
+                        android:id="@+id/groupCountTextView"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="0"
@@ -126,7 +129,24 @@
                         android:text=" following"
                         android:textSize="14sp" />
                 </LinearLayout>
+
             </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/followButton"
+                    android:layout_width="300dp"
+                    android:layout_height="wrap_content"
+                    android:theme="@style/Theme.Button"
+                    android:text="Follow User" />
+
+            </LinearLayout>
+
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/group_recyclerview"
                 android:layout_width="match_parent"

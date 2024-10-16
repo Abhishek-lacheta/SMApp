@@ -104,7 +104,7 @@ class HomeFragment : Fragment() {
         val post = dataList.find { it.id == postId }
         post?.let {
             it.commentcount = newCount
-            adapter.notifyItemChanged(dataList.indexOf(it)) // Notify adapter of changes
+            adapter.notifyItemChanged(dataList.indexOf(it))
         }
     }
 

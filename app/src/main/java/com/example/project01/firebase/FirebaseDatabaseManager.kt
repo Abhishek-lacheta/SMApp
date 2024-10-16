@@ -110,22 +110,6 @@ class FirebaseDatabaseManager(private val context: Context) {
             }
     }
 
-    // fetch group data on the basis of userId in UserProfileActivity
-    fun fetchDataGroupFromeFireStore1(userId: String, callback: (List<GroupModal>) -> Unit) {
-        database.collection("group").whereEqualTo("userId", userId)
-            .get()
-            .addOnSuccessListener { result ->
-                val dataList = ArrayList<GroupModal>()
-                for (document in result.documents) {
-                    val item = document.toObject(GroupModal::class.java)
-                    item?.id = document.id
-                    item?.let { dataList.add(it) }
-                }
-                callback(dataList)
-            }
-    }
-
-
     // favrate Fragment fetch home data
     fun fetchFavoriteItemsFromFirebase(callback: (List<HomeModal>) -> Unit) {
         database.collection("home")
@@ -514,7 +498,102 @@ class FirebaseDatabaseManager(private val context: Context) {
             }
         }
     }
+
+    // fetch group data on the basis of userId in UserProfileActivity
+    fun fetchDataGroupFromeFireStore1(userId: String, callback: (List<GroupModal>) -> Unit) {
+        database.collection("group").whereEqualTo("userId", userId)
+            .get()
+            .addOnSuccessListener { result ->
+                val dataList = ArrayList<GroupModal>()
+                for (document in result.documents) {
+                    val item = document.toObject(GroupModal::class.java)
+                    item?.id = document.id
+                    item?.let { dataList.add(it) }
+                }
+                callback(dataList)
+            }
+    }
+
+    //Follow User From UserProfile Fragment
+    fun followUser(followedUserId: String) {
+        val currentUser = authManager.getCurrentUser()
+        currentUser?.let { user ->
+            database.collection("user").document(user.uid).get()
+                .addOnSuccessListener { document ->
+                    val userName = document.getString("name")
+                    val image = document.getString("profileImageUrl")
+
+                    val followedData = hashMapOf(
+                        "userId" to user.uid,
+                        "userName" to userName,
+                        "image" to image
+                    )
+                    val followed =
+                        database.collection("user").document(followedUserId).collection("followers")
+                            .document(user.uid)
+                    val following =
+                        database.collection("user").document(user.uid).collection("following")
+                            .document(followedUserId)
+
+                    database.runTransaction { transaction ->
+                        transaction.set(followed, followedData)
+                        transaction.set(following, followedData)
+                    }.addOnSuccessListener {
+                        Toast.makeText(context, "Successfully followed!", Toast.LENGTH_SHORT).show()
+                    }
+                }
+        }
+    }
+
+    //UnFollow user From UserProfileFragment
+    fun unfollowUser(followedUserId: String) {
+        val currentUser = authManager.getCurrentUser() ?: return
+        val userId = currentUser.uid
+        val followed =
+            database.collection("user").document(followedUserId).collection("followers")
+                .document(userId)
+        val following = database.collection("user").document(userId).collection("following")
+            .document(followedUserId)
+
+        database.runTransaction { transaction ->
+            transaction.delete(followed)
+            transaction.delete(following)
+        }.addOnSuccessListener {
+            Toast.makeText(context, "Successfully Unfollowed!", Toast.LENGTH_SHORT).show()
+        }
+    }
+    fun getFollowersCount(userId: String, onCountFetched: (Int) -> Unit) {
+        database.collection("user")
+            .document(userId)
+            .collection("followers")
+            .addSnapshotListener{ snapshot, error ->
+                val count = snapshot?.documents?.size
+                onCountFetched(count ?: 0)
+            }
+    }
+    fun geFollwingCount(userId: String, onCountFetched: (Int) -> Unit) {
+
+        database.collection("user").document(userId).collection("following").get()
+            .addOnSuccessListener { document ->
+
+                val count = document.size()
+                onCountFetched(count)
+            }
+    }
+    // fetch group count on the basis of userId in UserProfileActivity
+    fun fetchGroupCountFromFirestore(userId: String, callback: (Int) -> Unit) {
+        database.collection("group").whereEqualTo("userId", userId)
+            .get()
+            .addOnSuccessListener { result ->
+                val groupCount = result.size()
+                callback(groupCount)
+            }
+
+    }
+
+
 }
+
 
 
 
