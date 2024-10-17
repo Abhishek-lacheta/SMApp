@@ -36,8 +36,8 @@
         android:label="User" />
     <fragment
         android:id="@+id/bottomSeatFragment"
-        android:name="com.example.project01.dialogs.BottomSeatFragment"
-        tools:layout="@layout/bottom_seat_dialog"
+        android:name="com.example.project01.fragments.BottomSeatFragment"
+        tools:layout="@layout/fragment_bottomseat"
         android:label="BottomSeatFragment" />
 
     <fragment
@@ -45,5 +45,14 @@
         android:name="com.example.project01.fragments.UserProfileFragment"
         tools:layout="@layout/fragment_user_profile"
         android:label="UserProfileFragment" />
-
+    <fragment
+        android:id="@+id/followersFragment"
+        android:name="com.example.project01.fragments.FollowersFragment"
+        tools:layout="@layout/fragment_followers"
+        android:label="FollowersFragment" />
+    <fragment
+        android:id="@+id/followingFragment"
+        android:name="com.example.project01.fragments.FollowingFragment"
+        tools:layout="@layout/fragment_following"
+        android:label="FollowingFragment" />
 </navigation>

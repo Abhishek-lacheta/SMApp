@@ -4,8 +4,10 @@ import android.content.Context
 import android.net.Uri
 import android.util.Log
 import android.widget.Toast
+import com.example.project01.modal.FollowerModal
 import com.example.project01.modal.GroupModal
 import com.example.project01.modal.HomeModal
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
@@ -41,7 +43,6 @@ class FirebaseDatabaseManager(private val context: Context) {
                 callback(emptyList())
             }
     }
-
     // Toggle like status like funcnality
     fun toggleLike(postId: String, userId: String, isLiked: Boolean, callback: (Boolean) -> Unit) {
         val postRef = database.collection("home").document(postId)
@@ -273,7 +274,6 @@ class FirebaseDatabaseManager(private val context: Context) {
         }
     }
 
-
     //AddPostHomeActivity save data
     private fun saveHomeData(homeMap: HashMap<String, Any?>, callback: (Boolean) -> Unit) {
         database.collection("home").document().set(homeMap)
@@ -286,7 +286,6 @@ class FirebaseDatabaseManager(private val context: Context) {
                 callback(false) // Notify failure
             }
     }
-
 
     // Update group collection from AddpostGroupActivity
     fun updateGroupData(
@@ -562,15 +561,19 @@ class FirebaseDatabaseManager(private val context: Context) {
             Toast.makeText(context, "Successfully Unfollowed!", Toast.LENGTH_SHORT).show()
         }
     }
+
+    //fetch followers count on the basis of userId in UserProfileActivity
     fun getFollowersCount(userId: String, onCountFetched: (Int) -> Unit) {
         database.collection("user")
             .document(userId)
             .collection("followers")
-            .addSnapshotListener{ snapshot, error ->
+            .addSnapshotListener { snapshot, error ->
                 val count = snapshot?.documents?.size
                 onCountFetched(count ?: 0)
             }
     }
+
+    //fetch following count on the basis of userId in UserProfileActivity
     fun geFollwingCount(userId: String, onCountFetched: (Int) -> Unit) {
 
         database.collection("user").document(userId).collection("following").get()
@@ -580,6 +583,7 @@ class FirebaseDatabaseManager(private val context: Context) {
                 onCountFetched(count)
             }
     }
+
     // fetch group count on the basis of userId in UserProfileActivity
     fun fetchGroupCountFromFirestore(userId: String, callback: (Int) -> Unit) {
         database.collection("group").whereEqualTo("userId", userId)
@@ -588,18 +592,7 @@ class FirebaseDatabaseManager(private val context: Context) {
                 val groupCount = result.size()
                 callback(groupCount)
             }
-
     }
 
 
 }
-
-
-
-
-
-
-
-
-
-

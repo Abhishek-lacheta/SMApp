@@ -1,4 +1,4 @@
-package com.example.project01.dialogs
+package com.example.project01.fragments
 
 import android.annotation.SuppressLint
 import android.os.Bundle
@@ -11,9 +11,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.project01.R
 import com.example.project01.adaptor.CommentsAdapter
-import com.example.project01.databinding.BottomSeatDialogBinding
+import com.example.project01.databinding.FragmentBottomseatBinding
 import com.example.project01.firebase.FirebaseAuthManager
-import com.example.project01.fragments.HomeFragment
 import com.example.project01.modal.Comment
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.firebase.Firebase
@@ -22,7 +21,7 @@ import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.firestore
 
 open class BottomSeatFragment : BottomSheetDialogFragment() {
-    private lateinit var binding: BottomSeatDialogBinding
+    private lateinit var binding:FragmentBottomseatBinding
     private lateinit var commentsRecyclerView: RecyclerView
     private lateinit var commentInput: EditText
     private lateinit var sendButton: ImageButton
@@ -36,7 +35,7 @@ open class BottomSeatFragment : BottomSheetDialogFragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = BottomSeatDialogBinding.inflate(inflater, container, false)
+        binding = FragmentBottomseatBinding.inflate(inflater, container, false)
         return binding.root
     }
 

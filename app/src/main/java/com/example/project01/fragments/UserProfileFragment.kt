@@ -7,16 +7,13 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import com.bumptech.glide.Glide
 import com.example.project01.R
 import com.example.project01.databinding.FragmentUserProfileBinding
-import com.example.project01.firebase.FirebaseAuthManager
 import com.example.project01.firebase.FirebaseDatabaseManager
 import com.example.project01.modal.GroupModal
-import com.google.firebase.firestore.FirebaseFirestore
 
 class UserProfileFragment : Fragment() {
     private lateinit var binding: FragmentUserProfileBinding
@@ -25,7 +22,7 @@ class UserProfileFragment : Fragment() {
     private lateinit var firebaseDatabaseManager: FirebaseDatabaseManager
     private val itemList = mutableListOf<GroupModal>()
     private lateinit var groupRecyclerAdapter: GroupRecyclerAdapter
-    private var isFollowing = false
+    private var isFollowing: Boolean = false
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -46,6 +43,18 @@ class UserProfileFragment : Fragment() {
         firebaseDatabaseManager = FirebaseDatabaseManager(requireContext())
         binding.groupRecyclerview.layoutManager = GridLayoutManager(requireContext(), 2)
 
+        binding.clickfollower.setOnClickListener {
+            val bundle = Bundle().apply {
+                putString("userId", userId)
+            }
+            findNavController().navigate(R.id.followersFragment, bundle)
+        }
+        binding.followingClick.setOnClickListener {
+            val bundle = Bundle().apply {
+                putString("userId", userId)
+            }
+            findNavController().navigate(R.id.followingFragment, bundle)
+        }
         binding.arrovBack.setOnClickListener {
             findNavController().navigateUp()
         }

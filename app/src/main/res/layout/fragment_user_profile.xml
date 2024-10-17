@@ -103,6 +103,7 @@
                         android:textStyle="bold" />
 
                     <TextView
+                        android:id="@+id/clickfollower"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text=" followers"
@@ -124,6 +125,7 @@
                         android:textStyle="bold" />
 
                     <TextView
+                        android:id="@+id/followingClick"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text=" following"
@@ -142,8 +144,9 @@
                     android:id="@+id/followButton"
                     android:layout_width="300dp"
                     android:layout_height="wrap_content"
-                    android:theme="@style/Theme.Button"
-                    android:text="Follow User" />
+                    android:layout_marginTop="10dp"
+                    android:text="Follow"
+                    android:theme="@style/Theme.Button"/>
 
             </LinearLayout>
 

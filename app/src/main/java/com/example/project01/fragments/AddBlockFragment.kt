@@ -16,7 +16,6 @@ import com.example.project01.R
 import com.example.project01.activity.AddPostHomeActivity
 import com.example.project01.adaptor.HomeAdaptor
 import com.example.project01.databinding.FragmentAddBloackBinding
-import com.example.project01.dialogs.BottomSeatFragment
 import com.example.project01.firebase.FirebaseAuthManager
 import com.example.project01.firebase.FirebaseDatabaseManager
 import com.example.project01.modal.HomeModal
