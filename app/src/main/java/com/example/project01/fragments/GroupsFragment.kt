@@ -12,6 +12,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
+import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.project01.R
@@ -53,6 +54,22 @@ class GroupsFragment : Fragment() {
         noDataLayout = binding.noDataLayout
         // Fetch data from Firestore
         fetchGroupData()
+        setupToolbar()
+    }
+
+    //backicon ke liye
+    private fun setupToolbar() {
+
+        val openFromUserfragment = arguments?.getBoolean("openFromUserfragment") ?: false
+        if (openFromUserfragment) {
+            binding.toolbar.setNavigationIcon(R.drawable.ic_arrovback)
+            binding.toolbar.setNavigationOnClickListener {
+
+                findNavController().popBackStack()
+            }
+        } else {
+            binding.toolbar.navigationIcon = null
+        }
     }
 
     //SetUp RecyclerView
@@ -118,18 +135,26 @@ class GroupsFragment : Fragment() {
                 "Item clicked: ${model.id}, ${model.name},${authManager.getCurrentUser()?.uid}"
             )
         }
-        findNavController().navigate(R.id.addBlockFragment, bundle)
+        val navOptions =
+            NavOptions.Builder()
+                .setEnterAnim(R.anim.slide_in_right)
+                .setExitAnim(R.anim.slide_out_left)
+                .setPopEnterAnim(R.anim.slide_in_left)
+                .setPopExitAnim(R.anim.slide_out_right)
+                .build()
+
+        findNavController().navigate(R.id.addBlockFragment, bundle, navOptions)
     }
 
     //Fetch GroupData
     private fun fetchGroupData() {
         databaseManager.fetchDataGroupFromeFireStore { fetchedList ->
-            if (fetchedList.isEmpty()){
-                noDataLayout.visibility=View.VISIBLE
-                binding.groupRecyclerview.visibility=View.GONE
-            }else{
-                noDataLayout.visibility=View.GONE
-                binding.groupRecyclerview.visibility=View.VISIBLE
+            if (fetchedList.isEmpty()) {
+                noDataLayout.visibility = View.VISIBLE
+                binding.groupRecyclerview.visibility = View.GONE
+            } else {
+                noDataLayout.visibility = View.GONE
+                binding.groupRecyclerview.visibility = View.VISIBLE
                 itemList.clear()
                 itemList.addAll(fetchedList)
                 setupRecyclerView()

@@ -12,6 +12,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.project01.activity.AddPostHomeActivity
@@ -29,7 +30,7 @@ class HomeFragment : Fragment() {
     private var dataList = ArrayList<HomeModal>()
     private lateinit var firebaseDatabaseManager: FirebaseDatabaseManager
     private val authManager = FirebaseAuthManager()
-    private lateinit var noDataLayout:View
+    private lateinit var noDataLayout: View
 
     @SuppressLint("MissingInflatedId")
     override fun onCreateView(
@@ -52,7 +53,7 @@ class HomeFragment : Fragment() {
 
         // Setup RecyclerView
         binding.recyclerview.layoutManager = LinearLayoutManager(context)
-       noDataLayout= binding.noDataLayout
+        noDataLayout = binding.noDataLayout
 
         // Fetch Data from Firestore
         fetchHomeData()
@@ -61,16 +62,16 @@ class HomeFragment : Fragment() {
     //fetch home data
     private fun fetchHomeData() {
         firebaseDatabaseManager.fetchDataHomeFromFireStore { fetchedList ->
-          if (fetchedList.isEmpty()){
-              noDataLayout.visibility=View.VISIBLE
-              binding.recyclerview.visibility=View.GONE
+            if (fetchedList.isEmpty()) {
+                noDataLayout.visibility = View.VISIBLE
+                binding.recyclerview.visibility = View.GONE
 
-          }else{
-              noDataLayout.visibility=View.GONE
-              binding.recyclerview.visibility=View.VISIBLE
-              dataList.clear()
-              dataList.addAll(fetchedList)
-          }
+            } else {
+                noDataLayout.visibility = View.GONE
+                binding.recyclerview.visibility = View.VISIBLE
+                dataList.clear()
+                dataList.addAll(fetchedList)
+            }
 
             // Fetch comment counts for each post
             dataList.forEach { item ->
@@ -121,8 +122,17 @@ class HomeFragment : Fragment() {
         val bundle = Bundle().apply {
             putString("userId", modal.userId)
         }
-        findNavController().navigate(R.id.userProfileFragment, bundle)
+        val navOptions =
+            NavOptions.Builder()
+                .setEnterAnim(R.anim.slide_in_right)
+                .setExitAnim(R.anim.slide_out_left)
+                .setPopEnterAnim(R.anim.slide_in_left)
+                .setPopExitAnim(R.anim.slide_out_right)
+                .build()
+
+        findNavController().navigate(R.id.userProfileFragment, bundle, navOptions)
     }
+
 
     private fun toggleLike(item: HomeModal) {
         val currentUserId = FirebaseAuth.getInstance().currentUser?.uid ?: return

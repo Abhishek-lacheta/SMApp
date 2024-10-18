@@ -7,7 +7,9 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.ui.navigateUp
 import androidx.recyclerview.widget.GridLayoutManager
 import com.bumptech.glide.Glide
 import com.example.project01.R
@@ -47,15 +49,33 @@ class UserProfileFragment : Fragment() {
             val bundle = Bundle().apply {
                 putString("userId", userId)
             }
-            findNavController().navigate(R.id.followersFragment, bundle)
+            val navOptions =
+                NavOptions.Builder()
+                    .setEnterAnim(R.anim.slide_in_right)
+                    .setExitAnim(R.anim.slide_out_left)
+                    .setPopEnterAnim(R.anim.slide_in_left)
+                    .setPopExitAnim(R.anim.slide_out_right)
+                    .build()
+
+            findNavController().navigate(R.id.followersFragment, bundle,navOptions)
         }
         binding.followingClick.setOnClickListener {
             val bundle = Bundle().apply {
                 putString("userId", userId)
             }
-            findNavController().navigate(R.id.followingFragment, bundle)
+
+            val navOptions =
+                NavOptions.Builder()
+                    .setEnterAnim(R.anim.slide_in_right)
+                    .setExitAnim(R.anim.slide_out_left)
+                    .setPopEnterAnim(R.anim.slide_in_left)
+                    .setPopExitAnim(R.anim.slide_out_right)
+                    .build()
+            findNavController().navigate(R.id.followingFragment, bundle,navOptions)
         }
-        binding.arrovBack.setOnClickListener {
+        binding.profiletoobar.setOnClickListener {
+
+
             findNavController().navigateUp()
         }
 
@@ -66,7 +86,6 @@ class UserProfileFragment : Fragment() {
             fetchFollowingCount(userId)
             fetchGroupCount(userId)
         }
-
         binding.followButton.setOnClickListener {
             followedUserId?.let { id ->
                 if (isFollowing) {
@@ -111,7 +130,15 @@ class UserProfileFragment : Fragment() {
             putString("userId", userId)
             Log.d("UserProfileFragment", "Item clicked: ${model.id}, ${model.name}, ${userId}")
         }
-        findNavController().navigate(R.id.addBlockFragment, bundle)
+
+        val navOptions =
+            NavOptions.Builder()
+                .setEnterAnim(R.anim.slide_in_right)
+                .setExitAnim(R.anim.slide_out_left)
+                .setPopEnterAnim(R.anim.slide_in_left)
+                .setPopExitAnim(R.anim.slide_out_right)
+                .build()
+        findNavController().navigate(R.id.addBlockFragment, bundle,navOptions)
     }
 
     // SetUp RecyclerView
@@ -139,7 +166,6 @@ class UserProfileFragment : Fragment() {
             }
         }
     }
-
     private fun fetchGroupData(userId: String) {
         firebaseDatabaseManager.fetchDataGroupFromeFireStore1(userId) { fetchedList ->
             itemList.clear()

@@ -11,6 +11,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.project01.adaptor.FollowerAdaptor
 import com.example.project01.databinding.FragmentFollowersBinding
+import com.example.project01.firebase.FirebaseDatabaseManager
 import com.example.project01.modal.FollowerModal
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.FirebaseFirestore
@@ -19,10 +20,12 @@ import com.google.firebase.firestore.firestore
 
 class FollowersFragment : Fragment() {
     private lateinit var binding: FragmentFollowersBinding
-    private val followerAdaptor = FollowerAdaptor(mutableListOf())
+    private val itemList = mutableListOf<FollowerModal>()
     private val database: FirebaseFirestore = Firebase.firestore
     private lateinit var userId: String
     private lateinit var navController: NavController
+    private lateinit var followerAdaptor: FollowerAdaptor
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -44,10 +47,24 @@ class FollowersFragment : Fragment() {
         }
         binding.followerrecyclerView.layoutManager = LinearLayoutManager(context)
 
-        binding.followerrecyclerView.adapter = followerAdaptor
         loadFollowerList()
+
+
     }
 
+
+    private fun setuprecyclerView() {
+        followerAdaptor = FollowerAdaptor(
+            followers = itemList,
+            onItemClick = { itemList -> onItemClick(itemList) },
+        )
+        binding.followerrecyclerView.adapter = followerAdaptor
+    }
+
+    fun onItemClick(follower: FollowerModal) {
+
+
+    }
 
     fun loadFollowerList() {
 
@@ -61,8 +78,10 @@ class FollowersFragment : Fragment() {
                     val followerImage = document.getString("image")
 
                     followers.add(FollowerModal(userName, followerImage))
+                    setuprecyclerView()
                 }
                 followerAdaptor.setFollowers(followers)
+
             }
     }
 

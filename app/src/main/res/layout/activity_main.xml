@@ -29,6 +29,8 @@
         app:labelVisibilityMode="labeled"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:enterAnim="@anim/slide_in_right"
+        app:exitAnim="@anim/slide_in_right"
         app:layout_constraintStart_toStartOf="parent"
         app:menu="@menu/nav_menu" />
 

@@ -16,6 +16,7 @@
         android:background="@color/white"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
         app:title="Group"
+        app:navigationIcon="@drawable/ic_arrovback"
         app:titleTextColor="@color/black" />
 
     <androidx.recyclerview.widget.RecyclerView
