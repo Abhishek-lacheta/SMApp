@@ -15,7 +15,7 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.project01.activity.AddPostHomeActivity
+import com.example.project01.activity.AddPostActivity
 import com.example.project01.adaptor.HomeAdaptor
 import com.example.project01.modal.HomeModal
 import com.example.project01.R
@@ -45,11 +45,7 @@ class HomeFragment : Fragment() {
 
         // Initialize FirebaseDatabaseManager
         firebaseDatabaseManager = FirebaseDatabaseManager(requireContext())
-        // Setup Toolbar
-        val activity = activity as AppCompatActivity
-        val toolbar = binding.hometoolbar
-        activity.setSupportActionBar(toolbar)
-        setHasOptionsMenu(true)
+       
 
         // Setup RecyclerView
         binding.recyclerview.layoutManager = LinearLayoutManager(context)
@@ -92,7 +88,7 @@ class HomeFragment : Fragment() {
             putString("postId", modal.id)
 
         }
-        val bottomSheet = BottomSeatFragment().apply {
+        val bottomSheet = CommentsFragment().apply {
             arguments = bundle
         }
 
@@ -155,22 +151,7 @@ class HomeFragment : Fragment() {
         }
     }
 
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.home_menu, menu)
-        super.onCreateOptionsMenu(menu, inflater)
-    }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.home_add -> {
-                val intent = Intent(requireContext(), AddPostHomeActivity::class.java)
-                startActivity(intent)
-                true
-            }
-
-            else -> super.onOptionsItemSelected(item)
-        }
-    }
 }
 
 

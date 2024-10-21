@@ -3,8 +3,6 @@ package com.example.project01.fragments
 import GroupRecyclerAdapter
 import android.content.Intent
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
@@ -23,13 +21,9 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CircleCrop
 import com.example.project01.R
-import com.example.project01.activity.AddPostGroupActivity
-import com.example.project01.activity.ChangePasswordActivity
-import com.example.project01.activity.EditProfileActivity
-import com.example.project01.activity.LoginActivity
+import com.example.project01.activity.AddGroupActivity
 import com.example.project01.activity.SettingActivity
 import com.example.project01.databinding.FragmentUserBinding
-import com.example.project01.dialogs.DialogUtils
 import com.example.project01.firebase.FirebaseAuthManager
 import com.example.project01.firebase.FirebaseDatabaseManager
 import com.example.project01.modal.GroupModal
@@ -53,6 +47,7 @@ class UserFragment : Fragment() {
         binding = FragmentUserBinding.inflate(inflater, container, false)
         return binding.root
     }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -103,26 +98,13 @@ class UserFragment : Fragment() {
             findNavController().navigate(R.id.followingFragment, bundle, navOptions)
         }
 
-        binding.GroupClick.setOnClickListener {
-            val bundle = Bundle().apply {
-                putBoolean("openFromUserfragment", true)
-            }
-            val navOptions =
-                NavOptions.Builder()
-                    .setEnterAnim(R.anim.slide_in_right)
-                    .setExitAnim(R.anim.slide_out_left)
-                    .setPopEnterAnim(R.anim.slide_in_left)
-                    .setPopExitAnim(R.anim.slide_out_right)
-                    .build()
-            findNavController().navigate(R.id.groupsFragment, bundle, navOptions)
-        }
-
         if (userId != null) {
             fetchFollowersCount(userId)
             fetchFollowingCount(userId)
             fetchGroupCount(userId)
         }
     }
+
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.user_menu, menu)
         super.onCreateOptionsMenu(menu, inflater)
@@ -130,8 +112,14 @@ class UserFragment : Fragment() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
-            R.id.clicksetting-> {
+            R.id.clicksetting -> {
                 val intent = Intent(requireContext(), SettingActivity::class.java)
+                startActivity(intent)
+                true
+            }
+
+            R.id.clickadd -> {
+                val intent = Intent(requireContext(), AddGroupActivity::class.java)
                 startActivity(intent)
                 true
             }
@@ -162,6 +150,7 @@ class UserFragment : Fragment() {
             binding.groupCountTextView.text = count.toString()
         }
     }
+
     //Get User Data
     private fun updateUI() {
         val currentUser = authManager.getCurrentUser()
@@ -184,6 +173,7 @@ class UserFragment : Fragment() {
             }
         }
     }
+
     //SetUp RecyclerView
     private fun setupRecyclerView() {
         groupRecyclerAdapteradaptor = GroupRecyclerAdapter(
@@ -202,7 +192,7 @@ class UserFragment : Fragment() {
             when (menuItem.itemId) {
                 R.id.confirm_delete -> deleteItem(item)
                 R.id.update -> {
-                    val intent = Intent(requireContext(), AddPostGroupActivity::class.java).apply {
+                    val intent = Intent(requireContext(), AddGroupActivity::class.java).apply {
                         putExtra("group", item)
                     }
                     startActivity(intent)
@@ -256,6 +246,7 @@ class UserFragment : Fragment() {
 
         findNavController().navigate(R.id.addBlockFragment, bundle, navOptions)
     }
+
     //Fetch User Data
     private fun fetchGroupData(userId: String) {
         databaseManager.fetchDataGroupFromeFireStore1(userId) { fetchedList ->

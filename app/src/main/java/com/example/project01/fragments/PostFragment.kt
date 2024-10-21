@@ -13,17 +13,17 @@ import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.project01.R
-import com.example.project01.activity.AddPostHomeActivity
+import com.example.project01.activity.AddPostActivity
 import com.example.project01.adaptor.HomeAdaptor
-import com.example.project01.databinding.FragmentAddBloackBinding
+import com.example.project01.databinding.FragmentPostBinding
 import com.example.project01.firebase.FirebaseAuthManager
 import com.example.project01.firebase.FirebaseDatabaseManager
 import com.example.project01.modal.HomeModal
 import com.google.firebase.auth.FirebaseAuth
 
-class AddBlockFragment : Fragment() {
+class PostFragment : Fragment() {
     private lateinit var adapter: HomeAdaptor
-    private lateinit var binding: FragmentAddBloackBinding
+    private lateinit var binding: FragmentPostBinding
     private var dataList = ArrayList<HomeModal>()
     private lateinit var databaseManager: FirebaseDatabaseManager
     private lateinit var modalId: String
@@ -39,7 +39,7 @@ class AddBlockFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = FragmentAddBloackBinding.inflate(inflater, container, false)
+        binding = FragmentPostBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -77,7 +77,7 @@ class AddBlockFragment : Fragment() {
 
             putString("postId", modal.id)
         }
-        val bottomSheet = BottomSeatFragment().apply {
+        val bottomSheet = CommentsFragment().apply {
             arguments = bundle
         }
 
@@ -168,7 +168,7 @@ class AddBlockFragment : Fragment() {
             when (menuItem.itemId) {
                 R.id.confirm_delete -> deleteItem(item)
                 R.id.update -> {
-                    val intent = Intent(requireContext(), AddPostHomeActivity::class.java).apply {
+                    val intent = Intent(requireContext(), AddPostActivity::class.java).apply {
                         putExtra("post", item)
                     }
                     startActivity(intent)

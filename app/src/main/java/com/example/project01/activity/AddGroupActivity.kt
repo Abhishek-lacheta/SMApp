@@ -7,13 +7,13 @@ import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
-import com.example.project01.databinding.ActivityAddPostGroupBinding
+import com.example.project01.databinding.ActivityAddGroupBinding
 import com.example.project01.firebase.FirebaseDatabaseManager
 import com.example.project01.modal.GroupModal
 
-class AddPostGroupActivity : AppCompatActivity() {
+class AddGroupActivity : AppCompatActivity() {
 
-    private lateinit var binding: ActivityAddPostGroupBinding
+    private lateinit var binding: ActivityAddGroupBinding
     private lateinit var databaseManager: FirebaseDatabaseManager
     private val PICK_IMAGE_REQUEST = 71
     private var imageUri: Uri? = null
@@ -21,7 +21,7 @@ class AddPostGroupActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityAddPostGroupBinding.inflate(layoutInflater)
+        binding = ActivityAddGroupBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         databaseManager = FirebaseDatabaseManager(this)

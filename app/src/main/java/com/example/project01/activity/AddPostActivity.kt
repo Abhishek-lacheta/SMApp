@@ -12,14 +12,14 @@ import android.widget.Spinner
 import android.widget.Toast
 import com.bumptech.glide.Glide
 import com.example.project01.R
-import com.example.project01.databinding.ActivityAddPostHomeBinding
+import com.example.project01.databinding.ActivityAddPostBinding
 import com.example.project01.firebase.FirebaseDatabaseManager
 import com.example.project01.modal.HomeModal
 
-class AddPostHomeActivity : AppCompatActivity() {
+class AddPostActivity : AppCompatActivity() {
 
     private var post: HomeModal? = null
-    private lateinit var binding: ActivityAddPostHomeBinding
+    private lateinit var binding: ActivityAddPostBinding
     private lateinit var databaseManager: FirebaseDatabaseManager
     private val PICK_IMAGE_REQUEST = 71
     private var imageUri: Uri? = null
@@ -31,7 +31,7 @@ class AddPostHomeActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityAddPostHomeBinding.inflate(layoutInflater)
+        binding = ActivityAddPostBinding.inflate(layoutInflater)
         setContentView(binding.root)
         databaseManager = FirebaseDatabaseManager(this)
 

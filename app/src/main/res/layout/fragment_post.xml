@@ -1,61 +1,60 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:gravity="center"
-    tools:context=".activity.MainActivity"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    tools:context=".activity.MainActivity">
 
     <androidx.appcompat.widget.Toolbar
-        android:id="@+id/toolbar"
+        android:id="@+id/AddBlocktoolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="@color/white"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-        app:title="Group"
         app:navigationIcon="@drawable/ic_arrovback"
         app:titleTextColor="@color/black" />
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/group_recyclerview"
+        android:id="@+id/recyclerview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
-
     <LinearLayout
         android:id="@+id/noDataLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="230dp"
         android:gravity="center"
         android:orientation="vertical"
-        android:layout_marginTop="230dp"
-        android:visibility="gone"
-        android:padding="32dp">
+        android:padding="32dp"
+        android:visibility="gone">
 
         <ImageView
             android:layout_width="100dp"
             android:layout_height="100dp"
-            android:src="@drawable/icon_empty_box"/>
+            android:src="@drawable/icon_empty_box" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="center"
             android:layout_marginTop="8dp"
-            android:text="No Group's Here!!"
+            android:text="No Post Here!!"
+            android:textColor="@android:color/darker_gray"
             android:textSize="20sp"
-            android:textColor="@android:color/darker_gray"
-            android:textStyle="bold"
-            android:layout_gravity="center" />
+            android:textStyle="bold" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Please add some groups."
-            android:textSize="14sp"
-            android:textColor="@android:color/darker_gray"
+            android:layout_gravity="center"
             android:layout_marginTop="8dp"
-            android:layout_gravity="center"/>
+            android:text="Please add some post."
+            android:textColor="@android:color/darker_gray"
+            android:textSize="14sp" />
     </LinearLayout>
+
+
 </LinearLayout>

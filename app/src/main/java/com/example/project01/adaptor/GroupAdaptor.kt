@@ -39,7 +39,6 @@ class GroupRecyclerAdapter(
         }
 
     }
-
     class GroupViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val imageView: ImageView = itemView.findViewById(R.id.image_view)
         val textView: TextView = itemView.findViewById(R.id.text_view)

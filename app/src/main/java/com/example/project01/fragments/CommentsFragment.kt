@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.project01.R
 import com.example.project01.adaptor.CommentsAdapter
-import com.example.project01.databinding.FragmentBottomseatBinding
+import com.example.project01.databinding.FragmentCommentsBinding
 import com.example.project01.firebase.FirebaseAuthManager
 import com.example.project01.modal.Comment
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -20,8 +20,8 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.firestore
 
-open class BottomSeatFragment : BottomSheetDialogFragment() {
-    private lateinit var binding:FragmentBottomseatBinding
+open class CommentsFragment : BottomSheetDialogFragment() {
+    private lateinit var binding:FragmentCommentsBinding
     private lateinit var commentsRecyclerView: RecyclerView
     private lateinit var commentInput: EditText
     private lateinit var sendButton: ImageButton
@@ -35,7 +35,7 @@ open class BottomSeatFragment : BottomSheetDialogFragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = FragmentBottomseatBinding.inflate(inflater, container, false)
+        binding = FragmentCommentsBinding.inflate(inflater, container, false)
         return binding.root
     }
 

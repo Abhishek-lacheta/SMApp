@@ -24,7 +24,7 @@ class CommentsAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CommentViewHolder {
         val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_bottom_seat, parent, false)
+            .inflate(R.layout.item_comments, parent, false)
         return CommentViewHolder(view)
     }
 

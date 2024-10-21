@@ -19,15 +19,15 @@
 
     <fragment
         android:id="@+id/groupsFragment"
-        android:name="GroupsFragment"
+        android:name="SearchFragment"
         android:label="GroupsFragment"
-        tools:layout="@layout/fragment_groups" >
+        tools:layout="@layout/fragment_search" >
     </fragment>
 
     <fragment
         android:id="@+id/addBlockFragment"
-        android:name="com.example.project01.fragments.AddBlockFragment"
-        tools:layout="@layout/fragment_add_bloack"
+        android:name="com.example.project01.fragments.PostFragment"
+        tools:layout="@layout/fragment_post"
         android:label="AddBlockFragment" />
     <fragment
         android:id="@+id/userFragment"
@@ -36,8 +36,8 @@
         android:label="User" />
     <fragment
         android:id="@+id/bottomSeatFragment"
-        android:name="com.example.project01.fragments.BottomSeatFragment"
-        tools:layout="@layout/fragment_bottomseat"
+        android:name="com.example.project01.fragments.CommentsFragment"
+        tools:layout="@layout/fragment_comments"
         android:label="BottomSeatFragment" />
 
     <fragment

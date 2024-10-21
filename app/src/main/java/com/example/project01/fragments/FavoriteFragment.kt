@@ -51,7 +51,7 @@ class FavoriteFragment : Fragment() {
 
             putString("postId", modal.id)
         }
-        val bottomSheet = BottomSeatFragment().apply {
+        val bottomSheet = CommentsFragment().apply {
             arguments = bundle
         }
 
