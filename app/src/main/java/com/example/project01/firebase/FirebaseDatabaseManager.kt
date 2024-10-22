@@ -566,6 +566,24 @@ class FirebaseDatabaseManager(private val context: Context) {
         }
     }
 
+
+    fun isUserFollowed(followedUserId: String, callback: (Boolean) -> Unit) {
+        val currentUser = authManager.getCurrentUser() ?: return
+        val userId = currentUser.uid
+
+        // Check if the current user is in the followers collection of the followed user
+        database.collection("user")
+            .document(followedUserId)
+            .collection("followers")
+            .document(userId)
+            .get()
+            .addOnSuccessListener { document ->
+                // If the document exists, the user is followed
+                callback(document.exists())
+            }
+
+    }
+
     //fetch followers count on the basis of userId in UserProfileActivity
     fun getFollowersCount(userId: String, onCountFetched: (Int) -> Unit) {
         database.collection("user")

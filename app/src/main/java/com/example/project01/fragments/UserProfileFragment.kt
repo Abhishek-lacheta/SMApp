@@ -85,23 +85,31 @@ class UserProfileFragment : Fragment() {
             fetchFollowersCount(userId)
             fetchFollowingCount(userId)
             fetchGroupCount(userId)
+            fetchFollowStatus(userId)
         }
         binding.followButton.setOnClickListener {
             followedUserId?.let { id ->
                 if (isFollowing) {
                     firebaseDatabaseManager.unfollowUser(id)
                     isFollowing = false
-                    binding.followButton.text = "Follow" // Update button text
                 } else {
                     firebaseDatabaseManager.followUser(id)
                     isFollowing = true
-                    binding.followButton.text = "UnFollow" // Update button text
                 }
+                updateFollowButton()
             }
         }
-        binding.followButton.text = if (isFollowing) "UnFollow" else "Follow"
     }
-
+    // Update button based on follow status
+    private fun fetchFollowStatus(userId: String) {
+        firebaseDatabaseManager.isUserFollowed(userId) { followed ->
+            isFollowing = followed
+            updateFollowButton()
+        }
+    }
+    private fun updateFollowButton() {
+        binding.followButton.text = if (isFollowing) "Unfollow" else "Follow"
+    }
     // Function to fetch followers count
     private fun fetchFollowersCount(userId: String) {
         firebaseDatabaseManager.getFollowersCount(userId) { count ->
@@ -153,7 +161,7 @@ class UserProfileFragment : Fragment() {
 
     private fun loadUserData(userId: String) {
         firebaseDatabaseManager.loadData(userId) { username, email, imageUrl ->
-            followedUserId = userId // Set the followed user ID here
+            followedUserId = userId
             binding.usernameTextView.text = username ?: "Unknown User"
 
             if (imageUrl.isNullOrEmpty()) {
