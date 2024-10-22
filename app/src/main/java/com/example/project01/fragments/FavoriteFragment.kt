@@ -12,18 +12,14 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.project01.R
 import com.example.project01.adaptor.HomeAdaptor
 import com.example.project01.databinding.FragmentFavoriteBinding
-import com.example.project01.firebase.FirebaseAuthManager
 import com.example.project01.firebase.FirebaseDatabaseManager
 import com.example.project01.modal.HomeModal
 import com.google.firebase.auth.FirebaseAuth
-
-
 class FavoriteFragment : Fragment() {
     private lateinit var adapter: HomeAdaptor
     private lateinit var binding: FragmentFavoriteBinding
     private var dataList = ArrayList<HomeModal>()
     private lateinit var databaseManager: FirebaseDatabaseManager
-    private val authManager = FirebaseAuthManager()
     private lateinit var noDataLayout: View
 
     override fun onCreateView(
@@ -107,10 +103,8 @@ class FavoriteFragment : Fragment() {
     }
 
     private fun setupRecyclerView() {
-        val currentUserId = authManager.getCurrentUser()?.uid // Get the current user's UID
         adapter = HomeAdaptor(
             itemList = dataList,
-            onShowPopupMenu = { view, item -> /* Handle popup menu */ },
             currentUserId = null,
             onLikeClick = { item -> toggleLike(item) },// Pass the like click handler
             onComment = { item -> onComment(item) },

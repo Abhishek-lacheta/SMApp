@@ -16,11 +16,11 @@ import com.example.project01.firebase.FirebaseAuthManager
 
 
 class SettingActivity : AppCompatActivity() {
-    private lateinit var binding:ActivitySettingBinding
+    private lateinit var binding: ActivitySettingBinding
     private var authManager = FirebaseAuthManager()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-      binding=ActivitySettingBinding.inflate(layoutInflater)
+        binding = ActivitySettingBinding.inflate(layoutInflater)
         setContentView(binding.root)
         // Go to Edit Profile Activity
         binding.editProfileButton.setOnClickListener {
@@ -45,17 +45,20 @@ class SettingActivity : AppCompatActivity() {
         binding.logoutLoader.visibility = View.VISIBLE
         binding.logoutId.visibility = View.GONE
 
-        authManager.signout {
-            Handler(Looper.getMainLooper()).postDelayed({
-                binding.logoutLoader.visibility = View.GONE
-                this?.let {
-                    DialogUtils.LogoutConfirmationDialog(it) {
-                        val intent = Intent(this, LoginActivity::class.java)
-                        startActivity(intent)
-                        this?.finish()
-                    }
+
+        DialogUtils.LogoutConfirmationDialog(this) { confirmed ->
+            if (confirmed) {
+                authManager.signout {
+                    binding.logoutLoader.visibility = View.GONE
+                    val intent = Intent(this, LoginActivity::class.java)
+                    startActivity(intent)
+                    this.finish()
                 }
-            }, 1000)
+            } else {
+
+                binding.logoutLoader.visibility = View.GONE
+                binding.logoutId.visibility = View.VISIBLE
+            }
         }
     }
 

@@ -141,7 +141,6 @@ class UserFragment : Fragment() {
         databaseManager.geFollwingCount(userId) { count ->
             binding.followingCountTextView.text = count.toString()
         }
-
     }
 
     // Function to fetch group count

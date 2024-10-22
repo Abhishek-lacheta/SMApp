@@ -82,6 +82,15 @@ class HomeFragment : Fragment() {
         }
     }
 
+    private fun setupRecyclerView() {
+        adapter = HomeAdaptor(itemList = dataList,
+            currentUserId = null,
+            onLikeClick = { item -> toggleLike(item) },
+            onComment = { item -> onComment(item) },
+            onItemClick = { item -> onItemClick(item) })
+        binding.recyclerview.adapter = adapter
+    }
+
     // Comment method
     private fun onComment(modal: HomeModal) {
         val bundle = Bundle().apply {
@@ -104,15 +113,7 @@ class HomeFragment : Fragment() {
         }
     }
 
-    private fun setupRecyclerView() {
-        val currentUserId = authManager.getCurrentUser()?.uid // Get the current user's UID
-        adapter = HomeAdaptor(itemList = dataList,
-            currentUserId = null,
-            onLikeClick = { item -> toggleLike(item) },
-            onComment = { item -> onComment(item) },
-            onItemClick = { item -> onItemClick(item) })
-        binding.recyclerview.adapter = adapter
-    }
+
 
     fun onItemClick(modal: HomeModal) {
         val bundle = Bundle().apply {
@@ -150,8 +151,6 @@ class HomeFragment : Fragment() {
             }
         }
     }
-
-
 }
 
 

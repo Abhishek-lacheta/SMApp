@@ -383,19 +383,18 @@ class FirebaseDatabaseManager(private val context: Context) {
     fun fetchGroupData(callback: (List<Pair<String, String>>) -> Unit) {
         val nameList = mutableListOf<String>()
         val idList = mutableListOf<String>()
-
-        database.collection("group").get()
-            .addOnSuccessListener { documents ->
-                for (document in documents) {
-                    nameList.add(document.getString("name") ?: "")
-                    idList.add(document.id)
+        val currentUser = authManager.getCurrentUser()
+        if (currentUser != null) {
+            val userId = currentUser.uid
+            database.collection("group").whereEqualTo("userId",userId).get()
+                .addOnSuccessListener { documents ->
+                    for (document in documents) {
+                        nameList.add(document.getString("name") ?: "")
+                        idList.add(document.id)
+                    }
+                    callback(nameList.zip(idList))
                 }
-                callback(nameList.zip(idList)) // Combine names and IDs into pairs
-            }
-            .addOnFailureListener { exception ->
-                Log.w("FirebaseDB", "Error getting documents: ", exception)
-                callback(emptyList()) // Return empty list on failure
-            }
+        }
     }
 
     //EditProfileActivity
@@ -466,20 +465,24 @@ class FirebaseDatabaseManager(private val context: Context) {
         onDataLoaded: (username: String?, email: String?, profileImageUrl: String?) -> Unit
     ) {
         val userRef = database.collection("user").document(userId)
-        userRef.get().addOnSuccessListener { document ->
+
+        // Use addSnapshotListener for real-time updates
+        userRef.addSnapshotListener { document, e ->
+            if (e != null) {
+                Log.w("FirebaseDataManager", "Listen failed.", e)
+                onDataLoaded(null, null, null)
+                return@addSnapshotListener
+            }
+
             if (document != null && document.exists()) {
                 val username = document.getString("name")
                 val email = document.getString("email")
                 val profileImageUrl = document.getString("profileImageUrl")
                 onDataLoaded(username, email, profileImageUrl)
-            } else {
-                onDataLoaded(null, null, null)
             }
-        }.addOnFailureListener { e ->
-            Log.w("FirebaseDataManager", "Error getting user data", e)
-            onDataLoaded(null, null, null)
         }
     }
+
 
     //fetch user data on userProfileActivity
     fun loadUserData(

@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
         android:allowBackup="true"
@@ -14,14 +15,15 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Project01"
         tools:targetApi="31">
+
+        <!-- Metadata for Google Play Services -->
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
+
+        <!-- Activities -->
         <activity
             android:name=".activity.SettingActivity"
-            android:exported="false" />
-        <activity
-            android:name=".activity.BlankActivity"
-            android:exported="false" />
-        <activity
-            android:name=".activity.UserProfileActivity"
             android:exported="false" />
         <activity
             android:name=".activity.EditProfileActivity"
@@ -38,7 +40,6 @@
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>

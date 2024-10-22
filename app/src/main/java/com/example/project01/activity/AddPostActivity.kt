@@ -13,6 +13,7 @@ import android.widget.Toast
 import com.bumptech.glide.Glide
 import com.example.project01.R
 import com.example.project01.databinding.ActivityAddPostBinding
+import com.example.project01.firebase.FirebaseAuthManager
 import com.example.project01.firebase.FirebaseDatabaseManager
 import com.example.project01.modal.HomeModal
 
@@ -29,6 +30,7 @@ class AddPostActivity : AppCompatActivity() {
     private var selectedGroupId: String? = null
     private var isFavorite: Boolean = false
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityAddPostBinding.inflate(layoutInflater)
@@ -42,8 +44,8 @@ class AddPostActivity : AppCompatActivity() {
         post?.let {
             binding.homeTitleId.setText(it.title)
             binding.homeDescId.setText(it.desc)
-            binding.spinner.visibility=View.GONE
-            binding.imageView.visibility=View.VISIBLE
+            binding.spinner.visibility = View.GONE
+            binding.imageView.visibility = View.VISIBLE
 
             it.imageUrl?.let { urlString ->
                 Glide.with(this)
@@ -115,6 +117,7 @@ class AddPostActivity : AppCompatActivity() {
     }
 
     private fun fetchData() {
+
         databaseManager.fetchGroupData { groups ->
             nameList.clear()
             idList.clear()
@@ -122,7 +125,6 @@ class AddPostActivity : AppCompatActivity() {
                 nameList.add(name)
                 idList.add(id)
             }
-
             setupSpinner()
 
 
@@ -176,6 +178,7 @@ class AddPostActivity : AppCompatActivity() {
             }
         }
     }
+
     private fun openImageChooser() {
         val intent = Intent()
         intent.type = "image/*"

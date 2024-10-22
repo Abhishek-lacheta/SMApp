@@ -12,7 +12,7 @@ class SplashActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_splash)
 
-        //TODO: move the firebase manager file
+        
         val auth = FirebaseAuth.getInstance()
         if (auth.currentUser != null) {
             startActivity(Intent(this, MainActivity::class.java))

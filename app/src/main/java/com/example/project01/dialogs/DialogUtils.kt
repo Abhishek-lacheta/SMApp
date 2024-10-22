@@ -15,10 +15,27 @@ object DialogUtils {
                 onDismiss?.invoke()
                 dialog.dismiss()
             }
-            .setNegativeButton("No") { dialog, _ -> dialog.dismiss() }
             .create()
             .show()
     }
+
+
+    fun LogoutConfirmationDialog(context: Context, onConfirm: ((Boolean) -> Unit)? = null) {
+        AlertDialog.Builder(context)
+            .setTitle("Confirm Logout")
+            .setMessage("Are you sure you want to logout?")
+            .setPositiveButton("Yes") { dialog, _ ->
+                onConfirm?.invoke(true)
+                dialog.dismiss()
+            }
+            .setNegativeButton("No") { dialog, _ ->
+                onConfirm?.invoke(false)
+                dialog.dismiss()
+            }
+            .create()
+            .show()
+    }
+
     fun loginFailureDialog(context: Context) {
         AlertDialog.Builder(context)
             .setTitle("Login Failed")
@@ -72,16 +89,7 @@ object DialogUtils {
             .show()
     }
 
-    fun LogoutConfirmationDialog(context: Context, onDismiss: (() -> Unit)? = null) {
-        AlertDialog.Builder(context)
-            .setTitle("Confirm Logout")
-            .setMessage("Are you sure you want to logout?")
-            .setPositiveButton("Yes") { dialog, _ ->
-                onDismiss?.invoke()
-                dialog.dismiss()
-            }
-            .setNegativeButton("No") { dialog, _ -> dialog.dismiss() }
-            .create()
-            .show()
-    }
+
+
+
 }

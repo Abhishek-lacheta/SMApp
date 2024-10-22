@@ -130,10 +130,9 @@
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/group_recyclerview"
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
+                android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:layout_weight="1"
-                android:clipToPadding="false"
                 android:padding="8dp" />
             <LinearLayout
                 android:id="@+id/noDataLayout"

@@ -11,7 +11,6 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.project01.adaptor.FollowerAdaptor
 import com.example.project01.databinding.FragmentFollowersBinding
-import com.example.project01.firebase.FirebaseDatabaseManager
 import com.example.project01.modal.FollowerModal
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.FirebaseFirestore
@@ -38,6 +37,7 @@ class FollowersFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         //get userID from UserProfileFragment
+        //get current userId from userFragment
         arguments?.let {
             userId = it.getString("userId", "")
         }
