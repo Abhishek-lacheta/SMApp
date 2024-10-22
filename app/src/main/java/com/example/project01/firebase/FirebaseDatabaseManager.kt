@@ -43,6 +43,7 @@ class FirebaseDatabaseManager(private val context: Context) {
                 callback(emptyList())
             }
     }
+
     // Toggle like status like funcnality
     fun toggleLike(postId: String, userId: String, isLiked: Boolean, callback: (Boolean) -> Unit) {
         val postRef = database.collection("home").document(postId)
@@ -237,7 +238,7 @@ class FirebaseDatabaseManager(private val context: Context) {
         currentUser?.let { user ->
             database.collection("user").document(user.uid).get()
                 .addOnSuccessListener { document ->
-                    val userName = document.getString("name") ?: "Unknown User" // Default name
+                    val userName = document.getString("name") ?: "Unknown User"
                     val image = document.getString("profileImageUrl")
                     val homeMap = hashMapOf(
                         "title" to title,
@@ -386,7 +387,7 @@ class FirebaseDatabaseManager(private val context: Context) {
         val currentUser = authManager.getCurrentUser()
         if (currentUser != null) {
             val userId = currentUser.uid
-            database.collection("group").whereEqualTo("userId",userId).get()
+            database.collection("group").whereEqualTo("userId", userId).get()
                 .addOnSuccessListener { documents ->
                     for (document in documents) {
                         nameList.add(document.getString("name") ?: "")
@@ -416,6 +417,24 @@ class FirebaseDatabaseManager(private val context: Context) {
     }
 
     //EditProfileActivity
+    private fun uploadImageToStorage(uri: Uri, userId: String) {
+        val storageRef = FirebaseStorage.getInstance().reference.child("profile_images/$userId.jpg")
+        storageRef.putFile(uri)
+            .addOnSuccessListener {
+                storageRef.downloadUrl.addOnSuccessListener { downloadUri ->
+                    val userRef = database.collection("user").document(userId)
+                    userRef.update("profileImageUrl", downloadUri.toString())
+                        .addOnSuccessListener {
+                            Log.d("FirebaseDataManager", "Profile image updated")
+                        }
+                        .addOnFailureListener { e ->
+                            Log.w("FirebaseDataManager", "Error updating profile image", e)
+                        }
+                }
+            }
+    }
+
+    //EditProfileActivity
     fun saveProfile(
         username: String,
         email: String,
@@ -441,22 +460,21 @@ class FirebaseDatabaseManager(private val context: Context) {
         }
     }
 
-    //EditProfileActivity
-    private fun uploadImageToStorage(uri: Uri, userId: String) {
-        val storageRef = FirebaseStorage.getInstance().reference.child("profile_images/$userId.jpg")
-        storageRef.putFile(uri)
-            .addOnSuccessListener {
-                storageRef.downloadUrl.addOnSuccessListener { downloadUri ->
-                    val userRef = database.collection("user").document(userId)
-                    userRef.update("profileImageUrl", downloadUri.toString())
-                        .addOnSuccessListener {
-                            Log.d("FirebaseDataManager", "Profile image updated")
-                        }
-                        .addOnFailureListener { e ->
-                            Log.w("FirebaseDataManager", "Error updating profile image", e)
-                        }
-                }
+    //fetch user data on userProfileActivity
+    fun loadData(
+        userId: String,
+        onDataLoaded: (username: String?, email: String?, imageUrl: String?) -> Unit
+    ) {
+        val userRef = database.collection("user").document(userId)
+
+        userRef.get().addOnSuccessListener { document ->
+            if (document != null && document.exists()) {
+                val username = document.getString("name")
+                val email = document.getString("email")
+                val imageUrl = document.getString("profileImageUrl")
+                onDataLoaded(username, email, imageUrl)
             }
+        }
     }
 
     //UserFragment
@@ -483,23 +501,6 @@ class FirebaseDatabaseManager(private val context: Context) {
         }
     }
 
-
-    //fetch user data on userProfileActivity
-    fun loadUserData(
-        userId: String,
-        onDataLoaded: (username: String?, email: String?, imageUrl: String?) -> Unit
-    ) {
-        val userRef = database.collection("user").document(userId)
-
-        userRef.get().addOnSuccessListener { document ->
-            if (document != null && document.exists()) {
-                val username = document.getString("name")
-                val email = document.getString("email")
-                val imageUrl = document.getString("profileImageUrl")
-                onDataLoaded(username, email, imageUrl)
-            }
-        }
-    }
 
     // fetch group data on the basis of userId in UserProfileActivity
     fun fetchDataGroupFromeFireStore1(userId: String, callback: (List<GroupModal>) -> Unit) {

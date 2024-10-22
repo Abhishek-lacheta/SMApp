@@ -152,7 +152,7 @@ class UserProfileFragment : Fragment() {
     }
 
     private fun loadUserData(userId: String) {
-        firebaseDatabaseManager.loadUserData(userId) { username, email, imageUrl ->
+        firebaseDatabaseManager.loadData(userId) { username, email, imageUrl ->
             followedUserId = userId // Set the followed user ID here
             binding.usernameTextView.text = username ?: "Unknown User"
 
