@@ -11,17 +11,18 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.project01.adaptor.FollowerAdaptor
 import com.example.project01.databinding.FragmentFollowersBinding
+import com.example.project01.firebase.FirebaseDatabaseManager
 import com.example.project01.modal.FollowerModal
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.firestore
-
 
 class FollowersFragment : Fragment() {
     private lateinit var binding: FragmentFollowersBinding
     private val itemList = mutableListOf<FollowerModal>()
     private val database: FirebaseFirestore = Firebase.firestore
     private lateinit var userId: String
+    private lateinit var firebaseDatabaseManager: FirebaseDatabaseManager
     private lateinit var navController: NavController
     private lateinit var followerAdaptor: FollowerAdaptor
 
@@ -38,6 +39,8 @@ class FollowersFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         //get userID from UserProfileFragment
         //get current userId from userFragment
+
+        firebaseDatabaseManager = FirebaseDatabaseManager(requireContext())
         arguments?.let {
             userId = it.getString("userId", "")
         }
@@ -61,10 +64,20 @@ class FollowersFragment : Fragment() {
         binding.followerrecyclerView.adapter = followerAdaptor
     }
 
-    fun onItemClick(follower: FollowerModal) {
+    private fun onItemClick(follower: FollowerModal) {
+        val isFollowing = follower.isFollowed
+        follower.isFollowed = !isFollowing // Toggle follow status
 
+        if (isFollowing) {
+            firebaseDatabaseManager.unfollowUser(userId)
+        } else {
+            firebaseDatabaseManager.followUser(userId)
+        }
 
+        // Update the RecyclerView
+        followerAdaptor.notifyItemChanged(itemList.indexOf(follower))
     }
+
 
     fun loadFollowerList() {
 

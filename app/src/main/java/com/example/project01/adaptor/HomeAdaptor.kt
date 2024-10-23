@@ -17,7 +17,7 @@ import java.util.Locale
 import java.util.Date
 
 class HomeAdaptor(
-    private val itemList: List<HomeModal>,
+    private var itemList: List<HomeModal>,
     private val onComment: (HomeModal) -> Unit,
     private val onShowPopupMenu: (View, HomeModal) -> Unit = { v, m -> },
     private val currentUserId: String?,

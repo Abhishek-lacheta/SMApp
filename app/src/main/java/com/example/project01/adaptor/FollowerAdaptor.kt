@@ -40,6 +40,8 @@ class FollowerAdaptor(
             onItemClick(follower)
         }
 
+        holder.followeButton.text = if (follower.isFollowed) "Follow" else "UnFollow"
+
     }
 
     override fun getItemCount(): Int = followers.size

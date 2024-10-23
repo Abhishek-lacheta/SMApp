@@ -21,6 +21,7 @@ import kotlinx.parcelize.Parcelize
     val image:String?=null,
     var likedBy: List<String> = listOf()
 ):Parcelable {
+
     val isLikedByCurrentUser: Boolean
         get() = likedBy.contains(FirebaseAuth.getInstance().currentUser?.uid)
 }

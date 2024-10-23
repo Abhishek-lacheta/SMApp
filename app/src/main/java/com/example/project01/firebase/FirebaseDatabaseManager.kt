@@ -566,7 +566,7 @@ class FirebaseDatabaseManager(private val context: Context) {
         }
     }
 
-
+    //Perform operation follow button
     fun isUserFollowed(followedUserId: String, callback: (Boolean) -> Unit) {
         val currentUser = authManager.getCurrentUser() ?: return
         val userId = currentUser.uid
