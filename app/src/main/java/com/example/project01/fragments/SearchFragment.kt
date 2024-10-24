@@ -40,6 +40,7 @@ class SearchFragment : Fragment() {
             when (position) {
                 0 -> tab.text = "Posts"
                 1 -> tab.text = "Groups"
+                2->tab.text="Users"
             }
         }.attach()
 
