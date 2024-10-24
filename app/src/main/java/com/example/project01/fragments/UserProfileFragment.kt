@@ -1,6 +1,5 @@
 package com.example.project01.fragments
 
-import GroupRecyclerAdapter
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -13,6 +12,7 @@ import androidx.navigation.ui.navigateUp
 import androidx.recyclerview.widget.GridLayoutManager
 import com.bumptech.glide.Glide
 import com.example.project01.R
+import com.example.project01.adaptor.GroupAdapter
 import com.example.project01.databinding.FragmentUserProfileBinding
 import com.example.project01.firebase.FirebaseDatabaseManager
 import com.example.project01.modal.GroupModal
@@ -23,7 +23,7 @@ class UserProfileFragment : Fragment() {
     private var followedUserId: String? = null
     private lateinit var firebaseDatabaseManager: FirebaseDatabaseManager
     private val itemList = mutableListOf<GroupModal>()
-    private lateinit var groupRecyclerAdapter: GroupRecyclerAdapter
+    private lateinit var groupRecyclerAdapter: GroupAdapter
     private var isFollowing: Boolean = false
 
     override fun onCreateView(
@@ -151,7 +151,7 @@ class UserProfileFragment : Fragment() {
 
     // SetUp RecyclerView
     private fun setupRecyclerView() {
-        groupRecyclerAdapter = GroupRecyclerAdapter(
+        groupRecyclerAdapter = GroupAdapter(
             itemList = itemList,
             onItemClick = { item -> onItemClick(item) },
             isPopupMenuVisible = false

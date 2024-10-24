@@ -22,7 +22,7 @@ class HomeAdaptor(
     private val onShowPopupMenu: (View, HomeModal) -> Unit = { v, m -> },
     private val currentUserId: String?,
     private val onLikeClick: (HomeModal) -> Unit,
-    private val onItemClick: (HomeModal) -> Unit
+    private val onItemClick: (HomeModal) -> Unit,
 ) : RecyclerView.Adapter<HomeAdaptor.ViewHolder>() {
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -94,6 +94,11 @@ class HomeAdaptor(
             onItemClick(item)
         }
 
+    }
+
+    fun updateList(newList: List<HomeModal>) {
+        itemList = newList
+        notifyDataSetChanged()
     }
 
     override fun getItemCount(): Int = itemList.size

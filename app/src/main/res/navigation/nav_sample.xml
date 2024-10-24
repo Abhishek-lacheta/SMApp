@@ -62,7 +62,7 @@
         android:label="PostsFragment" />
     <fragment
         android:id="@+id/groupsFragment2"
-        android:name="com.example.project01.fragments.GroupsFragment"
-        tools:layout="@layout/fragment_groups"
+        android:name="com.example.project01.fragments.SearchgroupsFragment"
+        tools:layout="@layout/fragment_search_groups"
         android:label="GroupsFragment" />
 </navigation>

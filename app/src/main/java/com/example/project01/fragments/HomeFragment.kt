@@ -1,26 +1,19 @@
 package com.example.project01.fragments
 
 import android.annotation.SuppressLint
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.Menu
-import android.view.MenuInflater
-import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.project01.activity.AddPostActivity
 import com.example.project01.adaptor.HomeAdaptor
 import com.example.project01.modal.HomeModal
 import com.example.project01.R
 import com.example.project01.databinding.FragmentHomeBinding
-import com.example.project01.firebase.FirebaseAuthManager
 import com.example.project01.firebase.FirebaseDatabaseManager
 import com.google.firebase.auth.FirebaseAuth
 
@@ -29,8 +22,17 @@ class HomeFragment : Fragment() {
     private lateinit var binding: FragmentHomeBinding
     private var dataList = ArrayList<HomeModal>()
     private lateinit var firebaseDatabaseManager: FirebaseDatabaseManager
-    private val authManager = FirebaseAuthManager()
     private lateinit var noDataLayout: View
+
+    // Filter function
+    fun filter(query: String) {
+        val filteredList = dataList.filter { item ->
+            item.title?.contains(query, ignoreCase = true) == true
+
+        }
+        adapter.updateList(filteredList)
+    }
+
 
     @SuppressLint("MissingInflatedId")
     override fun onCreateView(
@@ -45,7 +47,7 @@ class HomeFragment : Fragment() {
 
         // Initialize FirebaseDatabaseManager
         firebaseDatabaseManager = FirebaseDatabaseManager(requireContext())
-       
+
 
         // Setup RecyclerView
         binding.recyclerview.layoutManager = LinearLayoutManager(context)
@@ -112,7 +114,6 @@ class HomeFragment : Fragment() {
             adapter.notifyItemChanged(dataList.indexOf(it))
         }
     }
-
 
 
     fun onItemClick(modal: HomeModal) {

@@ -1,6 +1,5 @@
 package com.example.project01.fragments
 
-import GroupRecyclerAdapter
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -23,6 +22,7 @@ import com.bumptech.glide.load.resource.bitmap.CircleCrop
 import com.example.project01.R
 import com.example.project01.activity.AddGroupActivity
 import com.example.project01.activity.SettingActivity
+import com.example.project01.adaptor.GroupAdapter
 import com.example.project01.databinding.FragmentUserBinding
 import com.example.project01.firebase.FirebaseAuthManager
 import com.example.project01.firebase.FirebaseDatabaseManager
@@ -35,7 +35,7 @@ class UserFragment : Fragment() {
     private var authManager = FirebaseAuthManager()
     val currentUser = authManager.getCurrentUser()
     val userId = currentUser?.uid
-    private lateinit var groupRecyclerAdapteradaptor: GroupRecyclerAdapter
+    private lateinit var groupRecyclerAdapteradaptor: GroupAdapter
     private val itemList = mutableListOf<GroupModal>()
     private lateinit var databaseManager: FirebaseDatabaseManager
     private lateinit var noDataLayout: View
@@ -175,7 +175,7 @@ class UserFragment : Fragment() {
 
     //SetUp RecyclerView
     private fun setupRecyclerView() {
-        groupRecyclerAdapteradaptor = GroupRecyclerAdapter(
+        groupRecyclerAdapteradaptor = GroupAdapter(
             itemList = itemList,
             onGroupPopupMenu = { view, item -> showPopupMenu(view, item) },
             onItemClick = { itemList -> onItemClick(itemList) },

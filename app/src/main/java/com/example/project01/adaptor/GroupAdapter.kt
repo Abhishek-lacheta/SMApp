@@ -1,3 +1,4 @@
+package com.example.project01.adaptor
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -7,14 +8,13 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.project01.R
 import com.example.project01.modal.GroupModal
-
-class GroupRecyclerAdapter(
+class GroupAdapter(
     private val itemList: List<GroupModal>,
     private val onGroupPopupMenu: (View, GroupModal) -> Unit = { v, m -> },
     private val onItemClick: (GroupModal) -> Unit,
     private val isPopupMenuVisible:Boolean
 ) :
-    RecyclerView.Adapter<GroupRecyclerAdapter.GroupViewHolder>() {
+    RecyclerView.Adapter<GroupAdapter.GroupViewHolder>() {
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): GroupViewHolder {

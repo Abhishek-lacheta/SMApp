@@ -1,33 +1,26 @@
 package com.example.project01.adaptor
 
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
-import androidx.fragment.app.FragmentPagerAdapter
-import com.example.project01.fragments.GroupsFragment
-import com.example.project01.fragments.PostFragment
-import com.example.project01.fragments.PostsFragment
-import com.example.project01.fragments.UserFragment
+import androidx.viewpager2.adapter.FragmentStateAdapter
+import com.example.project01.fragments.SearchgroupsFragment
+import com.example.project01.fragments.SearchPostFragment
 
-class SearchPagerAdapter(fm: FragmentManager) : FragmentPagerAdapter(fm) {
+class SearchPagerAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
 
     private val fragments = listOf(
-        PostsFragment(),
-        GroupsFragment(),
+        SearchPostFragment(),
+        SearchgroupsFragment(),
     )
 
-    override fun getItem(position: Int): Fragment {
-        return fragments[position]
-    }
-
-    override fun getCount(): Int {
+    override fun getItemCount(): Int {
         return fragments.size
     }
 
-    override fun getPageTitle(position: Int): CharSequence? {
-        return when (position) {
-            0 -> "Posts"
-            1 -> "Groups"
-            else -> null
-        }
+    override fun createFragment(position: Int): Fragment {
+        return fragments[position]
+    }
+
+    fun getFragment(position: Int): Fragment {
+        return fragments[position]
     }
 }

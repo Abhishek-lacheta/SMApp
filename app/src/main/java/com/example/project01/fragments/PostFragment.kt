@@ -12,6 +12,7 @@ import android.widget.Toast
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.project01.R
 import com.example.project01.activity.AddPostActivity
 import com.example.project01.adaptor.HomeAdaptor
@@ -32,7 +33,6 @@ class PostFragment : Fragment() {
     private lateinit var navController: NavController
     private val authManager = FirebaseAuthManager()
     private lateinit var noDataLayout: View
-
 
     @SuppressLint("MissingInflatedId")
     override fun onCreateView(

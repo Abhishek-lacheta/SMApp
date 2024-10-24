@@ -8,7 +8,7 @@
 
     <item
         android:id="@+id/groupsFragment"
-        android:icon="@drawable/ic_personsearch"
+        android:icon="@drawable/ic_search"
         android:title="Search" />
 
     <item
