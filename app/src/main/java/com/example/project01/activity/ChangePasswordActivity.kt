@@ -47,21 +47,31 @@ class ChangePasswordActivity : AppCompatActivity() {
             }
         }
     }
-    private fun performChangePassword(currentPassword: String, newPassword: String) {
-        binding.changePassworLoader.visibility=View.VISIBLE
-        binding.changePasswordButton.visibility = View.GONE
 
+    private fun performChangePassword(currentPassword: String, newPassword: String) {
+        binding.changePassworLoader.visibility = View.VISIBLE
+        binding.changePasswordButton.visibility = View.GONE
+//This scope will be cancelled when the Lifecycle is destroyed.
         lifecycleScope.launch {
             try {
                 authManager.changePassword(currentPassword, newPassword)
                 DialogUtils.ChangegePassSuccessDialog(this@ChangePasswordActivity) {
-                    startActivity(Intent(this@ChangePasswordActivity, ChangePasswordActivity::class.java))
+                    startActivity(
+                        Intent(
+                            this@ChangePasswordActivity,
+                            ChangePasswordActivity::class.java
+                        )
+                    )
                     finish()
                 }
             } catch (e: Exception) {
-                Toast.makeText(this@ChangePasswordActivity, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    this@ChangePasswordActivity,
+                    "Error: ${e.message}",
+                    Toast.LENGTH_SHORT
+                ).show()
             } finally {
-                binding.changePassworLoader.visibility=View.GONE
+                binding.changePassworLoader.visibility = View.GONE
                 binding.changePasswordButton.visibility = View.VISIBLE
             }
         }

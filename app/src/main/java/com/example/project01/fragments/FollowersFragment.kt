@@ -51,10 +51,7 @@ class FollowersFragment : Fragment() {
         binding.followerrecyclerView.layoutManager = LinearLayoutManager(context)
 
         loadFollowerList()
-
-
     }
-
 
     private fun setuprecyclerView() {
         followerAdaptor = FollowerAdaptor(
@@ -75,6 +72,7 @@ class FollowersFragment : Fragment() {
         }
 
         // Update the RecyclerView
+        //Position of the item that has changed
         followerAdaptor.notifyItemChanged(itemList.indexOf(follower))
     }
 

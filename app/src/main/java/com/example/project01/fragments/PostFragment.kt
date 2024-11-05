@@ -47,6 +47,7 @@ class PostFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        // get id's from UserFragment
         arguments?.let {
             modalId = it.getString("modalId", "")
             modalName = it.getString("name", "")
@@ -153,10 +154,7 @@ class PostFragment : Fragment() {
                     Toast.makeText(context, "Failed to delete item", Toast.LENGTH_SHORT).show()
                 }
             }
-        } ?: run {
-            Toast.makeText(context, "Item ID is null", Toast.LENGTH_SHORT).show()
         }
-
         return true
     }
 

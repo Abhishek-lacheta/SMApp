@@ -1,8 +1,10 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="match_parent"
     android:orientation="vertical">
+
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/searchtoolbar"
@@ -13,25 +15,30 @@
         app:title="Search"
         app:titleTextColor="@color/black" />
 
-    <androidx.appcompat.widget.SearchView
-        android:id="@+id/search_view"
-        android:layout_marginTop="5dp"
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="14dp"
-        android:layout_marginEnd="14dp"
-        android:background="@drawable/round_button1"
-        android:iconifiedByDefault="true"
-        app:queryHint="Search here.."
-        app:searchHintIcon="@drawable/ic_search"
-        app:searchIcon="@drawable/ic_search"
-        app:iconifiedByDefault="false"
-        />
+        android:background="@color/white">
 
+        <androidx.appcompat.widget.SearchView
+            android:id="@+id/search_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="14dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginEnd="14dp"
+            android:background="@drawable/round_button1"
+            android:iconifiedByDefault="true"
+            app:iconifiedByDefault="false"
+            app:queryBackground="@android:color/transparent"
+            app:queryHint="Search here.."
+            app:searchHintIcon="@drawable/ic_search"
+            app:searchIcon="@drawable/ic_search" />
+
+    </FrameLayout>
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tab_layout"
         android:layout_width="match_parent"
-        android:layout_marginTop="5dp"
         android:layout_height="60dp"
         android:background="@color/white"
         app:tabIndicatorColor="@color/black"
@@ -41,6 +48,7 @@
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/view_pager"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="match_parent" />
+
 
 </LinearLayout>

@@ -46,7 +46,7 @@ class SearchgroupsFragment : Fragment() {
             itemList = itemList,
             onGroupPopupMenu = { view, item ->  },
             onItemClick = { itemList -> (itemList) },
-            isPopupMenuVisible = true
+            isPopupMenuVisible = false
         )
         binding.groupRecyclerview.adapter = groupRecyclerAdapter
     }

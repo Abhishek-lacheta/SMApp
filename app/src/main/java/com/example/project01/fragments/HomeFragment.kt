@@ -24,16 +24,6 @@ class HomeFragment : Fragment() {
     private lateinit var firebaseDatabaseManager: FirebaseDatabaseManager
     private lateinit var noDataLayout: View
 
-    // Filter function
-    fun filter(query: String) {
-        val filteredList = dataList.filter { item ->
-            item.title?.contains(query, ignoreCase = true) == true
-
-        }
-        adapter.updateList(filteredList)
-    }
-
-
     @SuppressLint("MissingInflatedId")
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -88,8 +78,8 @@ class HomeFragment : Fragment() {
         adapter = HomeAdaptor(itemList = dataList,
             currentUserId = null,
             onLikeClick = { item -> toggleLike(item) },
-            onComment = { item -> onComment(item) },
-            onItemClick = { item -> onItemClick(item) })
+            onComment = { item -> onComment(item) },//open comments fragment
+            onItemClick = { item -> onItemClick(item) })// open userprofile fragment
         binding.recyclerview.adapter = adapter
     }
 
@@ -102,7 +92,7 @@ class HomeFragment : Fragment() {
         val bottomSheet = CommentsFragment().apply {
             arguments = bundle
         }
-
+        //tag =Get the tag name of the fragment, if specified.
         bottomSheet.show(childFragmentManager, bottomSheet.tag)
     }
 
@@ -115,22 +105,16 @@ class HomeFragment : Fragment() {
         }
     }
 
-
     fun onItemClick(modal: HomeModal) {
         val bundle = Bundle().apply {
             putString("userId", modal.userId)
         }
-        val navOptions =
-            NavOptions.Builder()
-                .setEnterAnim(R.anim.slide_in_right)
-                .setExitAnim(R.anim.slide_out_left)
-                .setPopEnterAnim(R.anim.slide_in_left)
-                .setPopExitAnim(R.anim.slide_out_right)
-                .build()
+        val navOptions = NavOptions.Builder().setEnterAnim(R.anim.slide_in_right)
+            .setExitAnim(R.anim.slide_out_left).setPopEnterAnim(R.anim.slide_in_left)
+            .setPopExitAnim(R.anim.slide_out_right).build()
 
         findNavController().navigate(R.id.userProfileFragment, bundle, navOptions)
     }
-
 
     private fun toggleLike(item: HomeModal) {
         val currentUserId = FirebaseAuth.getInstance().currentUser?.uid ?: return

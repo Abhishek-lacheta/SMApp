@@ -14,7 +14,6 @@ import com.example.project01.modal.HomeModal
 import com.example.project01.R
 import java.text.SimpleDateFormat
 import java.util.Locale
-import java.util.Date
 
 class HomeAdaptor(
     private var itemList: List<HomeModal>,
@@ -63,14 +62,13 @@ class HomeAdaptor(
             holder.dateTextView.text = "Date not available"
         }
 
-        holder.showPopupMenu.visibility =
-            if (currentUserId == item.userId) View.VISIBLE else View.GONE
+        holder.showPopupMenu.visibility = if (currentUserId == item.userId) View.VISIBLE else View.GONE
 
         // Load image using Glide
         Glide.with(holder.itemView.context)
             .load(item.imageUrl)
             .into(holder.imageView)
-//Get UserProfileImage
+        //Get UserProfileImage
         Glide.with(holder.itemView.context).load(item.image).transform(CircleCrop())
             .into(holder.userImage)
 

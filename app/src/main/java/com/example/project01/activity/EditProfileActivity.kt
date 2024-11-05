@@ -7,7 +7,6 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContentProviderCompat.requireContext
 import com.bumptech.glide.Glide
 import com.example.project01.R
 import com.example.project01.databinding.ActivityEditProfileBinding
@@ -43,7 +42,7 @@ class EditProfileActivity : AppCompatActivity() {
     }
 
     private fun loadUserData() {
-        firebaseDatabaseManager.loadUserData { username, email, imageUrl ->
+        firebaseDatabaseManager.getUserData { username, email, imageUrl ->
             binding.editTextUsername.setText(username)
             binding.editTextEmail.setText(email)
 

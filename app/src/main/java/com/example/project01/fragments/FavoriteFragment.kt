@@ -15,6 +15,7 @@ import com.example.project01.databinding.FragmentFavoriteBinding
 import com.example.project01.firebase.FirebaseDatabaseManager
 import com.example.project01.modal.HomeModal
 import com.google.firebase.auth.FirebaseAuth
+
 class FavoriteFragment : Fragment() {
     private lateinit var adapter: HomeAdaptor
     private lateinit var binding: FragmentFavoriteBinding

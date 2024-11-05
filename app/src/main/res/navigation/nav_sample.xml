@@ -5,41 +5,32 @@
     android:id="@+id/nav_sample"
     app:startDestination="@id/homeFragment">
 
+
     <fragment
         android:id="@+id/homeFragment"
         android:name="com.example.project01.fragments.HomeFragment"
-        android:label=" Home"
-        tools:layout="@layout/fragment_home" />
-
+        tools:layout="@layout/fragment_home"
+        android:label="HomeFragment" />
     <fragment
-        android:id="@+id/favrateFragment"
-        android:name="com.example.project01.fragments.FavoriteFragment"
-        android:label="Favorite"
-        tools:layout="@layout/fragment_favorite" />
-
+        android:id="@+id/searchFragment"
+        android:name="com.example.project01.fragments.SearchFragment"
+        tools:layout="@layout/fragment_search"
+        android:label="SearchFragment" />
     <fragment
-        android:id="@+id/groupsFragment"
-        android:name="SearchFragment"
-        android:label="GroupsFragment"
-        tools:layout="@layout/fragment_search" >
-    </fragment>
-
-    <fragment
-        android:id="@+id/addBlockFragment"
+        android:id="@+id/postFragment"
         android:name="com.example.project01.fragments.PostFragment"
         tools:layout="@layout/fragment_post"
-        android:label="AddBlockFragment" />
+        android:label="PostFragment" />
+    <fragment
+        android:id="@+id/favoriteFragment"
+        android:name="com.example.project01.fragments.FavoriteFragment"
+        tools:layout="@layout/fragment_favorite"
+        android:label="FavoriteFragment" />
     <fragment
         android:id="@+id/userFragment"
         android:name="com.example.project01.fragments.UserFragment"
         tools:layout="@layout/fragment_user"
-        android:label="User" />
-    <fragment
-        android:id="@+id/bottomSeatFragment"
-        android:name="com.example.project01.fragments.CommentsFragment"
-        tools:layout="@layout/fragment_comments"
-        android:label="BottomSeatFragment" />
-
+        android:label="UserFragment" />
     <fragment
         android:id="@+id/userProfileFragment"
         android:name="com.example.project01.fragments.UserProfileFragment"
@@ -56,13 +47,25 @@
         tools:layout="@layout/fragment_following"
         android:label="FollowingFragment" />
     <fragment
-        android:id="@+id/postsFragment"
-        android:name="com.example.project01.fragments.PostsFragment"
-        tools:layout="@layout/fragment_posts"
-        android:label="PostsFragment" />
+        android:id="@+id/commentsFragment"
+        android:name="com.example.project01.fragments.CommentsFragment"
+        tools:layout="@layout/fragment_comments"
+        android:label="CommentsFragment" />
     <fragment
-        android:id="@+id/groupsFragment2"
+        android:id="@+id/searchPostFragment2"
+        android:name="com.example.project01.fragments.SearchPostFragment"
+        android:label="fragment_search_post"
+        tools:layout="@layout/fragment_search_post" />
+    <fragment
+        android:id="@+id/searchUsersFragment2"
+        android:name="com.example.project01.fragments.SearchUsersFragment"
+        android:label="fragment_search_users"
+        tools:layout="@layout/fragment_search_users" />
+    <fragment
+        android:id="@+id/searchgroupsFragment"
         android:name="com.example.project01.fragments.SearchgroupsFragment"
         tools:layout="@layout/fragment_search_groups"
-        android:label="GroupsFragment" />
+        android:label="SearchgroupsFragment" />
+
+
 </navigation>

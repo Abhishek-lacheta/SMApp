@@ -6,14 +6,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.project01.R
 import com.example.project01.adaptor.HomeAdaptor
 import com.example.project01.databinding.FragmentSearchPostBinding
 import com.example.project01.firebase.FirebaseDatabaseManager
 import com.example.project01.modal.HomeModal
 
-
-class SearchPostFragment : Fragment() {
+class SearchPostFragment : Fragment(), Searchable {
 
     private lateinit var adaptor: HomeAdaptor
     private lateinit var binding: FragmentSearchPostBinding
@@ -34,38 +32,39 @@ class SearchPostFragment : Fragment() {
         firebaseDatabaseManager = FirebaseDatabaseManager(requireContext())
 
         binding.recyclerview.layoutManager = LinearLayoutManager(context)
-        fetchHomeData()
+
+        // Set up search functionality (assuming there's an EditText for search)
     }
 
     private fun setupRecyclerView() {
-        adaptor = HomeAdaptor(itemList = dataList,
+        adaptor = HomeAdaptor(
+            itemList = dataList,
             currentUserId = null,
             onLikeClick = { item -> (item) },
             onComment = { item -> (item) },
-            onItemClick = { item -> (item) })
+            onItemClick = { item -> (item) }
+        )
         binding.recyclerview.adapter = adaptor
     }
 
-    private fun fetchHomeData() {
-        firebaseDatabaseManager.fetchDataHomeFromFireStore { fetchedList ->
-            if (fetchedList.isEmpty()) {
-
-            } else {
+    override fun search(query: String) {
+        if (query.isNotEmpty()) {
+            firebaseDatabaseManager.searchPosts(query) { results ->
                 dataList.clear()
-                dataList.addAll(fetchedList)
-            }
+                dataList.addAll(results)
 
-            // Fetch comment counts for each post
-            dataList.forEach { item ->
-                item.id?.let {
-                    firebaseDatabaseManager.getCommentCountForPost(it) { count ->
-                        item.commentcount = count
-                        adaptor.notifyItemChanged(dataList.indexOf(item))
+                // Update comment counts for the search results
+                dataList.forEach { item ->
+                    item.id?.let {
+                        firebaseDatabaseManager.getCommentCountForPost(it) { count ->
+                            item.commentcount = count
+                            adaptor.notifyItemChanged(dataList.indexOf(item))
+                        }
                     }
                 }
+                adaptor.notifyDataSetChanged() // Notify the adapter to refresh the list
             }
-            setupRecyclerView() // Initialize the adapter
         }
+        setupRecyclerView()
     }
-
 }

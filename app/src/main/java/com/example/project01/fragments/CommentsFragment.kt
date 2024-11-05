@@ -42,6 +42,7 @@ open class CommentsFragment : BottomSheetDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        // get postId from Home Fragment
         arguments?.let {
             postId = it.getString("postId", "")
         }
@@ -72,9 +73,8 @@ open class CommentsFragment : BottomSheetDialogFragment() {
                 .addOnSuccessListener { document ->
                     val userName = document.getString("name") ?: "Unknown User"
                     val image = document.getString("profileImageUrl")
+                    val currentTimeMillis = System.currentTimeMillis() // Get current time in milliseconds
 
-                    val currentTimeMillis =
-                        System.currentTimeMillis() // Get current time in milliseconds
                     val commentData = hashMapOf(
                         "text" to comment,
                         "userId" to user.uid,

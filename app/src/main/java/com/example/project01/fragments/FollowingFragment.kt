@@ -35,6 +35,8 @@ class FollowingFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        //get userID from UserProfileFragment
+        //get current userId from userFragment
         arguments?.let {
             userId = it.getString("userId", "")
         }

@@ -1,12 +1,12 @@
+package com.example.project01.fragments
+
 import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.SearchView
-import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
+import androidx.appcompat.widget.SearchView
 import androidx.viewpager2.widget.ViewPager2
 import com.example.project01.R
 import com.example.project01.adaptor.SearchPagerAdapter
@@ -21,15 +21,10 @@ class SearchFragment : Fragment() {
 
     @SuppressLint("MissingInflatedId")
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.fragment_search, container, false)
 
-        val toolbar: Toolbar = view.findViewById(R.id.searchtoolbar)
-        (activity as AppCompatActivity).setSupportActionBar(toolbar)
-
-        // Initialize ViewPager and TabLayout
         viewPager = view.findViewById(R.id.view_pager)
         tabLayout = view.findViewById(R.id.tab_layout)
 
@@ -40,18 +35,29 @@ class SearchFragment : Fragment() {
             when (position) {
                 0 -> tab.text = "Posts"
                 1 -> tab.text = "Groups"
-                2->tab.text="Users"
+                2 -> tab.text = "Users"
             }
         }.attach()
 
         val searchView: SearchView = view.findViewById(R.id.search_view)
 
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                query?.let {
+                    val currentFragment = pagerAdapter.getCurrentFragment(viewPager.currentItem)
+                    if (currentFragment is Searchable) {
+                        currentFragment.search(it)
+                    }
+                }
+                return true
+            }
 
-        searchView.setOnClickListener {
-            searchView.isIconified = false
-        }
+            override fun onQueryTextChange(newText: String?): Boolean {
+
+                return false
+            }
+        })
 
         return view
     }
 }
-

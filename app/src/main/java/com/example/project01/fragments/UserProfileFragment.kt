@@ -27,8 +27,7 @@ class UserProfileFragment : Fragment() {
     private var isFollowing: Boolean = false
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View? {
         binding = FragmentUserProfileBinding.inflate(inflater, container, false)
         return binding.root
@@ -37,6 +36,7 @@ class UserProfileFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        //Get id's from Home Fragment
         arguments?.let {
             // Set userId from HomeFragment
             userId = it.getString("userId", "")
@@ -49,29 +49,21 @@ class UserProfileFragment : Fragment() {
             val bundle = Bundle().apply {
                 putString("userId", userId)
             }
-            val navOptions =
-                NavOptions.Builder()
-                    .setEnterAnim(R.anim.slide_in_right)
-                    .setExitAnim(R.anim.slide_out_left)
-                    .setPopEnterAnim(R.anim.slide_in_left)
-                    .setPopExitAnim(R.anim.slide_out_right)
-                    .build()
+            val navOptions = NavOptions.Builder().setEnterAnim(R.anim.slide_in_right)
+                .setExitAnim(R.anim.slide_out_left).setPopEnterAnim(R.anim.slide_in_left)
+                .setPopExitAnim(R.anim.slide_out_right).build()
 
-            findNavController().navigate(R.id.followersFragment, bundle,navOptions)
+            findNavController().navigate(R.id.followersFragment, bundle, navOptions)
         }
         binding.followingClick.setOnClickListener {
             val bundle = Bundle().apply {
                 putString("userId", userId)
             }
 
-            val navOptions =
-                NavOptions.Builder()
-                    .setEnterAnim(R.anim.slide_in_right)
-                    .setExitAnim(R.anim.slide_out_left)
-                    .setPopEnterAnim(R.anim.slide_in_left)
-                    .setPopExitAnim(R.anim.slide_out_right)
-                    .build()
-            findNavController().navigate(R.id.followingFragment, bundle,navOptions)
+            val navOptions = NavOptions.Builder().setEnterAnim(R.anim.slide_in_right)
+                .setExitAnim(R.anim.slide_out_left).setPopEnterAnim(R.anim.slide_in_left)
+                .setPopExitAnim(R.anim.slide_out_right).build()
+            findNavController().navigate(R.id.followingFragment, bundle, navOptions)
         }
         binding.profiletoobar.setOnClickListener {
 
@@ -100,6 +92,7 @@ class UserProfileFragment : Fragment() {
             }
         }
     }
+
     // Update button based on follow status
     private fun fetchFollowStatus(userId: String) {
         firebaseDatabaseManager.isUserFollowed(userId) { followed ->
@@ -107,14 +100,15 @@ class UserProfileFragment : Fragment() {
             updateFollowButton()
         }
     }
+
     private fun updateFollowButton() {
         binding.followButton.text = if (isFollowing) "Unfollow" else "Follow"
     }
+
     // Function to fetch followers count
     private fun fetchFollowersCount(userId: String) {
         firebaseDatabaseManager.getFollowersCount(userId) { count ->
-            binding.followersCountTextView.text =
-                count.toString()
+            binding.followersCountTextView.text = count.toString()
         }
     }
 
@@ -139,14 +133,10 @@ class UserProfileFragment : Fragment() {
             Log.d("UserProfileFragment", "Item clicked: ${model.id}, ${model.name}, ${userId}")
         }
 
-        val navOptions =
-            NavOptions.Builder()
-                .setEnterAnim(R.anim.slide_in_right)
-                .setExitAnim(R.anim.slide_out_left)
-                .setPopEnterAnim(R.anim.slide_in_left)
-                .setPopExitAnim(R.anim.slide_out_right)
-                .build()
-        findNavController().navigate(R.id.addBlockFragment, bundle,navOptions)
+        val navOptions = NavOptions.Builder().setEnterAnim(R.anim.slide_in_right)
+            .setExitAnim(R.anim.slide_out_left).setPopEnterAnim(R.anim.slide_in_left)
+            .setPopExitAnim(R.anim.slide_out_right).build()
+        findNavController().navigate(R.id.postFragment, bundle, navOptions)
     }
 
     // SetUp RecyclerView
@@ -160,20 +150,18 @@ class UserProfileFragment : Fragment() {
     }
 
     private fun loadUserData(userId: String) {
-        firebaseDatabaseManager.loadData(userId) { username, email, imageUrl ->
+        firebaseDatabaseManager.getUserData(userId) { username, email, profileImageUrl ->
             followedUserId = userId
             binding.usernameTextView.text = username ?: "Unknown User"
 
-            if (imageUrl.isNullOrEmpty()) {
+            if (profileImageUrl.isNullOrEmpty()) {
                 binding.profileImageView.setImageResource(R.drawable.ic_defauluser) // Default image
             } else {
-                Glide.with(this)
-                    .load(imageUrl)
-                    .circleCrop()
-                    .into(binding.profileImageView)
+                Glide.with(this).load(profileImageUrl).circleCrop().into(binding.profileImageView)
             }
         }
     }
+
     private fun fetchGroupData(userId: String) {
         firebaseDatabaseManager.fetchDataGroupFromeFireStore1(userId) { fetchedList ->
             itemList.clear()

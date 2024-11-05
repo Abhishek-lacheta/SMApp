@@ -67,7 +67,7 @@ class UserFragment : Fragment() {
         if (userId != null) {
             fetchGroupData(userId)
         }
-        updateUI()
+        getCurrentUser()
 
         //Open Follwers Screen
         binding.clickfollower.setOnClickListener {
@@ -131,8 +131,7 @@ class UserFragment : Fragment() {
     // Function to fetch followers count
     private fun fetchFollowersCount(userId: String) {
         databaseManager.getFollowersCount(userId) { count ->
-            binding.followersCountTextView.text =
-                count.toString()
+            binding.followersCountTextView.text = count.toString()
         }
     }
 
@@ -151,7 +150,7 @@ class UserFragment : Fragment() {
     }
 
     //Get User Data
-    private fun updateUI() {
+    private fun getCurrentUser() {
         val currentUser = authManager.getCurrentUser()
         if (currentUser != null) {
             val userId = currentUser.uid
@@ -243,7 +242,7 @@ class UserFragment : Fragment() {
                 .setPopExitAnim(R.anim.slide_out_right)
                 .build()
 
-        findNavController().navigate(R.id.addBlockFragment, bundle, navOptions)
+        findNavController().navigate(R.id.postFragment, bundle, navOptions)
     }
 
     //Fetch User Data

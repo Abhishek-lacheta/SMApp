@@ -4,10 +4,8 @@ import android.content.Context
 import android.net.Uri
 import android.util.Log
 import android.widget.Toast
-import com.example.project01.modal.FollowerModal
 import com.example.project01.modal.GroupModal
 import com.example.project01.modal.HomeModal
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
@@ -18,6 +16,24 @@ class FirebaseDatabaseManager(private val context: Context) {
     private val storage = FirebaseStorage.getInstance()
     private var authManager = FirebaseAuthManager()
 
+    fun searchPosts(searchQuery: String, callback: (List<HomeModal>) -> Unit) {
+        val query = database.collection("home")
+            .whereArrayContains("title", searchQuery.uppercase())
+            .whereArrayContains("title", searchQuery.lowercase())
+
+
+        query.get()
+            .addOnSuccessListener { result ->
+                val dataList = result.documents.mapNotNull { document ->
+                    document.toObject(HomeModal::class.java)
+                }
+                callback(dataList)
+            }
+            .addOnFailureListener { exception ->
+                Log.e("FirestoreError", "Error getting documents: ", exception)
+                callback(emptyList())
+            }
+    }
     //Home fragment fetch home collection
     fun fetchDataHomeFromFireStore(callback: (List<HomeModal>) -> Unit) {
         database.collection("home").get()
@@ -86,29 +102,6 @@ class FirebaseDatabaseManager(private val context: Context) {
             .addOnFailureListener { e ->
                 Log.e("GetCommentCount", "Error getting comments", e)
                 callback(0)
-            }
-    }
-
-    //Group Fragment fetch group collection
-    fun fetchDataGroupFromeFireStore(callback: (List<GroupModal>) -> Unit) {
-        database.collection("group")
-            .whereEqualTo("userId", authManager.getCurrentUser()?.uid).get()
-            .addOnSuccessListener { result ->
-                val dataList = ArrayList<GroupModal>()
-                for (document in result.documents) {
-                    val item = document.toObject(GroupModal::class.java)
-                    item?.id = document.id
-                    item?.let { dataList.add(it) }
-                }
-                callback(dataList)
-            }
-            .addOnFailureListener { exception ->
-                Toast.makeText(
-                    context,
-                    "Error fetching group data: ${exception.message}",
-                    Toast.LENGTH_LONG
-                ).show()
-                callback(emptyList())
             }
     }
 
@@ -261,17 +254,8 @@ class FirebaseDatabaseManager(private val context: Context) {
                                 saveHomeData(homeMap, callback)
                             }
                         }
-                        .addOnFailureListener {
-                            Toast.makeText(context, "Failed to upload image", Toast.LENGTH_SHORT)
-                                .show()
-                            callback(false) // Notify failure
-                        }
                 }
-                .addOnFailureListener {
-                    Toast.makeText(context, "Failed to retrieve user data", Toast.LENGTH_SHORT)
-                        .show()
-                    callback(false) // Notify failure
-                }
+
         }
     }
 
@@ -289,12 +273,7 @@ class FirebaseDatabaseManager(private val context: Context) {
     }
 
     // Update group collection from AddpostGroupActivity
-    fun updateGroupData(
-        groupId: String,
-        name: String,
-        imageUri: Uri,
-        callback: (Boolean) -> Unit
-    ) {
+    fun updateGroupData(groupId: String, name: String, imageUri: Uri, callback: (Boolean) -> Unit) {
         val groupUpdate = hashMapOf<String, Any>(
             "name" to name,
         )
@@ -399,7 +378,7 @@ class FirebaseDatabaseManager(private val context: Context) {
     }
 
     //EditProfileActivity
-    fun loadUserData(onDataLoaded: (username: String?, email: String?, imageUrl: String?) -> Unit) {
+    fun getUserData(onDataLoaded: (username: String?, email: String?, imageUrl: String?) -> Unit) {
         val currentUser = authManager.getCurrentUser()
         if (currentUser != null) {
             val userId = currentUser.uid
@@ -460,28 +439,8 @@ class FirebaseDatabaseManager(private val context: Context) {
         }
     }
 
-    //fetch user data on userProfileActivity
-    fun loadData(
-        userId: String,
-        onDataLoaded: (username: String?, email: String?, imageUrl: String?) -> Unit
-    ) {
-        val userRef = database.collection("user").document(userId)
-
-        userRef.get().addOnSuccessListener { document ->
-            if (document != null && document.exists()) {
-                val username = document.getString("name")
-                val email = document.getString("email")
-                val imageUrl = document.getString("profileImageUrl")
-                onDataLoaded(username, email, imageUrl)
-            }
-        }
-    }
-
-    //UserFragment
-    fun getUserData(
-        userId: String,
-        onDataLoaded: (username: String?, email: String?, profileImageUrl: String?) -> Unit
-    ) {
+    //fetch user data on userProfileActivity and UserFragment
+    fun getUserData(userId: String, onDataLoaded: (username: String?, email: String?, profileImageUrl: String?) -> Unit) {
         val userRef = database.collection("user").document(userId)
 
         // Use addSnapshotListener for real-time updates
@@ -586,9 +545,7 @@ class FirebaseDatabaseManager(private val context: Context) {
 
     //fetch followers count on the basis of userId in UserProfileActivity
     fun getFollowersCount(userId: String, onCountFetched: (Int) -> Unit) {
-        database.collection("user")
-            .document(userId)
-            .collection("followers")
+        database.collection("user").document(userId).collection("followers")
             .addSnapshotListener { snapshot, error ->
                 val count = snapshot?.documents?.size
                 onCountFetched(count ?: 0)
@@ -616,5 +573,44 @@ class FirebaseDatabaseManager(private val context: Context) {
             }
     }
 
+    //fetch user data on userProfileActivity
+    fun loadData(
+        userId: String,
+        onDataLoaded: (username: String?, email: String?, imageUrl: String?) -> Unit
+    ) {
+        val userRef = database.collection("user").document(userId)
+
+        userRef.get().addOnSuccessListener { document ->
+            if (document != null && document.exists()) {
+                val username = document.getString("name")
+                val email = document.getString("email")
+                val imageUrl = document.getString("profileImageUrl")
+                onDataLoaded(username, email, imageUrl)
+            }
+        }
+    }
+
+    //Group Fragment fetch group collection
+    fun fetchDataGroupFromeFireStore(callback: (List<GroupModal>) -> Unit) {
+        database.collection("group")
+            .whereEqualTo("userId", authManager.getCurrentUser()?.uid).get()
+            .addOnSuccessListener { result ->
+                val dataList = ArrayList<GroupModal>()
+                for (document in result.documents) {
+                    val item = document.toObject(GroupModal::class.java)
+                    item?.id = document.id
+                    item?.let { dataList.add(it) }
+                }
+                callback(dataList)
+            }
+            .addOnFailureListener { exception ->
+                Toast.makeText(
+                    context,
+                    "Error fetching group data: ${exception.message}",
+                    Toast.LENGTH_LONG
+                ).show()
+                callback(emptyList())
+            }
+    }
 
 }
