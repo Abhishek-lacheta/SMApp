@@ -1,6 +1,7 @@
 package com.example.project01.fragments
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -49,7 +50,11 @@ class SearchPostFragment : Fragment(), Searchable {
 
     override fun search(query: String) {
         if (query.isNotEmpty()) {
+            Log.d("Search", "Searching for query: $query")
+
             firebaseDatabaseManager.searchPosts(query) { results ->
+                Log.d("Search", "Received ${results.size} results from Firestore.")
+
                 dataList.clear()
                 dataList.addAll(results)
 
@@ -64,7 +69,11 @@ class SearchPostFragment : Fragment(), Searchable {
                 }
                 adaptor.notifyDataSetChanged() // Notify the adapter to refresh the list
             }
+        } else {
+            Log.d("Search", "Search query is empty, skipping search.")
         }
+
         setupRecyclerView()
     }
+
 }

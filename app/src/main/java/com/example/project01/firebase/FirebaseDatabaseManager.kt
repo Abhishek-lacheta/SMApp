@@ -17,13 +17,18 @@ class FirebaseDatabaseManager(private val context: Context) {
     private var authManager = FirebaseAuthManager()
 
     fun searchPosts(searchQuery: String, callback: (List<HomeModal>) -> Unit) {
+        // Normalize searchQuery to lowercase for case-insensitive search
+        val lowerCaseQuery = searchQuery.lowercase()
+
+        // Debugging logs
+        Log.d("FirestoreQuery", "Searching for: $lowerCaseQuery")
+
         val query = database.collection("home")
-            .whereArrayContains("title", searchQuery.uppercase())
-            .whereArrayContains("title", searchQuery.lowercase())
-
-
+            .whereGreaterThanOrEqualTo("title", lowerCaseQuery)
+            .whereLessThanOrEqualTo("title", lowerCaseQuery + "\uf8ff")
         query.get()
             .addOnSuccessListener { result ->
+                Log.d("FirestoreQuery", "Query successful, found ${result.size()} results.")
                 val dataList = result.documents.mapNotNull { document ->
                     document.toObject(HomeModal::class.java)
                 }
@@ -34,6 +39,34 @@ class FirebaseDatabaseManager(private val context: Context) {
                 callback(emptyList())
             }
     }
+
+
+    fun searchGroups(searchQuery: String, callback: (List<GroupModal>) -> Unit) {
+        // Normalize searchQuery to lowercase for case-insensitive search
+        val lowerCaseQuery = searchQuery.lowercase()
+
+        // Debugging logs
+        Log.d("FirestoreQuery", "Searching for: $lowerCaseQuery")
+
+        val query = database.collection("group")
+            .whereGreaterThanOrEqualTo("name", lowerCaseQuery)
+            .whereLessThanOrEqualTo("name", lowerCaseQuery + "\uf8ff")
+        query.get()
+            .addOnSuccessListener { result ->
+                Log.d("FirestoreQuery", "Query successful, found ${result.size()} results.")
+                val dataList = result.documents.mapNotNull { document ->
+                    document.toObject(GroupModal::class.java)
+                }
+                callback(dataList)
+            }
+            .addOnFailureListener { exception ->
+                Log.e("FirestoreError", "Error getting documents: ", exception)
+                callback(emptyList())
+            }
+    }
+
+
+
     //Home fragment fetch home collection
     fun fetchDataHomeFromFireStore(callback: (List<HomeModal>) -> Unit) {
         database.collection("home").get()

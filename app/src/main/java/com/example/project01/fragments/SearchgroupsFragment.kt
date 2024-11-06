@@ -17,7 +17,7 @@ class SearchgroupsFragment : Fragment() {
     private lateinit var binding: FragmentSearchGroupsBinding
     private lateinit var groupRecyclerAdapter: GroupAdapter
     private lateinit var databaseManager: FirebaseDatabaseManager
-    private val itemList = mutableListOf<GroupModal>()
+    private var itemList = mutableListOf<GroupModal>()
     private var authManager = FirebaseAuthManager()
     val currentUser = authManager.getCurrentUser()
     val userId = currentUser?.uid
@@ -33,28 +33,33 @@ class SearchgroupsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        databaseManager=FirebaseDatabaseManager(requireContext())
+        databaseManager = FirebaseDatabaseManager(requireContext())
         binding.groupRecyclerview.layoutManager = GridLayoutManager(context, 2)
-        if (userId != null) {
-            fetchGroupData(userId)
-        }
+
     }
 
     //SetUp RecyclerView
     private fun setupRecyclerView() {
         groupRecyclerAdapter = GroupAdapter(
             itemList = itemList,
-            onGroupPopupMenu = { view, item ->  },
+            onGroupPopupMenu = { view, item -> },
             onItemClick = { itemList -> (itemList) },
             isPopupMenuVisible = false
         )
         binding.groupRecyclerview.adapter = groupRecyclerAdapter
     }
-    private fun fetchGroupData(userId: String) {
-        databaseManager.fetchDataGroupFromeFireStore1(userId) { fetchedList ->
-            itemList.clear()
-            itemList.addAll(fetchedList)
-            setupRecyclerView()
+
+
+   /* override fun search(query: String) {
+        if (query.isNotEmpty()) {
+
+            databaseManager.searchGroups(query) { fetchedList ->
+                itemList.clear()
+                itemList.addAll(fetchedList)
+                groupRecyclerAdapter.notifyDataSetChanged()
+            }
+
         }
-    }
+        setupRecyclerView()
+    }*/
 }
