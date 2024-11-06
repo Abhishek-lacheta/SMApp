@@ -5,46 +5,38 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.LinearLayout
 import androidx.fragment.app.Fragment
 import androidx.appcompat.widget.SearchView
-import androidx.viewpager2.widget.ViewPager2
-import com.example.project01.R
 import com.example.project01.adaptor.SearchPagerAdapter
-import com.google.android.material.tabs.TabLayout
+import com.example.project01.databinding.FragmentSearchBinding
 import com.google.android.material.tabs.TabLayoutMediator
 
 class SearchFragment : Fragment() {
 
-    private lateinit var viewPager: ViewPager2
     private lateinit var pagerAdapter: SearchPagerAdapter
-    private lateinit var tabLayout: TabLayout
-    private lateinit var searchView: SearchView
-    private lateinit var noDataLayout: LinearLayout
+    private lateinit var binding: FragmentSearchBinding
 
     @SuppressLint("MissingInflatedId")
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View? {
-        val view = inflater.inflate(R.layout.fragment_search, container, false)
+       binding=FragmentSearchBinding.inflate(inflater,container,false)
+        return binding.root
+    }
 
-        // Initialize views
-        viewPager = view.findViewById(R.id.view_pager)
-        tabLayout = view.findViewById(R.id.tab_layout)
-        searchView = view.findViewById(R.id.search_view)
-        noDataLayout = view.findViewById(R.id.noDataLayout)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
-        // Initially hide ViewPager, TabLayout, and NoDataLayout
-        viewPager.visibility = View.GONE
-        tabLayout.visibility = View.GONE
-        noDataLayout.visibility = View.VISIBLE
+        binding.viewPager.visibility = View.GONE
+        binding.tabLayout.visibility = View.GONE
+        binding.noDataLayout.visibility = View.VISIBLE
 
         // Set up the pager adapter for ViewPager2
         pagerAdapter = SearchPagerAdapter(this)
-        viewPager.adapter = pagerAdapter
+        binding.viewPager.adapter = pagerAdapter
 
         // Set up TabLayout with ViewPager2
-        TabLayoutMediator(tabLayout, viewPager) { tab, position ->
+        TabLayoutMediator(binding.tabLayout, binding.viewPager) { tab, position ->
             when (position) {
                 0 -> tab.text = "Posts"
                 1 -> tab.text = "Groups"
@@ -53,12 +45,12 @@ class SearchFragment : Fragment() {
         }.attach()
 
         // Set query listener on the SearchView
-        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+        binding.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
 
             override fun onQueryTextSubmit(query: String?): Boolean {
                 query?.let {
                     // Trigger search in the currently visible fragment
-                    val currentFragment = pagerAdapter.getCurrentFragment(viewPager.currentItem)
+                    val currentFragment = pagerAdapter.getCurrentFragment(binding.viewPager.currentItem)
                     if (currentFragment is Searchable) {
                         currentFragment.search(it)
                     }
@@ -69,20 +61,18 @@ class SearchFragment : Fragment() {
             override fun onQueryTextChange(newText: String?): Boolean {
 
                 if (newText.isNullOrEmpty()) {
-                    viewPager.visibility = View.GONE
-                    tabLayout.visibility = View.GONE
-                    noDataLayout.visibility = View.VISIBLE
+                    binding.viewPager.visibility = View.GONE
+                    binding.tabLayout.visibility = View.GONE
+                    binding.noDataLayout.visibility = View.VISIBLE
                 } else {
 
-                    viewPager.visibility = View.VISIBLE
-                    tabLayout.visibility = View.VISIBLE
-                    noDataLayout.visibility = View.GONE
+                    binding.viewPager.visibility = View.VISIBLE
+                    binding.tabLayout.visibility = View.VISIBLE
+                    binding.noDataLayout.visibility = View.GONE
                 }
                 return true
             }
         })
-
-        return view
     }
 
 }
