@@ -38,7 +38,6 @@ class UserFragment : Fragment() {
     private lateinit var groupRecyclerAdapteradaptor: GroupAdapter
     private val itemList = mutableListOf<GroupModal>()
     private lateinit var databaseManager: FirebaseDatabaseManager
-    private lateinit var noDataLayout: View
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -62,7 +61,6 @@ class UserFragment : Fragment() {
 
         // Set up RecyclerView
         binding.groupRecyclerview.layoutManager = GridLayoutManager(context, 2)
-        noDataLayout = binding.noDataLayout
         // Fetch data from Firestore
         if (userId != null) {
             fetchGroupData(userId)

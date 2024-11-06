@@ -23,6 +23,7 @@ import com.example.project01.modal.HomeModal
 import com.google.firebase.auth.FirebaseAuth
 
 class PostFragment : Fragment() {
+    // Group ke andar ki post
     private lateinit var adapter: HomeAdaptor
     private lateinit var binding: FragmentPostBinding
     private var dataList = ArrayList<HomeModal>()

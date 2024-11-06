@@ -5,7 +5,6 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/searchtoolbar"
         android:layout_width="match_parent"
@@ -31,11 +30,45 @@
             android:iconifiedByDefault="true"
             app:iconifiedByDefault="false"
             app:queryBackground="@android:color/transparent"
-            app:queryHint="Search here.."
+            app:queryHint="Search here..."
             app:searchHintIcon="@drawable/ic_search"
             app:searchIcon="@drawable/ic_search" />
 
+        <LinearLayout
+            android:id="@+id/noDataLayout"
+            android:layout_width="match_parent"
+            android:layout_height="830dp"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:visibility="visible">
+
+            <ImageView
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:src="@drawable/ic_search"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="type to search"
+                android:textSize="20sp"
+                android:textColor="@android:color/darker_gray"
+                android:textStyle="bold"
+                android:layout_gravity="center" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="your posts,groups and users"
+                android:textSize="14sp"
+                android:textColor="@android:color/darker_gray"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="150dp"
+                android:layout_gravity="center"/>
+        </LinearLayout>
     </FrameLayout>
+
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tab_layout"
         android:layout_width="match_parent"
@@ -43,12 +76,12 @@
         android:background="@color/white"
         app:tabIndicatorColor="@color/black"
         app:tabIndicatorFullWidth="true"
-        app:tabSelectedTextColor="@color/black" />
+        app:tabSelectedTextColor="@color/black"
+        android:visibility="gone" />
 
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/view_pager"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
-
-
+        android:layout_height="match_parent"
+        android:visibility="gone" />
 </LinearLayout>

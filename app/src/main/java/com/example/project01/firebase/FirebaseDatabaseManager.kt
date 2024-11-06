@@ -189,7 +189,7 @@ class FirebaseDatabaseManager(private val context: Context) {
     }
 
 
-    //MultipalGroupFragment fetch data groupById
+    // Post Fragment Group ke andar ki post  fetch data groupById
     fun fetchDataByGroupId(userId: String, groupId: String, callback: (List<HomeModal>) -> Unit) {
         database.collection("home")
             .whereEqualTo("userId", userId)
