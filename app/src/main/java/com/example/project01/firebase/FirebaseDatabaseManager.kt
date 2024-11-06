@@ -4,6 +4,7 @@ import android.content.Context
 import android.net.Uri
 import android.util.Log
 import android.widget.Toast
+import com.example.project01.modal.FollowerModal
 import com.example.project01.modal.GroupModal
 import com.example.project01.modal.HomeModal
 import com.google.firebase.firestore.FieldValue
@@ -56,6 +57,31 @@ class FirebaseDatabaseManager(private val context: Context) {
                 Log.d("FirestoreQuery", "Query successful, found ${result.size()} results.")
                 val dataList = result.documents.mapNotNull { document ->
                     document.toObject(GroupModal::class.java)
+                }
+                callback(dataList)
+            }
+            .addOnFailureListener { exception ->
+                Log.e("FirestoreError", "Error getting documents: ", exception)
+                callback(emptyList())
+            }
+    }
+
+
+    fun searchUsers(searchQuery: String, callback: (List<FollowerModal>) -> Unit) {
+        // Normalize searchQuery to lowercase for case-insensitive search
+        val lowerCaseQuery = searchQuery.lowercase()
+
+        // Debugging logs
+        Log.d("FirestoreQuery", "Searching for: $lowerCaseQuery")
+
+        val query = database.collection("user")
+            .whereGreaterThanOrEqualTo("name", lowerCaseQuery)
+            .whereLessThanOrEqualTo("name", lowerCaseQuery + "\uf8ff")
+        query.get()
+            .addOnSuccessListener { result ->
+                Log.d("FirestoreQuery", "Query successful, found ${result.size()} results.")
+                val dataList = result.documents.mapNotNull { document ->
+                    document.toObject(FollowerModal::class.java)
                 }
                 callback(dataList)
             }
