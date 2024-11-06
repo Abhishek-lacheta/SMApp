@@ -12,7 +12,7 @@ import com.example.project01.databinding.FragmentSearchPostBinding
 import com.example.project01.firebase.FirebaseDatabaseManager
 import com.example.project01.modal.HomeModal
 
-class SearchPostFragment : Fragment(), Searchable {
+class SearchPostFragment : Fragment() {
 
     private lateinit var adaptor: HomeAdaptor
     private lateinit var binding: FragmentSearchPostBinding
@@ -48,7 +48,7 @@ class SearchPostFragment : Fragment(), Searchable {
         binding.recyclerview.adapter = adaptor
     }
 
-    override fun search(query: String) {
+   /* override fun search(query: String) {
         if (query.isNotEmpty()) {
             Log.d("Search", "Searching for query: $query")
 
@@ -74,6 +74,6 @@ class SearchPostFragment : Fragment(), Searchable {
         }
 
         setupRecyclerView()
-    }
+    }*/
 
 }

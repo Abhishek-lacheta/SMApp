@@ -13,7 +13,7 @@ import com.example.project01.firebase.FirebaseDatabaseManager
 import com.example.project01.modal.GroupModal
 
 
-class SearchgroupsFragment : Fragment() {
+class SearchgroupsFragment : Fragment(),Searchable {
     private lateinit var binding: FragmentSearchGroupsBinding
     private lateinit var groupRecyclerAdapter: GroupAdapter
     private lateinit var databaseManager: FirebaseDatabaseManager
@@ -50,7 +50,7 @@ class SearchgroupsFragment : Fragment() {
     }
 
 
-   /* override fun search(query: String) {
+    override fun search(query: String) {
         if (query.isNotEmpty()) {
 
             databaseManager.searchGroups(query) { fetchedList ->
@@ -61,5 +61,5 @@ class SearchgroupsFragment : Fragment() {
 
         }
         setupRecyclerView()
-    }*/
+    }
 }
