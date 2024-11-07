@@ -7,8 +7,11 @@ import android.widget.Toast
 import com.example.project01.modal.FollowerModal
 import com.example.project01.modal.GroupModal
 import com.example.project01.modal.HomeModal
+import com.google.android.gms.tasks.Task
+import com.google.android.gms.tasks.Tasks
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.storage.FirebaseStorage
 import java.util.UUID
 
@@ -18,79 +21,54 @@ class FirebaseDatabaseManager(private val context: Context) {
     private var authManager = FirebaseAuthManager()
 
     fun searchPosts(searchQuery: String, callback: (List<HomeModal>) -> Unit) {
-        // Normalize searchQuery to lowercase for case-insensitive search
         val lowerCaseQuery = searchQuery.lowercase()
 
-        // Debugging logs
-        Log.d("FirestoreQuery", "Searching for: $lowerCaseQuery")
-
         val query = database.collection("home")
-            .whereGreaterThanOrEqualTo("title", lowerCaseQuery)
-            .whereLessThanOrEqualTo("title", lowerCaseQuery + "\uf8ff")
+            .whereGreaterThanOrEqualTo("title_lc", lowerCaseQuery)
+            .whereLessThanOrEqualTo("title_lc", lowerCaseQuery + "\uf8ff")
         query.get()
             .addOnSuccessListener { result ->
-                Log.d("FirestoreQuery", "Query successful, found ${result.size()} results.")
                 val dataList = result.documents.mapNotNull { document ->
                     document.toObject(HomeModal::class.java)
                 }
                 callback(dataList)
             }
-            .addOnFailureListener { exception ->
-                Log.e("FirestoreError", "Error getting documents: ", exception)
-                callback(emptyList())
-            }
+
     }
 
 
     fun searchGroups(searchQuery: String, callback: (List<GroupModal>) -> Unit) {
-        // Normalize searchQuery to lowercase for case-insensitive search
         val lowerCaseQuery = searchQuery.lowercase()
 
-        // Debugging logs
-        Log.d("FirestoreQuery", "Searching for: $lowerCaseQuery")
-
         val query = database.collection("group")
-            .whereGreaterThanOrEqualTo("name", lowerCaseQuery)
-            .whereLessThanOrEqualTo("name", lowerCaseQuery + "\uf8ff")
+            .whereGreaterThanOrEqualTo("name_lc", lowerCaseQuery)
+            .whereLessThanOrEqualTo("name_lc", lowerCaseQuery + "\uf8ff")
         query.get()
             .addOnSuccessListener { result ->
-                Log.d("FirestoreQuery", "Query successful, found ${result.size()} results.")
                 val dataList = result.documents.mapNotNull { document ->
                     document.toObject(GroupModal::class.java)
                 }
                 callback(dataList)
             }
-            .addOnFailureListener { exception ->
-                Log.e("FirestoreError", "Error getting documents: ", exception)
-                callback(emptyList())
-            }
+
     }
 
 
     fun searchUsers(searchQuery: String, callback: (List<FollowerModal>) -> Unit) {
-        // Normalize searchQuery to lowercase for case-insensitive search
         val lowerCaseQuery = searchQuery.lowercase()
 
-        // Debugging logs
-        Log.d("FirestoreQuery", "Searching for: $lowerCaseQuery")
-
         val query = database.collection("user")
-            .whereGreaterThanOrEqualTo("name", lowerCaseQuery)
-            .whereLessThanOrEqualTo("name", lowerCaseQuery + "\uf8ff")
+            .whereGreaterThanOrEqualTo("name_Lc", lowerCaseQuery)
+            .whereLessThanOrEqualTo("name_Lc", lowerCaseQuery + "\uf8ff")
         query.get()
             .addOnSuccessListener { result ->
-                Log.d("FirestoreQuery", "Query successful, found ${result.size()} results.")
                 val dataList = result.documents.mapNotNull { document ->
                     document.toObject(FollowerModal::class.java)
                 }
                 callback(dataList)
             }
-            .addOnFailureListener { exception ->
-                Log.e("FirestoreError", "Error getting documents: ", exception)
-                callback(emptyList())
-            }
-    }
 
+    }
 
 
     //Home fragment fetch home collection
@@ -247,7 +225,12 @@ class FirebaseDatabaseManager(private val context: Context) {
 
     // AddPostGroupActivity image upload and save data
     fun uploadImageAndSaveData(imageUri: Uri, name: String, callback: (Boolean) -> Unit) {
-        val homeMap = hashMapOf("name" to name, "userId" to authManager.getCurrentUser()?.uid)
+        val name_lc = name.lowercase()
+        val homeMap = hashMapOf(
+            "name" to name,
+            "name_lc" to name_lc,
+            "userId" to authManager.getCurrentUser()?.uid
+        )
         val storageRef = storage.reference
         val imageRef = storageRef.child("images/${UUID.randomUUID()}.jpg")
 
@@ -292,8 +275,10 @@ class FirebaseDatabaseManager(private val context: Context) {
                 .addOnSuccessListener { document ->
                     val userName = document.getString("name") ?: "Unknown User"
                     val image = document.getString("profileImageUrl")
+                    val title_lc = title.lowercase()
                     val homeMap = hashMapOf(
                         "title" to title,
+                        "title_lc" to title_lc,
                         "desc" to desc,
                         "created_at" to FieldValue.serverTimestamp(),
                         "groupId" to (selectedGroupId ?: ""),
@@ -333,8 +318,10 @@ class FirebaseDatabaseManager(private val context: Context) {
 
     // Update group collection from AddpostGroupActivity
     fun updateGroupData(groupId: String, name: String, imageUri: Uri, callback: (Boolean) -> Unit) {
+        val name_lc = name.lowercase()
         val groupUpdate = hashMapOf<String, Any>(
             "name" to name,
+            "name_lc" to name_lc
         )
 
         val storageRef = storage.reference
@@ -398,8 +385,10 @@ class FirebaseDatabaseManager(private val context: Context) {
 
         callback: (Boolean) -> Unit
     ) {
+        val title_lc = title.lowercase()
         val postUpdates = hashMapOf<String, Any>(
             "title" to title,
+            "title_lc" to title_lc,
             "desc" to description
         )
         val storageRef = storage.reference
@@ -484,8 +473,10 @@ class FirebaseDatabaseManager(private val context: Context) {
         if (currentUser != null) {
             val userId = currentUser.uid
             val userRef = database.collection("user").document(userId)
-
-            userRef.update("name", username, "email", email)
+            userRef.update(
+                "name", username,
+                "email", email
+            )
                 .addOnSuccessListener {
                     onSuccess()
                     profileImageUri?.let { uri ->
@@ -499,7 +490,10 @@ class FirebaseDatabaseManager(private val context: Context) {
     }
 
     //fetch user data on userProfileActivity and UserFragment
-    fun getUserData(userId: String, onDataLoaded: (username: String?, email: String?, profileImageUrl: String?) -> Unit) {
+    fun getUserData(
+        userId: String,
+        onDataLoaded: (username: String?, email: String?, profileImageUrl: String?) -> Unit
+    ) {
         val userRef = database.collection("user").document(userId)
 
         // Use addSnapshotListener for real-time updates

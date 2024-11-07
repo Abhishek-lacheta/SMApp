@@ -6,6 +6,7 @@ import kotlinx.parcelize.Parcelize
 @Parcelize
 data class GroupModal(
     val name: String? = null,
+    val name_lc:String?=null,
     val imageUrl: String? = null,
     var id: String? = null
 ): Parcelable

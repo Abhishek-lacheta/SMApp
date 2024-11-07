@@ -12,7 +12,7 @@ import com.example.project01.databinding.FragmentSearchPostBinding
 import com.example.project01.firebase.FirebaseDatabaseManager
 import com.example.project01.modal.HomeModal
 
-class SearchPostFragment : Fragment(),Searchable {
+class SearchPostFragment : Fragment(), Searchable {
 
     private lateinit var adaptor: HomeAdaptor
     private lateinit var binding: FragmentSearchPostBinding
@@ -50,11 +50,7 @@ class SearchPostFragment : Fragment(),Searchable {
 
     override fun search(query: String) {
         if (query.isNotEmpty()) {
-            Log.d("Search", "Searching for query: $query")
-
             firebaseDatabaseManager.searchPosts(query) { results ->
-                Log.d("Search", "Received ${results.size} results from Firestore.")
-
                 dataList.clear()
                 dataList.addAll(results)
 

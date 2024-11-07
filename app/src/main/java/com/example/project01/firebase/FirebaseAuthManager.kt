@@ -14,7 +14,6 @@ class FirebaseAuthManager {
     private var database = FirebaseFirestore.getInstance()
 
 
-
     // SigUpActivity method Register a new user
     suspend fun registerUser(name: String, email: String, password: String): AuthResult {
 
@@ -36,9 +35,10 @@ class FirebaseAuthManager {
 
     fun performSignUp2(uid: String?, name: String, email: String) {
         if (uid == null) return
-
+        val name_Lc = name.lowercase()
         val userMap = hashMapOf(
             "name" to name,
+            "name_Lc" to name_Lc,
             "email" to email
         )
         database.collection("user").document(uid).set(userMap)

@@ -14,7 +14,7 @@ import com.example.project01.firebase.FirebaseDatabaseManager
 import com.example.project01.modal.FollowerModal
 import com.google.firebase.firestore.FirebaseFirestore
 
-class SearchUsersFragment : Fragment() {
+class SearchUsersFragment : Fragment(),Searchable {
     private lateinit var binding: FragmentSearchUsersBinding
     private val itemList = mutableListOf<FollowerModal>()
     private lateinit var followerAdaptor: FollowerAdaptor
@@ -47,15 +47,16 @@ class SearchUsersFragment : Fragment() {
         binding.followerrecyclerView.adapter = followerAdaptor
     }
 
-   /* override fun search(query: String) {
-        if (query.isNotEmpty()) {
+     override fun search(query: String) {
+         if (query.isNotEmpty()) {
 
-            databaseManager.searchUsers(query) { fetchedList ->
-                itemList.clear()
-                itemList.addAll(fetchedList)
-                followerAdaptor.notifyDataSetChanged()
-            }
+             databaseManager.searchUsers(query) { fetchedList ->
+                 itemList.clear()
+                 itemList.addAll(fetchedList)
+                 followerAdaptor.notifyDataSetChanged()
+             }
 
-        }
-    }*/
+         }
+     }
+
 }

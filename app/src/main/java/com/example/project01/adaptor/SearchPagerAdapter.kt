@@ -8,7 +8,7 @@ import com.example.project01.fragments.SearchUsersFragment
 import com.example.project01.fragments.SearchgroupsFragment
 
 class SearchPagerAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
-    private val fragmentList = listOf(
+    private val fragmentList: List<Fragment> = listOf(
         SearchPostFragment(),
         SearchgroupsFragment(),
         SearchUsersFragment()

@@ -57,7 +57,6 @@ class SearchFragment : Fragment() {
                 }
                 return true
             }
-
             override fun onQueryTextChange(newText: String?): Boolean {
 
                 if (newText.isNullOrEmpty()) {
@@ -74,7 +73,6 @@ class SearchFragment : Fragment() {
             }
         })
     }
-
 }
 
 

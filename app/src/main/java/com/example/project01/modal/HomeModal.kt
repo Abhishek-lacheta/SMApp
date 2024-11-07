@@ -9,6 +9,7 @@ import kotlinx.parcelize.Parcelize
 @Parcelize
  class HomeModal (
     val title: String? = null,
+    val title_lc: String? = null,
     val desc: String? = null,
     val imageUrl: String? = null,
     val created_at: Timestamp? = null,
