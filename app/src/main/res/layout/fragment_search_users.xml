@@ -8,7 +8,7 @@
     tools:context=".fragments.SearchUsersFragment">
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/followerrecyclerView"
+        android:id="@+id/userrecyclerview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 </LinearLayout>

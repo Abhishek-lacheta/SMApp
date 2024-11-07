@@ -1,4 +1,6 @@
 package com.example.project01.modal
 
-class UserModal {
-}
+class UserModal (
+    val userName: String?= null,
+    val image: String?=null,
+)

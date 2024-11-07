@@ -1,28 +1,21 @@
 package com.example.project01.fragments
 
 import android.os.Bundle
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.project01.adaptor.FollowerAdaptor
+import com.example.project01.adaptor.UserAdaptor
 import com.example.project01.databinding.FragmentSearchUsersBinding
-import com.example.project01.firebase.FirebaseAuthManager
 import com.example.project01.firebase.FirebaseDatabaseManager
-import com.example.project01.modal.FollowerModal
-import com.google.firebase.firestore.FirebaseFirestore
+import com.example.project01.modal.UserModal
 
-class SearchUsersFragment : Fragment(),Searchable {
+class SearchUsersFragment : Fragment(), Searchable {
     private lateinit var binding: FragmentSearchUsersBinding
-    private val itemList = mutableListOf<FollowerModal>()
-    private lateinit var followerAdaptor: FollowerAdaptor
-    private val database = FirebaseFirestore.getInstance()
+    private val itemList = mutableListOf<UserModal>()
+    private lateinit var UserAdaptor: UserAdaptor
     private lateinit var databaseManager: FirebaseDatabaseManager
-    private var authManager = FirebaseAuthManager()
-    private val currentUser = authManager.getCurrentUser()
-    private val userId = currentUser?.uid
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -35,28 +28,28 @@ class SearchUsersFragment : Fragment(),Searchable {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         databaseManager = FirebaseDatabaseManager(requireContext())
-        binding.followerrecyclerView.layoutManager = LinearLayoutManager(context)
-        setupRecyclerView()
+        binding.userrecyclerview.layoutManager = LinearLayoutManager(context)
+
 
     }
 
     private fun setupRecyclerView() {
-        followerAdaptor = FollowerAdaptor(followers = itemList) { item ->
-            // Handle item click
-        }
-        binding.followerrecyclerView.adapter = followerAdaptor
+        UserAdaptor = UserAdaptor(Users = itemList)
+        binding.userrecyclerview.adapter = UserAdaptor
     }
 
-     override fun search(query: String) {
-         if (query.isNotEmpty()) {
+    override fun search(query: String) {
+        if (query.isNotEmpty()) {
 
-             databaseManager.searchUsers(query) { fetchedList ->
-                 itemList.clear()
-                 itemList.addAll(fetchedList)
-                 followerAdaptor.notifyDataSetChanged()
-             }
+            databaseManager.searchUsers(query) { fetchedList ->
+                itemList.clear()
+                itemList.addAll(fetchedList)
+                UserAdaptor.notifyDataSetChanged()
+            }
 
-         }
-     }
+        }
+
+        setupRecyclerView()
+    }
 
 }
