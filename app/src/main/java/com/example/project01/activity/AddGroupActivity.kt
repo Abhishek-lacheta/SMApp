@@ -8,13 +8,13 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
 import com.example.project01.databinding.ActivityAddGroupBinding
-import com.example.project01.firebase.FirebaseDatabaseManager
+import com.example.project01.firebase.FirebaseDatabseGroupManager
 import com.example.project01.modal.GroupModal
 
 class AddGroupActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityAddGroupBinding
-    private lateinit var databaseManager: FirebaseDatabaseManager
+    private lateinit var databaseManager: FirebaseDatabseGroupManager
     private val PICK_IMAGE_REQUEST = 71
     private var imageUri: Uri? = null
     private var group: GroupModal? = null
@@ -24,7 +24,7 @@ class AddGroupActivity : AppCompatActivity() {
         binding = ActivityAddGroupBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        databaseManager = FirebaseDatabaseManager(this)
+        databaseManager = FirebaseDatabseGroupManager(this)
         group = intent.getParcelableExtra("group")
         //Set Update Data
         group?.let {
@@ -55,7 +55,7 @@ class AddGroupActivity : AppCompatActivity() {
                         saveData()
                     } else {
                         group!!.id?.let { groupId ->
-                            updateGroupInFirebase(groupId)
+                            updateData(groupId)
                         } ?: run {
                             Toast.makeText(this, "Group ID is null.", Toast.LENGTH_SHORT).show()
                         }
@@ -77,7 +77,7 @@ class AddGroupActivity : AppCompatActivity() {
         val name = binding.nameId.text.toString().trim()
 
         imageUri?.let { uri ->
-            databaseManager.uploadImageAndSaveData(uri, name) { success ->
+            databaseManager.saveGroup(uri, name) { success ->
                 binding.submitLoader.visibility = View.GONE
                 binding.buttonId.visibility = View.VISIBLE
             }
@@ -85,12 +85,12 @@ class AddGroupActivity : AppCompatActivity() {
     }
 
     //Update Group Collection
-    private fun updateGroupInFirebase(groupId: String) {
+    private fun updateData(groupId: String) {
         binding.submitLoader.visibility = View.VISIBLE
         binding.buttonId.visibility = View.GONE
         val name = binding.nameId.text.toString().trim()
         imageUri?.let { uri ->
-            databaseManager.updateGroupData(groupId, name, uri) { success ->
+            databaseManager.updateData(groupId, name, uri) { success ->
                 binding.submitLoader.visibility = View.GONE
                 binding.buttonId.visibility = View.VISIBLE
                 if (success) {

@@ -8,13 +8,13 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
-import androidx.navigation.ui.navigateUp
 import androidx.recyclerview.widget.GridLayoutManager
 import com.bumptech.glide.Glide
 import com.example.project01.R
 import com.example.project01.adaptor.GroupAdapter
 import com.example.project01.databinding.FragmentUserProfileBinding
 import com.example.project01.firebase.FirebaseDatabaseManager
+import com.example.project01.firebase.FirebaseDatabseGroupManager
 import com.example.project01.modal.GroupModal
 
 class UserProfileFragment : Fragment() {
@@ -22,6 +22,7 @@ class UserProfileFragment : Fragment() {
     private lateinit var userId: String
     private var followedUserId: String? = null
     private lateinit var firebaseDatabaseManager: FirebaseDatabaseManager
+    private lateinit var groupdatabaseManger:FirebaseDatabseGroupManager
     private val itemList = mutableListOf<GroupModal>()
     private lateinit var groupRecyclerAdapter: GroupAdapter
     private var isFollowing: Boolean = false
@@ -43,6 +44,7 @@ class UserProfileFragment : Fragment() {
         }
 
         firebaseDatabaseManager = FirebaseDatabaseManager(requireContext())
+        groupdatabaseManger= FirebaseDatabseGroupManager(requireContext())
         binding.groupRecyclerview.layoutManager = GridLayoutManager(requireContext(), 2)
 
         binding.clickfollower.setOnClickListener {
@@ -73,7 +75,7 @@ class UserProfileFragment : Fragment() {
 
         if (userId.isNotEmpty()) {
             loadUserData(userId)
-            fetchGroupData(userId)
+            getGroups(userId)
             fetchFollowersCount(userId)
             fetchFollowingCount(userId)
             fetchGroupCount(userId)
@@ -120,7 +122,7 @@ class UserProfileFragment : Fragment() {
     }
 
     private fun fetchGroupCount(userId: String) {
-        firebaseDatabaseManager.fetchGroupCountFromFirestore(userId) { count ->
+        groupdatabaseManger.getGroupCount(userId) { count ->
             binding.groupCountTextView.text = count.toString()
         }
     }
@@ -162,8 +164,8 @@ class UserProfileFragment : Fragment() {
         }
     }
 
-    private fun fetchGroupData(userId: String) {
-        firebaseDatabaseManager.fetchDataGroupFromeFireStore1(userId) { fetchedList ->
+    private fun getGroups(userId: String) {
+        groupdatabaseManger.getGroups(userId) { fetchedList ->
             itemList.clear()
             itemList.addAll(fetchedList)
             setupRecyclerView()

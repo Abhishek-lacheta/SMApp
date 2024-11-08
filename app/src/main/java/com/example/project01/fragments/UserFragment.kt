@@ -26,6 +26,7 @@ import com.example.project01.adaptor.GroupAdapter
 import com.example.project01.databinding.FragmentUserBinding
 import com.example.project01.firebase.FirebaseAuthManager
 import com.example.project01.firebase.FirebaseDatabaseManager
+import com.example.project01.firebase.FirebaseDatabseGroupManager
 import com.example.project01.modal.GroupModal
 
 
@@ -38,6 +39,7 @@ class UserFragment : Fragment() {
     private lateinit var groupRecyclerAdapteradaptor: GroupAdapter
     private val itemList = mutableListOf<GroupModal>()
     private lateinit var databaseManager: FirebaseDatabaseManager
+    private lateinit var groupdatabaseManager:FirebaseDatabseGroupManager
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -58,12 +60,13 @@ class UserFragment : Fragment() {
 
         // Initialize FirebaseDatabaseManager
         databaseManager = FirebaseDatabaseManager(requireContext())
+        groupdatabaseManager=FirebaseDatabseGroupManager(requireContext())
 
         // Set up RecyclerView
         binding.groupRecyclerview.layoutManager = GridLayoutManager(context, 2)
         // Fetch data from Firestore
         if (userId != null) {
-            fetchGroupData(userId)
+            getGroups(userId)
         }
         getCurrentUser()
 
@@ -142,7 +145,7 @@ class UserFragment : Fragment() {
 
     // Function to fetch group count
     private fun fetchGroupCount(userId: String) {
-        databaseManager.fetchGroupCountFromFirestore(userId) { count ->
+        groupdatabaseManager.getGroupCount(userId) { count ->
             binding.groupCountTextView.text = count.toString()
         }
     }
@@ -205,7 +208,7 @@ class UserFragment : Fragment() {
     //delete data
     private fun deleteItem(item: GroupModal): Boolean {
         item.id?.let { documentId ->
-            databaseManager.deleteGroupData(documentId) { success ->
+            groupdatabaseManager.deleteGroup(documentId) { success ->
                 if (success) {
                     itemList.remove(item)
                     groupRecyclerAdapteradaptor.notifyDataSetChanged()
@@ -243,9 +246,9 @@ class UserFragment : Fragment() {
         findNavController().navigate(R.id.postFragment, bundle, navOptions)
     }
 
-    //Fetch User Data
-    private fun fetchGroupData(userId: String) {
-        databaseManager.fetchDataGroupFromeFireStore1(userId) { fetchedList ->
+    //get groups from group collection
+    private fun getGroups(userId: String) {
+        groupdatabaseManager.getGroups(userId) { fetchedList ->
             itemList.clear()
             itemList.addAll(fetchedList)
             setupRecyclerView()
