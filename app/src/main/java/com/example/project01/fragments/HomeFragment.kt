@@ -15,7 +15,7 @@ import com.example.project01.adaptor.HomeAdaptor
 import com.example.project01.modal.HomeModal
 import com.example.project01.R
 import com.example.project01.databinding.FragmentHomeBinding
-import com.example.project01.firebase.FirebaseDatabaseManager
+import com.example.project01.firebase.FirebaseDatabasePostManager
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentSnapshot
 
@@ -23,7 +23,7 @@ class HomeFragment : Fragment() {
     private lateinit var adapter: HomeAdaptor
     private lateinit var binding: FragmentHomeBinding
     private var dataList = ArrayList<HomeModal>()
-    private lateinit var firebaseDatabaseManager: FirebaseDatabaseManager
+    private lateinit var firebaseDatabaseManager: FirebaseDatabasePostManager
     private lateinit var noDataLayout: View
     private var isLoading = false
     private var lastVisibleDocument: DocumentSnapshot? = null
@@ -40,7 +40,7 @@ class HomeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         // Initialize FirebaseDatabaseManager
-        firebaseDatabaseManager = FirebaseDatabaseManager(requireContext())
+        firebaseDatabaseManager = FirebaseDatabasePostManager(requireContext())
 
 
         // Setup RecyclerView
@@ -50,7 +50,7 @@ class HomeFragment : Fragment() {
 
         // Agar dataList empty hai, toh data fetch karo
         if (dataList.isEmpty()) {
-            fetchHomeData() // Fetch data if it's empty
+            getPost() // Fetch data if it's empty
         } else {
             // Agar data hai already, toh direct display karo
             noDataLayout.visibility = View.GONE
@@ -65,18 +65,18 @@ class HomeFragment : Fragment() {
                 if (!recyclerView.canScrollVertically(1)) {
                     // Agar loading nahi ho raha, tabhi new data fetch karo
                     if (!isLoading) {
-                        fetchHomeData()
+                        getPost()
                     }
                 }
             }
         })
     }
     //fetch home data
-    private fun fetchHomeData() {
+    private fun getPost() {
         isLoading = true // Data load ho raha hai, loading flag set karo
 
         // Firestore se data fetch karo
-        firebaseDatabaseManager.fetchDataHomeFromFireStore(lastVisibleDocument) { fetchedList, lastVisible ->
+        firebaseDatabaseManager.getPost(lastVisibleDocument) { fetchedList, lastVisible ->
             isLoading = false  // Data load hone ke baad loading ko false karo
 
             // Agar fetched list empty hai
@@ -115,8 +115,6 @@ class HomeFragment : Fragment() {
 
         }
     }
-
-
     private fun setupRecyclerView() {
         adapter = HomeAdaptor(
             itemList = dataList,

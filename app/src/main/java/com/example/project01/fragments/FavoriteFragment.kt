@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.project01.R
 import com.example.project01.adaptor.HomeAdaptor
 import com.example.project01.databinding.FragmentFavoriteBinding
-import com.example.project01.firebase.FirebaseDatabaseManager
+import com.example.project01.firebase.FirebaseDatabasePostManager
 import com.example.project01.modal.HomeModal
 import com.google.firebase.auth.FirebaseAuth
 
@@ -20,7 +20,7 @@ class FavoriteFragment : Fragment() {
     private lateinit var adapter: HomeAdaptor
     private lateinit var binding: FragmentFavoriteBinding
     private var dataList = ArrayList<HomeModal>()
-    private lateinit var databaseManager: FirebaseDatabaseManager
+    private lateinit var databaseManager: FirebaseDatabasePostManager
     private lateinit var noDataLayout: View
 
     override fun onCreateView(
@@ -34,11 +34,11 @@ class FavoriteFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        databaseManager = FirebaseDatabaseManager(requireContext())
+        databaseManager = FirebaseDatabasePostManager(requireContext())
         binding.recyclerview.layoutManager = LinearLayoutManager(context)
         noDataLayout = binding.noDataLayout
 
-        fetchFavoriteData()
+        getFavoritePost()
     }
 
     //comment ke liye
@@ -56,8 +56,8 @@ class FavoriteFragment : Fragment() {
     }
 
 
-    private fun fetchFavoriteData() {
-        databaseManager.fetchFavoriteItemsFromFirebase { fetchedList ->
+    private fun getFavoritePost() {
+        databaseManager.getFavoritePost { fetchedList ->
             if (fetchedList.isEmpty()) {
                 noDataLayout.visibility = View.VISIBLE
                 binding.recyclerview.visibility = View.GONE

@@ -19,6 +19,7 @@ import com.example.project01.adaptor.HomeAdaptor
 import com.example.project01.databinding.FragmentPostBinding
 import com.example.project01.firebase.FirebaseAuthManager
 import com.example.project01.firebase.FirebaseDatabaseManager
+import com.example.project01.firebase.FirebaseDatabasePostManager
 import com.example.project01.modal.HomeModal
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentSnapshot
@@ -28,7 +29,7 @@ class PostFragment : Fragment() {
     private lateinit var adapter: HomeAdaptor
     private lateinit var binding: FragmentPostBinding
     private var dataList = ArrayList<HomeModal>()
-    private lateinit var databaseManager: FirebaseDatabaseManager
+    private lateinit var databaseManager: FirebaseDatabasePostManager
     private lateinit var modalId: String
     private lateinit var modalName: String
     private lateinit var userId: String
@@ -59,7 +60,7 @@ class PostFragment : Fragment() {
 
         }
 
-        databaseManager = FirebaseDatabaseManager(requireContext())
+        databaseManager = FirebaseDatabasePostManager(requireContext())
 
         noDataLayout = binding.noDataLayout
 
@@ -116,7 +117,7 @@ class PostFragment : Fragment() {
     private fun getPosts() {
         isLoading = true
 
-        databaseManager.fetchDataByGroupId(
+        databaseManager.getPostByGroup(
             userId,
             modalId,
             lastVisibleDocument
@@ -184,7 +185,7 @@ class PostFragment : Fragment() {
 
     private fun deleteItem(item: HomeModal): Boolean {
         item.id?.let { documentId ->
-            databaseManager.deleteData(documentId) { success ->
+            databaseManager.deletePost(documentId) { success ->
                 if (success) {
                     dataList.remove(item)
                     adapter.notifyDataSetChanged()
