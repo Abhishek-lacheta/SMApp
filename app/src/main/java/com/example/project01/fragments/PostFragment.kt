@@ -21,6 +21,7 @@ import com.example.project01.firebase.FirebaseAuthManager
 import com.example.project01.firebase.FirebaseDatabaseManager
 import com.example.project01.modal.HomeModal
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.DocumentSnapshot
 
 class PostFragment : Fragment() {
     // Group ke andar ki post
@@ -34,6 +35,8 @@ class PostFragment : Fragment() {
     private lateinit var navController: NavController
     private val authManager = FirebaseAuthManager()
     private lateinit var noDataLayout: View
+    private var isLoading = false
+    private var lastVisibleDocument: DocumentSnapshot? = null
 
     @SuppressLint("MissingInflatedId")
     override fun onCreateView(
@@ -57,11 +60,21 @@ class PostFragment : Fragment() {
         }
 
         databaseManager = FirebaseDatabaseManager(requireContext())
-        binding.recyclerview.layoutManager = LinearLayoutManager(context)
+
         noDataLayout = binding.noDataLayout
 
 
-        fetchDataFromFirestore()
+        setupRecyclerView()
+
+        // Agar dataList empty hai, toh data fetch karo
+        if (dataList.isEmpty()) {
+            getPosts() // Fetch data if it's empty
+        } else {
+            // Agar data hai already, toh direct display karo
+            noDataLayout.visibility = View.GONE
+            binding.recyclerview.visibility = View.VISIBLE
+            adapter.addData(dataList) // Existing data ko adapter me add karna
+        }
 
 
         binding.AddBlocktoolbar.setTitle(modalName)
@@ -70,6 +83,19 @@ class PostFragment : Fragment() {
         binding.AddBlocktoolbar.setNavigationOnClickListener {
             navController.navigateUp()
         }
+        binding.recyclerview.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+                // Agar list ke end tak pahuch gaye toh data load karo
+                if (!recyclerView.canScrollVertically(1)) {
+                    // Agar loading nahi ho raha, tabhi new data fetch karo
+                    if (!isLoading) {
+                        getPosts()
+                    }
+                }
+            }
+        })
+
     }
 
     //Comment ke liye
@@ -87,17 +113,27 @@ class PostFragment : Fragment() {
     }
 
     // fetch data on group fragment
-    private fun fetchDataFromFirestore() {
-        databaseManager.fetchDataByGroupId(userId, modalId) { fetchedList ->
+    private fun getPosts() {
+        isLoading = true
+
+        databaseManager.fetchDataByGroupId(
+            userId,
+            modalId,
+            lastVisibleDocument
+        ) { fetchedList, lastVisible ->
+            isLoading = false
             if (fetchedList.isEmpty()) {
+                if (dataList.isEmpty()) {
                 noDataLayout.visibility = View.VISIBLE
                 binding.recyclerview.visibility = View.GONE
-            } else {
+            } }else {
                 noDataLayout.visibility = View.GONE
                 binding.recyclerview.visibility = View.VISIBLE
-                dataList.clear() // Clear existing data
+
+                adapter.addData(fetchedList)
+                lastVisibleDocument = lastVisible
                 dataList.addAll(fetchedList)
-                setupRecyclerView() // Initialize the adapter
+
             }
         }
     }
@@ -135,6 +171,7 @@ class PostFragment : Fragment() {
             onComment = { item -> onComment(item) },
             onItemClick = { item -> onItemClick(item) }
         )
+        binding.recyclerview.layoutManager = LinearLayoutManager(context)
         binding.recyclerview.adapter = adapter
     }
 
@@ -144,6 +181,7 @@ class PostFragment : Fragment() {
         }
         findNavController().navigate(R.id.userProfileFragment, bundle)
     }
+
     private fun deleteItem(item: HomeModal): Boolean {
         item.id?.let { documentId ->
             databaseManager.deleteData(documentId) { success ->

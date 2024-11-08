@@ -94,13 +94,16 @@ class HomeAdaptor(
 
     }
 
-    fun updateList(newList: List<HomeModal>) {
-        itemList = newList
-        notifyDataSetChanged()
+    fun addData(newData: List<HomeModal>) {
+        val newList = ArrayList(itemList)
+        newList.addAll(newData)  // Add new data to the existing list
+        itemList = newList  // Update the list in the adapter
+        notifyDataSetChanged()  // Notify RecyclerView to update
     }
 
     override fun getItemCount(): Int = itemList.size
 }
+
 
 
 

@@ -4,15 +4,12 @@ import android.content.Context
 import android.net.Uri
 import android.util.Log
 import android.widget.Toast
-import com.example.project01.modal.FollowerModal
 import com.example.project01.modal.GroupModal
 import com.example.project01.modal.HomeModal
 import com.example.project01.modal.UserModal
-import com.google.android.gms.tasks.Task
-import com.google.android.gms.tasks.Tasks
+import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.storage.FirebaseStorage
 import java.util.UUID
 
@@ -20,6 +17,7 @@ class FirebaseDatabaseManager(private val context: Context) {
     private val database = FirebaseFirestore.getInstance()
     private val storage = FirebaseStorage.getInstance()
     private var authManager = FirebaseAuthManager()
+
 
     fun searchPosts(searchQuery: String, callback: (List<HomeModal>) -> Unit) {
         val lowerCaseQuery = searchQuery.lowercase()
@@ -54,11 +52,9 @@ class FirebaseDatabaseManager(private val context: Context) {
 
     }
 
-
     fun searchUsers(searchQuery: String, callback: (List<UserModal>) -> Unit) {
         val lowerCaseQuery = searchQuery.lowercase()
         Log.d("FirestoreQuery", "Searching for: $lowerCaseQuery")
-
 
         val query = database.collection("user")
             .whereGreaterThanOrEqualTo("name_Lc", lowerCaseQuery)
@@ -75,32 +71,77 @@ class FirebaseDatabaseManager(private val context: Context) {
 
     }
 
-
     //Home fragment fetch home collection
-    fun fetchDataHomeFromFireStore(callback: (List<HomeModal>) -> Unit) {
-        database.collection("home").get()
+    fun fetchDataHomeFromFireStore(
+        lastVisible: DocumentSnapshot? = null,
+        callback: (List<HomeModal>, DocumentSnapshot?) -> Unit
+    ) {
+        var query = database.collection("home").limit(2)
+
+
+        lastVisible?.let {
+            query = query.startAfter(it)
+        }
+
+        query.get()
             .addOnSuccessListener { result ->
                 val dataList = ArrayList<HomeModal>()
+                var lastVisibleDoc: DocumentSnapshot? = null
 
                 for (document in result.documents) {
                     val item = document.toObject(HomeModal::class.java)
                     item?.let {
-                        it.id = document.id // Set the document ID
+                        it.id = document.id
                         dataList.add(it)
                     }
                 }
-                callback(dataList)
 
-            }
-            .addOnFailureListener { exception ->
-                Toast.makeText(
-                    context,
-                    "Error fetching data: ${exception.message}",
-                    Toast.LENGTH_LONG
-                ).show()
-                callback(emptyList())
+                // Get the last document for pagination
+                if (result.size() > 0) {
+                    lastVisibleDoc = result.documents[result.size() - 1]
+                }
+
+                // Return data and the last document to the fragment
+                callback(dataList, lastVisibleDoc)
             }
     }
+
+    // Post Fragment Group ke andar ki post  fetch data groupById
+    fun fetchDataByGroupId(
+        userId: String,
+        groupId: String,
+        lastVisible: DocumentSnapshot? = null,
+        callback: (List<HomeModal>, DocumentSnapshot?) -> Unit
+    ) {
+        var query = database.collection("home")
+            .whereEqualTo("userId", userId)
+            .whereEqualTo("groupId", groupId).limit(2)
+
+        lastVisible?.let {
+            query = query.startAfter(it)
+        }
+        query.get().addOnSuccessListener { result ->
+            val dataList = ArrayList<HomeModal>()
+            var lastVisibleDoc: DocumentSnapshot? = null
+
+            for (document in result.documents) {
+                val item = document.toObject(HomeModal::class.java)
+                item?.let {
+                    it.id = document.id
+                    dataList.add(it)
+                }
+            }
+
+            // Get the last document for pagination
+            if (result.size() > 0) {
+                lastVisibleDoc = result.documents[result.size() - 1]
+            }
+
+            // Return data and the last document to the fragment
+            callback(dataList, lastVisibleDoc)
+        }
+    }
+
 
     // Toggle like status like funcnality
     fun toggleLike(postId: String, userId: String, isLiked: Boolean, callback: (Boolean) -> Unit) {
@@ -171,31 +212,6 @@ class FirebaseDatabaseManager(private val context: Context) {
             }
     }
 
-
-    // Post Fragment Group ke andar ki post  fetch data groupById
-    fun fetchDataByGroupId(userId: String, groupId: String, callback: (List<HomeModal>) -> Unit) {
-        database.collection("home")
-            .whereEqualTo("userId", userId)
-            .whereEqualTo("groupId", groupId)
-            .get()
-            .addOnSuccessListener { result ->
-                val dataList = ArrayList<HomeModal>()
-                for (document in result.documents) {
-                    val item = document.toObject(HomeModal::class.java)
-                    item?.id = document.id
-                    item?.let { dataList.add(it) }
-                }
-                callback(dataList)
-            }
-            .addOnFailureListener { exception ->
-                Toast.makeText(
-                    context,
-                    "Error fetching data: ${exception.message}",
-                    Toast.LENGTH_LONG
-                ).show()
-                callback(emptyList())
-            }
-    }
 
     // MultipalGroupFragment Delete a document
     fun deleteData(documentId: String, callback: (Boolean) -> Unit) {

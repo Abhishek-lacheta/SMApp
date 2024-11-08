@@ -10,12 +10,14 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.project01.adaptor.HomeAdaptor
 import com.example.project01.modal.HomeModal
 import com.example.project01.R
 import com.example.project01.databinding.FragmentHomeBinding
 import com.example.project01.firebase.FirebaseDatabaseManager
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.DocumentSnapshot
 
 class HomeFragment : Fragment() {
     private lateinit var adapter: HomeAdaptor
@@ -23,6 +25,8 @@ class HomeFragment : Fragment() {
     private var dataList = ArrayList<HomeModal>()
     private lateinit var firebaseDatabaseManager: FirebaseDatabaseManager
     private lateinit var noDataLayout: View
+    private var isLoading = false
+    private var lastVisibleDocument: DocumentSnapshot? = null
 
     @SuppressLint("MissingInflatedId")
     override fun onCreateView(
@@ -40,46 +44,75 @@ class HomeFragment : Fragment() {
 
 
         // Setup RecyclerView
-        binding.recyclerview.layoutManager = LinearLayoutManager(context)
         noDataLayout = binding.noDataLayout
 
-        // Fetch Data from Firestore
-        fetchHomeData()
-    }
+        setupRecyclerView()
 
-    //fetch home data
-    private fun fetchHomeData() {
-        firebaseDatabaseManager.fetchDataHomeFromFireStore { fetchedList ->
-            if (fetchedList.isEmpty()) {
-                noDataLayout.visibility = View.VISIBLE
-                binding.recyclerview.visibility = View.GONE
+        // Agar dataList empty hai, toh data fetch karo
+        if (dataList.isEmpty()) {
+            fetchHomeData() // Fetch data if it's empty
+        } else {
+            // Agar data hai already, toh direct display karo
+            noDataLayout.visibility = View.GONE
+            binding.recyclerview.visibility = View.VISIBLE
+            adapter.addData(dataList) // Existing data ko adapter me add karna
+        }
 
-            } else {
-                noDataLayout.visibility = View.GONE
-                binding.recyclerview.visibility = View.VISIBLE
-                dataList.clear()
-                dataList.addAll(fetchedList)
-            }
-
-            // Fetch comment counts for each post
-            dataList.forEach { item ->
-                item.id?.let {
-                    firebaseDatabaseManager.getCommentCountForPost(it) { count ->
-                        item.commentcount = count
-                        adapter.notifyItemChanged(dataList.indexOf(item))
+        binding.recyclerview.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+                // Agar list ke end tak pahuch gaye toh data load karo
+                if (!recyclerView.canScrollVertically(1)) {
+                    // Agar loading nahi ho raha, tabhi new data fetch karo
+                    if (!isLoading) {
+                        fetchHomeData()
                     }
                 }
             }
-            setupRecyclerView() // Initialize the adapter
+        })
+    }
+    //fetch home data
+    private fun fetchHomeData() {
+        isLoading = true // Data load ho raha hai, loading flag set karo
+
+        // Firestore se data fetch karo
+        firebaseDatabaseManager.fetchDataHomeFromFireStore(lastVisibleDocument) { fetchedList, lastVisible ->
+            isLoading = false  // Data load hone ke baad loading ko false karo
+
+            // Agar fetched list empty hai
+            if (fetchedList.isEmpty()) {
+                if (dataList.isEmpty()) {
+                    // Agar dono dataList aur fetchedList empty hai, "No Data Found" show karo
+                    noDataLayout.visibility = View.VISIBLE
+                    binding.recyclerview.visibility = View.GONE
+                }
+            } else {
+                // Agar data mil gaya hai, "No Data Found" ko hide karo
+                noDataLayout.visibility = View.GONE
+                binding.recyclerview.visibility = View.VISIBLE
+
+                // Naye data ko existing list me add karo
+                adapter.addData(fetchedList)
+
+                // Pagination ke liye lastVisibleDocument update karo
+                lastVisibleDocument = lastVisible
+
+                // Data ko add karo dataList me
+                dataList.addAll(fetchedList)
+            }
         }
     }
 
+
     private fun setupRecyclerView() {
-        adapter = HomeAdaptor(itemList = dataList,
+        adapter = HomeAdaptor(
+            itemList = dataList,
             currentUserId = null,
             onLikeClick = { item -> toggleLike(item) },
-            onComment = { item -> onComment(item) },//open comments fragment
-            onItemClick = { item -> onItemClick(item) })// open userprofile fragment
+            onComment = { item -> onComment(item) },
+            onItemClick = { item -> onItemClick(item) }
+        )
+        binding.recyclerview.layoutManager = LinearLayoutManager(context)
         binding.recyclerview.adapter = adapter
     }
 
@@ -137,5 +170,6 @@ class HomeFragment : Fragment() {
         }
     }
 }
+
 
 
