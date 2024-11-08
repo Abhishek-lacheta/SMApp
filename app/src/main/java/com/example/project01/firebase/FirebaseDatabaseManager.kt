@@ -18,59 +18,6 @@ class FirebaseDatabaseManager(private val context: Context) {
     private val storage = FirebaseStorage.getInstance()
     private var authManager = FirebaseAuthManager()
 
-
-    fun searchPosts(searchQuery: String, callback: (List<HomeModal>) -> Unit) {
-        val lowerCaseQuery = searchQuery.lowercase()
-
-        val query = database.collection("home")
-            .whereGreaterThanOrEqualTo("title_lc", lowerCaseQuery)
-            .whereLessThanOrEqualTo("title_lc", lowerCaseQuery + "\uf8ff")
-        query.get()
-            .addOnSuccessListener { result ->
-                val dataList = result.documents.mapNotNull { document ->
-                    document.toObject(HomeModal::class.java)
-                }
-                callback(dataList)
-            }
-
-    }
-
-
-    fun searchGroups(searchQuery: String, callback: (List<GroupModal>) -> Unit) {
-        val lowerCaseQuery = searchQuery.lowercase()
-
-        val query = database.collection("group")
-            .whereGreaterThanOrEqualTo("name_lc", lowerCaseQuery)
-            .whereLessThanOrEqualTo("name_lc", lowerCaseQuery + "\uf8ff")
-        query.get()
-            .addOnSuccessListener { result ->
-                val dataList = result.documents.mapNotNull { document ->
-                    document.toObject(GroupModal::class.java)
-                }
-                callback(dataList)
-            }
-
-    }
-
-    fun searchUsers(searchQuery: String, callback: (List<UserModal>) -> Unit) {
-        val lowerCaseQuery = searchQuery.lowercase()
-        Log.d("FirestoreQuery", "Searching for: $lowerCaseQuery")
-
-        val query = database.collection("user")
-            .whereGreaterThanOrEqualTo("name_Lc", lowerCaseQuery)
-            .whereLessThanOrEqualTo("name_Lc", lowerCaseQuery + "\uf8ff")
-        query.get()
-            .addOnSuccessListener { result ->
-                Log.d("FirestoreQuery", "Query successful, found ${result.size()} results.")
-
-                val dataList = result.documents.mapNotNull { document ->
-                    document.toObject(UserModal::class.java)
-                }
-                callback(dataList)
-            }
-
-    }
-
     //Home fragment fetch home collection
     fun fetchDataHomeFromFireStore(
         lastVisible: DocumentSnapshot? = null,

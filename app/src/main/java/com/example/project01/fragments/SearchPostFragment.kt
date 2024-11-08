@@ -10,13 +10,14 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.project01.adaptor.HomeAdaptor
 import com.example.project01.databinding.FragmentSearchPostBinding
 import com.example.project01.firebase.FirebaseDatabaseManager
+import com.example.project01.firebase.FirebaseDatabaseSearchManager
 import com.example.project01.modal.HomeModal
 
 class SearchPostFragment : Fragment(), Searchable {
 
     private lateinit var adaptor: HomeAdaptor
     private lateinit var binding: FragmentSearchPostBinding
-    private lateinit var firebaseDatabaseManager: FirebaseDatabaseManager
+    private lateinit var firebaseDatabaseManager: FirebaseDatabaseSearchManager
     private var dataList = ArrayList<HomeModal>()
 
     override fun onCreateView(
@@ -30,7 +31,7 @@ class SearchPostFragment : Fragment(), Searchable {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        firebaseDatabaseManager = FirebaseDatabaseManager(requireContext())
+        firebaseDatabaseManager = FirebaseDatabaseSearchManager(requireContext())
 
         binding.recyclerview.layoutManager = LinearLayoutManager(context)
 
@@ -54,15 +55,6 @@ class SearchPostFragment : Fragment(), Searchable {
                 dataList.clear()
                 dataList.addAll(results)
 
-                // Update comment counts for the search results
-                dataList.forEach { item ->
-                    item.id?.let {
-                        firebaseDatabaseManager.getCommentCountForPost(it) { count ->
-                            item.commentcount = count
-                            adaptor.notifyItemChanged(dataList.indexOf(item))
-                        }
-                    }
-                }
                 adaptor.notifyDataSetChanged() // Notify the adapter to refresh the list
             }
         } else {
