@@ -1,14 +1,20 @@
 package com.example.project01.firebase
 
 import android.content.Context
+import android.net.Uri
 import android.util.Log
 import android.widget.Toast
 import com.example.project01.modal.HomeModal
 import com.google.firebase.firestore.DocumentSnapshot
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.FirebaseStorage
+import java.util.UUID
 
 class FirebaseDatabasePostManager(private val context: Context) {
     private val database = FirebaseFirestore.getInstance()
+    private val storage = FirebaseStorage.getInstance()
+    private var authManager = FirebaseAuthManager()
 
     //Home fragment fetch home collection
     fun getPost(
@@ -120,6 +126,125 @@ class FirebaseDatabasePostManager(private val context: Context) {
                 callback(emptyList())
             }
     }
+
+
+    // AddPostHomeActivity Upload image and save home data
+    fun saveData(
+        imageUri: Uri,
+        title: String,
+        desc: String,
+        selectedGroupId: String?,
+        isFavorite: Boolean,
+        callback: (Boolean) -> Unit
+    ) {
+        val currentUser = authManager.getCurrentUser()
+        currentUser?.let { user ->
+            database.collection("user").document(user.uid).get()
+                .addOnSuccessListener { document ->
+                    val userName = document.getString("name") ?: "Unknown User"
+                    val image = document.getString("profileImageUrl")
+                    val title_lc = title.lowercase()
+                    val homeMap = hashMapOf(
+                        "title" to title,
+                        "title_lc" to title_lc,
+                        "desc" to desc,
+                        "created_at" to FieldValue.serverTimestamp(),
+                        "groupId" to (selectedGroupId ?: ""),
+                        "isFavorite" to isFavorite,
+                        "userId" to user.uid,
+                        "userName" to userName,
+                        "image" to image
+                    )
+
+                    val storageRef = storage.reference
+                    val imageRef = storageRef.child("images/${UUID.randomUUID()}.jpg")
+
+                    imageRef.putFile(imageUri)
+                        .addOnSuccessListener {
+                            imageRef.downloadUrl.addOnSuccessListener { downloadUri ->
+                                homeMap["imageUrl"] = downloadUri.toString()
+                                savePost(homeMap, callback)
+                            }
+                        }
+                }
+
+        }
+    }
+
+    //AddPostHomeActivity save data
+    private fun savePost(homeMap: HashMap<String, Any?>, callback: (Boolean) -> Unit) {
+        database.collection("home").document().set(homeMap)
+            .addOnSuccessListener {
+                Toast.makeText(context, "Successfully Added Data", Toast.LENGTH_SHORT).show()
+                callback(true) // Notify success
+            }
+            .addOnFailureListener {
+                Toast.makeText(context, "Failed to add data", Toast.LENGTH_SHORT).show()
+                callback(false) // Notify failure
+            }
+    }
+
+    // Update Data in Home collection  From AddGroupActivity
+    fun updateData(
+        postId: String,
+        imageUri: Uri,
+        title: String,
+        description: String,
+
+        callback: (Boolean) -> Unit
+    ) {
+        val title_lc = title.lowercase()
+        val postUpdates = hashMapOf<String, Any>(
+            "title" to title,
+            "title_lc" to title_lc,
+            "desc" to description
+        )
+        val storageRef = storage.reference
+        val imageRef = storageRef.child("images/${UUID.randomUUID()}.jpg")
+        imageRef.putFile(imageUri)
+            .addOnSuccessListener {
+                imageRef.downloadUrl.addOnSuccessListener { downloadUri ->
+                    postUpdates["imageUrl"] = downloadUri.toString()
+                    // Pass groupId along with groupUpdate
+                    updatePost(postId, postUpdates, callback)
+                }
+            }
+            .addOnFailureListener {
+                Toast.makeText(context, "Failed to upload image", Toast.LENGTH_SHORT).show()
+                callback(false) // Notify failure
+            }
+    }
+
+
+    // updated Home Data
+    private fun updatePost(
+        postId: String,
+        postUpdates: HashMap<String, Any>,
+        callback: (Boolean) -> Unit
+    ) {
+        database.collection("home").document(postId)
+            .update(postUpdates)
+            .addOnSuccessListener {
+
+                callback(true)
+            }
+            .addOnFailureListener { e ->
+                Log.w("FirebaseDatabaseManager", "Error updating document", e)
+                callback(false)
+            }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
     // Toggle like status like funcnality
     fun toggleLike(postId: String, userId: String, isLiked: Boolean, callback: (Boolean) -> Unit) {
         val postRef = database.collection("home").document(postId)

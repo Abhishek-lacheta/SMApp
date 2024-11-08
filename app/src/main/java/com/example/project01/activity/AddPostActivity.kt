@@ -13,14 +13,16 @@ import android.widget.Toast
 import com.bumptech.glide.Glide
 import com.example.project01.R
 import com.example.project01.databinding.ActivityAddPostBinding
-import com.example.project01.firebase.FirebaseDatabaseManager
+import com.example.project01.firebase.FirebaseDatabasePostManager
+import com.example.project01.firebase.FirebaseDatabseGroupManager
 import com.example.project01.modal.HomeModal
 
 class AddPostActivity : AppCompatActivity() {
 
     private var post: HomeModal? = null
     private lateinit var binding: ActivityAddPostBinding
-    private lateinit var databaseManager: FirebaseDatabaseManager
+    private lateinit var databaseManager: FirebaseDatabasePostManager
+    private lateinit var groupdatabaseManager: FirebaseDatabseGroupManager
     private val PICK_IMAGE_REQUEST = 71
     private var imageUri: Uri? = null
     private lateinit var spinner: Spinner
@@ -29,12 +31,12 @@ class AddPostActivity : AppCompatActivity() {
     private var selectedGroupId: String? = null
     private var isFavorite: Boolean = false
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityAddPostBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        databaseManager = FirebaseDatabaseManager(this)
+        databaseManager = FirebaseDatabasePostManager(this)
+        groupdatabaseManager=FirebaseDatabseGroupManager(this)
 
         // Retrieve the passed data
         post = intent.getParcelableExtra<HomeModal>("post")
@@ -64,7 +66,7 @@ class AddPostActivity : AppCompatActivity() {
         }
 
         spinner = findViewById(R.id.spinner)
-        fetchData()
+        getGroup()
 
         binding.selectImageButton.setOnClickListener {
             openImageChooser()
@@ -77,12 +79,12 @@ class AddPostActivity : AppCompatActivity() {
             if (imageUri != null) {
                 if (title.isNotEmpty() && description.isNotEmpty()) {
                     if (post == null) {
-                        uploadImageAndSaveData()
+                        savePost()
                     } else {
                         // Update existing post
 
                         post!!.id?.let { postId ->
-                            updateDataInFirebase(postId)
+                            updatePost(postId)
                         }
                     }
                 } else {
@@ -115,9 +117,9 @@ class AddPostActivity : AppCompatActivity() {
         }
     }
 
-    private fun fetchData() {
+    private fun getGroup() {
 
-        databaseManager.fetchGroupData { groups ->
+        groupdatabaseManager.getGroup { groups ->
             nameList.clear()
             idList.clear()
             groups.forEach { (name, id) ->
@@ -131,7 +133,7 @@ class AddPostActivity : AppCompatActivity() {
     }
 
     // Update Home Collection
-    private fun updateDataInFirebase(postId: String) {
+    private fun updatePost(postId: String) {
         binding.submitLoader.visibility = View.VISIBLE
         binding.homeButtonId.visibility = View.GONE
 
@@ -155,7 +157,7 @@ class AddPostActivity : AppCompatActivity() {
     }
 
     // Save Data In home Collection
-    private fun uploadImageAndSaveData() {
+    private fun savePost() {
         binding.submitLoader.visibility = View.VISIBLE
         binding.homeButtonId.visibility = View.GONE
 
@@ -163,7 +165,7 @@ class AddPostActivity : AppCompatActivity() {
         val desc = binding.homeDescId.text.toString().trim()
 
         imageUri?.let { uri ->
-            databaseManager.uploadImageAndSaveData(
+            databaseManager.saveData(
                 uri, title, desc, selectedGroupId, isFavorite
             ) { success ->
                 binding.submitLoader.visibility = View.GONE

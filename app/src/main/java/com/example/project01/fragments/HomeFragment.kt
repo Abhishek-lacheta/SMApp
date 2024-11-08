@@ -108,11 +108,7 @@ class HomeFragment : Fragment() {
                         adapter.notifyItemChanged(dataList.indexOf(item))
                     }
                 }
-
-
             }
-
-
         }
     }
     private fun setupRecyclerView() {
