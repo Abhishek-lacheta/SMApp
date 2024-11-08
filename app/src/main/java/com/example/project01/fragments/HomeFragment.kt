@@ -100,6 +100,19 @@ class HomeFragment : Fragment() {
                 // Data ko add karo dataList me
                 dataList.addAll(fetchedList)
             }
+            dataList.forEach{item->
+                item.id?.let {
+                    firebaseDatabaseManager.getCommentCountForPost(it){
+                        count->
+                        item.commentcount=count
+                        adapter.notifyItemChanged(dataList.indexOf(item))
+                    }
+                }
+
+
+            }
+
+
         }
     }
 
@@ -148,7 +161,6 @@ class HomeFragment : Fragment() {
 
         findNavController().navigate(R.id.userProfileFragment, bundle, navOptions)
     }
-
     private fun toggleLike(item: HomeModal) {
         val currentUserId = FirebaseAuth.getInstance().currentUser?.uid ?: return
         val newLikedStatus = !item.isLikedByCurrentUser // Toggle the like status
