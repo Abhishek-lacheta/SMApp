@@ -7,10 +7,9 @@ import com.example.project01.modal.HomeModal
 import com.example.project01.modal.UserModal
 import com.google.firebase.firestore.FirebaseFirestore
 
-class FirebaseDatabaseSearchManager(private val context: Context) {
+class SearchFirebaseManager(private val context: Context) {
 
     private val database = FirebaseFirestore.getInstance()
-
 
     fun searchPosts(searchQuery: String, callback: (List<HomeModal>) -> Unit) {
         val lowerCaseQuery = searchQuery.lowercase()

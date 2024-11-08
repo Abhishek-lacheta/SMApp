@@ -10,12 +10,12 @@ import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
 import com.example.project01.R
 import com.example.project01.databinding.ActivityEditProfileBinding
-import com.example.project01.firebase.FirebaseDatabaseManager
+import com.example.project01.firebase.UserFirebaseManager
 
 
 class EditProfileActivity : AppCompatActivity() {
     private lateinit var binding: ActivityEditProfileBinding
-    private lateinit var firebaseDatabaseManager: FirebaseDatabaseManager
+    private lateinit var firebaseDatabaseManager: UserFirebaseManager
     private var profileImageUri: Uri? = null
     private val IMAGE_PICK_CODE = 1000
 
@@ -24,7 +24,7 @@ class EditProfileActivity : AppCompatActivity() {
         binding = ActivityEditProfileBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        firebaseDatabaseManager = FirebaseDatabaseManager(this)
+        firebaseDatabaseManager = UserFirebaseManager(this)
         loadUserData()
 
         binding.buttonEditProfile.setOnClickListener {
@@ -42,7 +42,7 @@ class EditProfileActivity : AppCompatActivity() {
     }
 
     private fun loadUserData() {
-        firebaseDatabaseManager.getUserData { username, email, imageUrl ->
+        firebaseDatabaseManager.getUser { username, email, imageUrl ->
             binding.editTextUsername.setText(username)
             binding.editTextEmail.setText(email)
 
@@ -83,7 +83,7 @@ class EditProfileActivity : AppCompatActivity() {
         val username = binding.editTextUsername.text.toString()
         val email = binding.editTextEmail.text.toString()
 
-        firebaseDatabaseManager.saveProfile(username, email, profileImageUri,
+        firebaseDatabaseManager.updateData(username, email, profileImageUri,
             onSuccess = {
                 Toast.makeText(this, "Profile updated", Toast.LENGTH_SHORT).show()
             },

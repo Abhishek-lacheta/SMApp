@@ -15,7 +15,8 @@ import com.example.project01.adaptor.HomeAdaptor
 import com.example.project01.modal.HomeModal
 import com.example.project01.R
 import com.example.project01.databinding.FragmentHomeBinding
-import com.example.project01.firebase.FirebaseDatabasePostManager
+import com.example.project01.firebase.FirebaseManager
+import com.example.project01.firebase.PostFirebaseManager
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentSnapshot
 
@@ -23,7 +24,8 @@ class HomeFragment : Fragment() {
     private lateinit var adapter: HomeAdaptor
     private lateinit var binding: FragmentHomeBinding
     private var dataList = ArrayList<HomeModal>()
-    private lateinit var firebaseDatabaseManager: FirebaseDatabasePostManager
+    private lateinit var firebaseDatabaseManager: PostFirebaseManager
+    private lateinit var firebaseManager: FirebaseManager
     private lateinit var noDataLayout: View
     private var isLoading = false
     private var lastVisibleDocument: DocumentSnapshot? = null
@@ -40,7 +42,8 @@ class HomeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         // Initialize FirebaseDatabaseManager
-        firebaseDatabaseManager = FirebaseDatabasePostManager(requireContext())
+        firebaseDatabaseManager = PostFirebaseManager(requireContext())
+        firebaseManager= FirebaseManager(requireContext())
 
 
         // Setup RecyclerView
@@ -102,7 +105,7 @@ class HomeFragment : Fragment() {
             }
             dataList.forEach{item->
                 item.id?.let {
-                    firebaseDatabaseManager.getCommentCountForPost(it){
+                    firebaseManager.getCommentCountForPost(it){
                         count->
                         item.commentcount=count
                         adapter.notifyItemChanged(dataList.indexOf(item))
@@ -159,7 +162,7 @@ class HomeFragment : Fragment() {
         val currentUserId = FirebaseAuth.getInstance().currentUser?.uid ?: return
         val newLikedStatus = !item.isLikedByCurrentUser // Toggle the like status
 
-        firebaseDatabaseManager.toggleLike(item.id!!, currentUserId, newLikedStatus) { success ->
+        firebaseManager.toggleLike(item.id!!, currentUserId, newLikedStatus) { success ->
             if (success) {
                 // Update local state based on newLikedStatus
                 if (newLikedStatus) {

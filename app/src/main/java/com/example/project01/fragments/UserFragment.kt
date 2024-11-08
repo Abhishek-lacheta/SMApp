@@ -25,8 +25,8 @@ import com.example.project01.activity.SettingActivity
 import com.example.project01.adaptor.GroupAdapter
 import com.example.project01.databinding.FragmentUserBinding
 import com.example.project01.firebase.FirebaseAuthManager
-import com.example.project01.firebase.FirebaseDatabaseManager
-import com.example.project01.firebase.FirebaseDatabseGroupManager
+import com.example.project01.firebase.UserFirebaseManager
+import com.example.project01.firebase.GroupFirebaseManager
 import com.example.project01.modal.GroupModal
 
 
@@ -38,8 +38,8 @@ class UserFragment : Fragment() {
     val userId = currentUser?.uid
     private lateinit var groupRecyclerAdapteradaptor: GroupAdapter
     private val itemList = mutableListOf<GroupModal>()
-    private lateinit var databaseManager: FirebaseDatabaseManager
-    private lateinit var groupdatabaseManager:FirebaseDatabseGroupManager
+    private lateinit var databaseManager: UserFirebaseManager
+    private lateinit var groupdatabaseManager:GroupFirebaseManager
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -59,8 +59,8 @@ class UserFragment : Fragment() {
         setHasOptionsMenu(true)
 
         // Initialize FirebaseDatabaseManager
-        databaseManager = FirebaseDatabaseManager(requireContext())
-        groupdatabaseManager=FirebaseDatabseGroupManager(requireContext())
+        databaseManager = UserFirebaseManager(requireContext())
+        groupdatabaseManager=GroupFirebaseManager(requireContext())
 
         // Set up RecyclerView
         binding.groupRecyclerview.layoutManager = GridLayoutManager(context, 2)
@@ -157,7 +157,7 @@ class UserFragment : Fragment() {
             val userId = currentUser.uid
 
             // Use FirebaseDataManager to fetch user data
-            databaseManager.getUserData(userId) { username, email, profileImageUrl ->
+            databaseManager.getUser(userId) { username, email, profileImageUrl ->
                 binding.userEmail.text = email ?: "No email"
                 binding.name.text = username ?: "No username"
 

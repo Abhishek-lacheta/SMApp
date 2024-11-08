@@ -9,15 +9,14 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.example.project01.adaptor.GroupAdapter
 import com.example.project01.databinding.FragmentSearchGroupsBinding
 import com.example.project01.firebase.FirebaseAuthManager
-import com.example.project01.firebase.FirebaseDatabaseManager
-import com.example.project01.firebase.FirebaseDatabaseSearchManager
+import com.example.project01.firebase.SearchFirebaseManager
 import com.example.project01.modal.GroupModal
 
 
 class SearchgroupsFragment : Fragment(),Searchable{
     private lateinit var binding: FragmentSearchGroupsBinding
     private lateinit var groupRecyclerAdapter: GroupAdapter
-    private lateinit var databaseManager: FirebaseDatabaseSearchManager
+    private lateinit var databaseManager: SearchFirebaseManager
     private var itemList = mutableListOf<GroupModal>()
     private var authManager = FirebaseAuthManager()
     val currentUser = authManager.getCurrentUser()
@@ -34,7 +33,7 @@ class SearchgroupsFragment : Fragment(),Searchable{
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        databaseManager = FirebaseDatabaseSearchManager(requireContext())
+        databaseManager = SearchFirebaseManager(requireContext())
         binding.groupRecyclerview.layoutManager = GridLayoutManager(context, 2)
 
     }

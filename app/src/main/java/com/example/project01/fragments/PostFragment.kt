@@ -18,8 +18,8 @@ import com.example.project01.activity.AddPostActivity
 import com.example.project01.adaptor.HomeAdaptor
 import com.example.project01.databinding.FragmentPostBinding
 import com.example.project01.firebase.FirebaseAuthManager
-import com.example.project01.firebase.FirebaseDatabaseManager
-import com.example.project01.firebase.FirebaseDatabasePostManager
+import com.example.project01.firebase.FirebaseManager
+import com.example.project01.firebase.PostFirebaseManager
 import com.example.project01.modal.HomeModal
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentSnapshot
@@ -29,7 +29,8 @@ class PostFragment : Fragment() {
     private lateinit var adapter: HomeAdaptor
     private lateinit var binding: FragmentPostBinding
     private var dataList = ArrayList<HomeModal>()
-    private lateinit var databaseManager: FirebaseDatabasePostManager
+    private lateinit var databaseManager: PostFirebaseManager
+    private lateinit var firebaseManager: FirebaseManager
     private lateinit var modalId: String
     private lateinit var modalName: String
     private lateinit var userId: String
@@ -60,7 +61,8 @@ class PostFragment : Fragment() {
 
         }
 
-        databaseManager = FirebaseDatabasePostManager(requireContext())
+        databaseManager = PostFirebaseManager(requireContext())
+        firebaseManager= FirebaseManager(requireContext())
 
         noDataLayout = binding.noDataLayout
 
@@ -143,7 +145,7 @@ class PostFragment : Fragment() {
         val currentUserId = FirebaseAuth.getInstance().currentUser?.uid ?: return
         val newLikedStatus = !item.isLikedByCurrentUser // Toggle the like status
 
-        databaseManager.toggleLike(item.id!!, currentUserId, newLikedStatus) { success ->
+        firebaseManager.toggleLike(item.id!!, currentUserId, newLikedStatus) { success ->
             if (success) {
                 // Update local state based on newLikedStatus
                 if (newLikedStatus) {

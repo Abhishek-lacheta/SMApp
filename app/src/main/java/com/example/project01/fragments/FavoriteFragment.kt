@@ -12,7 +12,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.project01.R
 import com.example.project01.adaptor.HomeAdaptor
 import com.example.project01.databinding.FragmentFavoriteBinding
-import com.example.project01.firebase.FirebaseDatabasePostManager
+import com.example.project01.firebase.FirebaseManager
+import com.example.project01.firebase.PostFirebaseManager
 import com.example.project01.modal.HomeModal
 import com.google.firebase.auth.FirebaseAuth
 
@@ -20,7 +21,8 @@ class FavoriteFragment : Fragment() {
     private lateinit var adapter: HomeAdaptor
     private lateinit var binding: FragmentFavoriteBinding
     private var dataList = ArrayList<HomeModal>()
-    private lateinit var databaseManager: FirebaseDatabasePostManager
+    private lateinit var databaseManager: PostFirebaseManager
+    private lateinit var firebaseManager: FirebaseManager
     private lateinit var noDataLayout: View
 
     override fun onCreateView(
@@ -34,7 +36,8 @@ class FavoriteFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        databaseManager = FirebaseDatabasePostManager(requireContext())
+        databaseManager = PostFirebaseManager(requireContext())
+        firebaseManager= FirebaseManager(requireContext())
         binding.recyclerview.layoutManager = LinearLayoutManager(context)
         noDataLayout = binding.noDataLayout
 
@@ -75,7 +78,7 @@ class FavoriteFragment : Fragment() {
         val currentUserId = FirebaseAuth.getInstance().currentUser?.uid ?: return
         val newLikedStatus = !item.isLikedByCurrentUser // Toggle the like status
 
-        databaseManager.toggleLike(item.id!!, currentUserId, newLikedStatus) { success ->
+        firebaseManager.toggleLike(item.id!!, currentUserId, newLikedStatus) { success ->
             if (success) {
                 // Update local state based on newLikedStatus
                 if (newLikedStatus) {

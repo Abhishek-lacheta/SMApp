@@ -13,16 +13,16 @@ import android.widget.Toast
 import com.bumptech.glide.Glide
 import com.example.project01.R
 import com.example.project01.databinding.ActivityAddPostBinding
-import com.example.project01.firebase.FirebaseDatabasePostManager
-import com.example.project01.firebase.FirebaseDatabseGroupManager
+import com.example.project01.firebase.PostFirebaseManager
+import com.example.project01.firebase.GroupFirebaseManager
 import com.example.project01.modal.HomeModal
 
 class AddPostActivity : AppCompatActivity() {
 
     private var post: HomeModal? = null
     private lateinit var binding: ActivityAddPostBinding
-    private lateinit var databaseManager: FirebaseDatabasePostManager
-    private lateinit var groupdatabaseManager: FirebaseDatabseGroupManager
+    private lateinit var databaseManager: PostFirebaseManager
+    private lateinit var groupdatabaseManager: GroupFirebaseManager
     private val PICK_IMAGE_REQUEST = 71
     private var imageUri: Uri? = null
     private lateinit var spinner: Spinner
@@ -35,8 +35,8 @@ class AddPostActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityAddPostBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        databaseManager = FirebaseDatabasePostManager(this)
-        groupdatabaseManager=FirebaseDatabseGroupManager(this)
+        databaseManager = PostFirebaseManager(this)
+        groupdatabaseManager=GroupFirebaseManager(this)
 
         // Retrieve the passed data
         post = intent.getParcelableExtra<HomeModal>("post")

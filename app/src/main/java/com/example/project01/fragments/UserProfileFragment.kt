@@ -13,16 +13,16 @@ import com.bumptech.glide.Glide
 import com.example.project01.R
 import com.example.project01.adaptor.GroupAdapter
 import com.example.project01.databinding.FragmentUserProfileBinding
-import com.example.project01.firebase.FirebaseDatabaseManager
-import com.example.project01.firebase.FirebaseDatabseGroupManager
+import com.example.project01.firebase.UserFirebaseManager
+import com.example.project01.firebase.GroupFirebaseManager
 import com.example.project01.modal.GroupModal
 
 class UserProfileFragment : Fragment() {
     private lateinit var binding: FragmentUserProfileBinding
     private lateinit var userId: String
     private var followedUserId: String? = null
-    private lateinit var firebaseDatabaseManager: FirebaseDatabaseManager
-    private lateinit var groupdatabaseManger:FirebaseDatabseGroupManager
+    private lateinit var firebaseDatabaseManager: UserFirebaseManager
+    private lateinit var groupdatabaseManger:GroupFirebaseManager
     private val itemList = mutableListOf<GroupModal>()
     private lateinit var groupRecyclerAdapter: GroupAdapter
     private var isFollowing: Boolean = false
@@ -43,8 +43,8 @@ class UserProfileFragment : Fragment() {
             userId = it.getString("userId", "")
         }
 
-        firebaseDatabaseManager = FirebaseDatabaseManager(requireContext())
-        groupdatabaseManger= FirebaseDatabseGroupManager(requireContext())
+        firebaseDatabaseManager = UserFirebaseManager(requireContext())
+        groupdatabaseManger= GroupFirebaseManager(requireContext())
         binding.groupRecyclerview.layoutManager = GridLayoutManager(requireContext(), 2)
 
         binding.clickfollower.setOnClickListener {
@@ -152,7 +152,7 @@ class UserProfileFragment : Fragment() {
     }
 
     private fun loadUserData(userId: String) {
-        firebaseDatabaseManager.getUserData(userId) { username, email, profileImageUrl ->
+        firebaseDatabaseManager.getUser(userId) { username, email, profileImageUrl ->
             followedUserId = userId
             binding.usernameTextView.text = username ?: "Unknown User"
 

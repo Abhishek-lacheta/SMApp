@@ -9,7 +9,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import java.util.UUID
 
-class FirebaseDatabseGroupManager(private val context: Context)  {
+class GroupFirebaseManager(private val context: Context)  {
     private val database = FirebaseFirestore.getInstance()
     private val storage = FirebaseStorage.getInstance()
     private var authManager = FirebaseAuthManager()
@@ -147,6 +147,29 @@ class FirebaseDatabseGroupManager(private val context: Context)  {
             .addOnFailureListener { e ->
                 Log.w("FirebaseDatabaseManager", "Error updating document", e)
                 callback(false)
+            }
+    }
+
+    //Group Fragment fetch group collection is function ka koi use nahi hai example ke liye hai
+    fun fetchDataGroupFromeFireStore(callback: (List<GroupModal>) -> Unit) {
+        database.collection("group")
+            .whereEqualTo("userId", authManager.getCurrentUser()?.uid).get()
+            .addOnSuccessListener { result ->
+                val dataList = ArrayList<GroupModal>()
+                for (document in result.documents) {
+                    val item = document.toObject(GroupModal::class.java)
+                    item?.id = document.id
+                    item?.let { dataList.add(it) }
+                }
+                callback(dataList)
+            }
+            .addOnFailureListener { exception ->
+                Toast.makeText(
+                    context,
+                    "Error fetching group data: ${exception.message}",
+                    Toast.LENGTH_LONG
+                ).show()
+                callback(emptyList())
             }
     }
 

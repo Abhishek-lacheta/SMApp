@@ -8,13 +8,13 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
 import com.example.project01.databinding.ActivityAddGroupBinding
-import com.example.project01.firebase.FirebaseDatabseGroupManager
+import com.example.project01.firebase.GroupFirebaseManager
 import com.example.project01.modal.GroupModal
 
 class AddGroupActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityAddGroupBinding
-    private lateinit var databaseManager: FirebaseDatabseGroupManager
+    private lateinit var databaseManager: GroupFirebaseManager
     private val PICK_IMAGE_REQUEST = 71
     private var imageUri: Uri? = null
     private var group: GroupModal? = null
@@ -24,7 +24,7 @@ class AddGroupActivity : AppCompatActivity() {
         binding = ActivityAddGroupBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        databaseManager = FirebaseDatabseGroupManager(this)
+        databaseManager = GroupFirebaseManager(this)
         group = intent.getParcelableExtra("group")
         //Set Update Data
         group?.let {

@@ -11,7 +11,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.project01.adaptor.FollowerAdaptor
 import com.example.project01.databinding.FragmentFollowersBinding
-import com.example.project01.firebase.FirebaseDatabaseManager
+import com.example.project01.firebase.UserFirebaseManager
 import com.example.project01.modal.FollowerModal
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.FirebaseFirestore
@@ -22,7 +22,7 @@ class FollowersFragment : Fragment() {
     private val itemList = mutableListOf<FollowerModal>()
     private val database: FirebaseFirestore = Firebase.firestore
     private lateinit var userId: String
-    private lateinit var firebaseDatabaseManager: FirebaseDatabaseManager
+    private lateinit var firebaseDatabaseManager: UserFirebaseManager
     private lateinit var navController: NavController
     private lateinit var followerAdaptor: FollowerAdaptor
 
@@ -40,7 +40,7 @@ class FollowersFragment : Fragment() {
         //get userID from UserProfileFragment
         //get current userId from userFragment
 
-        firebaseDatabaseManager = FirebaseDatabaseManager(requireContext())
+        firebaseDatabaseManager = UserFirebaseManager(requireContext())
         arguments?.let {
             userId = it.getString("userId", "")
         }

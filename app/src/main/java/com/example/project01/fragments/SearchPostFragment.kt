@@ -9,15 +9,14 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.project01.adaptor.HomeAdaptor
 import com.example.project01.databinding.FragmentSearchPostBinding
-import com.example.project01.firebase.FirebaseDatabaseManager
-import com.example.project01.firebase.FirebaseDatabaseSearchManager
+import com.example.project01.firebase.SearchFirebaseManager
 import com.example.project01.modal.HomeModal
 
 class SearchPostFragment : Fragment(), Searchable {
 
     private lateinit var adaptor: HomeAdaptor
     private lateinit var binding: FragmentSearchPostBinding
-    private lateinit var firebaseDatabaseManager: FirebaseDatabaseSearchManager
+    private lateinit var firebaseDatabaseManager: SearchFirebaseManager
     private var dataList = ArrayList<HomeModal>()
 
     override fun onCreateView(
@@ -31,7 +30,7 @@ class SearchPostFragment : Fragment(), Searchable {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        firebaseDatabaseManager = FirebaseDatabaseSearchManager(requireContext())
+        firebaseDatabaseManager = SearchFirebaseManager(requireContext())
 
         binding.recyclerview.layoutManager = LinearLayoutManager(context)
 

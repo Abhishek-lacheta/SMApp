@@ -4,25 +4,15 @@ import android.content.Context
 import android.net.Uri
 import android.util.Log
 import android.widget.Toast
-import com.example.project01.modal.GroupModal
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
-import java.util.UUID
 
-class FirebaseDatabaseManager(private val context: Context) {
+class UserFirebaseManager(private val context: Context) {
     private val database = FirebaseFirestore.getInstance()
-    private val storage = FirebaseStorage.getInstance()
     private var authManager = FirebaseAuthManager()
 
-
-
-
-
-
-
-
-    //EditProfileActivity
-    fun getUserData(onDataLoaded: (username: String?, email: String?, imageUrl: String?) -> Unit) {
+    //EditProfileActivity direct user ke data ko load krvaya EditProfile par
+    fun getUser(onDataLoaded: (username: String?, email: String?, imageUrl: String?) -> Unit) {
         val currentUser = authManager.getCurrentUser()
         if (currentUser != null) {
             val userId = currentUser.uid
@@ -38,55 +28,8 @@ class FirebaseDatabaseManager(private val context: Context) {
             }
         }
     }
-
-    //EditProfileActivity
-    private fun uploadImageToStorage(uri: Uri, userId: String) {
-        val storageRef = FirebaseStorage.getInstance().reference.child("profile_images/$userId.jpg")
-        storageRef.putFile(uri)
-            .addOnSuccessListener {
-                storageRef.downloadUrl.addOnSuccessListener { downloadUri ->
-                    val userRef = database.collection("user").document(userId)
-                    userRef.update("profileImageUrl", downloadUri.toString())
-                        .addOnSuccessListener {
-                            Log.d("FirebaseDataManager", "Profile image updated")
-                        }
-                        .addOnFailureListener { e ->
-                            Log.w("FirebaseDataManager", "Error updating profile image", e)
-                        }
-                }
-            }
-    }
-
-    //EditProfileActivity
-    fun saveProfile(
-        username: String,
-        email: String,
-        profileImageUri: Uri?,
-        onSuccess: () -> Unit,
-        onFailure: (Exception) -> Unit
-    ) {
-        val currentUser = authManager.getCurrentUser()
-        if (currentUser != null) {
-            val userId = currentUser.uid
-            val userRef = database.collection("user").document(userId)
-            userRef.update(
-                "name", username,
-                "email", email
-            )
-                .addOnSuccessListener {
-                    onSuccess()
-                    profileImageUri?.let { uri ->
-                        uploadImageToStorage(uri, userId)
-                    }
-                }
-                .addOnFailureListener { e ->
-                    onFailure(e)
-                }
-        }
-    }
-
-    //fetch user data on userProfileActivity and UserFragment
-    fun getUserData(
+    //fetch user data on the basis of userID from userProfileActivity and UserFragment
+    fun getUser(
         userId: String,
         onDataLoaded: (username: String?, email: String?, profileImageUrl: String?) -> Unit
     ) {
@@ -109,8 +52,50 @@ class FirebaseDatabaseManager(private val context: Context) {
         }
     }
 
-
-
+    //EditProfileActivity
+    fun updateData(
+        username: String,
+        email: String,
+        profileImageUri: Uri?,
+        onSuccess: () -> Unit,
+        onFailure: (Exception) -> Unit
+    ) {
+        val currentUser = authManager.getCurrentUser()
+        if (currentUser != null) {
+            val userId = currentUser.uid
+            val userRef = database.collection("user").document(userId)
+            userRef.update(
+                "name", username,
+                "email", email
+            )
+                .addOnSuccessListener {
+                    onSuccess()
+                    profileImageUri?.let { uri ->
+                        updateUser(uri, userId)
+                    }
+                }
+                .addOnFailureListener { e ->
+                    onFailure(e)
+                }
+        }
+    }
+    //EditProfileActivity
+    private fun updateUser(uri: Uri, userId: String) {
+        val storageRef = FirebaseStorage.getInstance().reference.child("profile_images/$userId.jpg")
+        storageRef.putFile(uri)
+            .addOnSuccessListener {
+                storageRef.downloadUrl.addOnSuccessListener { downloadUri ->
+                    val userRef = database.collection("user").document(userId)
+                    userRef.update("profileImageUrl", downloadUri.toString())
+                        .addOnSuccessListener {
+                            Log.d("FirebaseDataManager", "Profile image updated")
+                        }
+                        .addOnFailureListener { e ->
+                            Log.w("FirebaseDataManager", "Error updating profile image", e)
+                        }
+                }
+            }
+    }
 
     //Follow User From UserProfile Fragment
     fun followUser(followedUserId: String) {
@@ -142,7 +127,6 @@ class FirebaseDatabaseManager(private val context: Context) {
                 }
         }
     }
-
     //UnFollow user From UserProfileFragment
     fun unfollowUser(followedUserId: String) {
         val currentUser = authManager.getCurrentUser() ?: return
@@ -199,9 +183,7 @@ class FirebaseDatabaseManager(private val context: Context) {
             }
     }
 
-
-
-    //fetch user data on userProfileActivity
+    //fetch user data on userProfileActivity unused function example ke liye
     fun loadData(
         userId: String,
         onDataLoaded: (username: String?, email: String?, imageUrl: String?) -> Unit
@@ -217,28 +199,4 @@ class FirebaseDatabaseManager(private val context: Context) {
             }
         }
     }
-
-    //Group Fragment fetch group collection
-    fun fetchDataGroupFromeFireStore(callback: (List<GroupModal>) -> Unit) {
-        database.collection("group")
-            .whereEqualTo("userId", authManager.getCurrentUser()?.uid).get()
-            .addOnSuccessListener { result ->
-                val dataList = ArrayList<GroupModal>()
-                for (document in result.documents) {
-                    val item = document.toObject(GroupModal::class.java)
-                    item?.id = document.id
-                    item?.let { dataList.add(it) }
-                }
-                callback(dataList)
-            }
-            .addOnFailureListener { exception ->
-                Toast.makeText(
-                    context,
-                    "Error fetching group data: ${exception.message}",
-                    Toast.LENGTH_LONG
-                ).show()
-                callback(emptyList())
-            }
-    }
-
 }
