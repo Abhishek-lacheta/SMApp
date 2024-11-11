@@ -33,7 +33,6 @@ class UserProfileFragment : Fragment() {
         binding = FragmentUserProfileBinding.inflate(inflater, container, false)
         return binding.root
     }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -163,7 +162,6 @@ class UserProfileFragment : Fragment() {
             }
         }
     }
-
     private fun getGroups(userId: String) {
         groupdatabaseManger.getGroups(userId) { fetchedList ->
             itemList.clear()

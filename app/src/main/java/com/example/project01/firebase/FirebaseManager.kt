@@ -7,6 +7,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 
 class FirebaseManager(private val context: Context) {
     private val database = FirebaseFirestore.getInstance()
+
     // Toggle like status like funcnality
     fun toggleLike(postId: String, userId: String, isLiked: Boolean, callback: (Boolean) -> Unit) {
         val postRef = database.collection("home").document(postId)

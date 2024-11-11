@@ -140,7 +140,7 @@ class HomeFragment : Fragment() {
     }
 
     //new comment count
-    fun updateCommentCount(postId: String, newCount: Int) {
+    fun getCommentCount(postId: String, newCount: Int) {
         val post = dataList.find { it.id == postId }
         post?.let {
             it.commentcount = newCount

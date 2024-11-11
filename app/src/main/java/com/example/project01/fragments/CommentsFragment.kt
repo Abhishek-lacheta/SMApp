@@ -2,6 +2,7 @@ package com.example.project01.fragments
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,12 +17,13 @@ import com.example.project01.firebase.FirebaseAuthManager
 import com.example.project01.modal.Comment
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.firebase.Firebase
+import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.firestore
 
 open class CommentsFragment : BottomSheetDialogFragment() {
-    private lateinit var binding:FragmentCommentsBinding
+    private lateinit var binding: FragmentCommentsBinding
     private lateinit var commentsRecyclerView: RecyclerView
     private lateinit var commentInput: EditText
     private lateinit var sendButton: ImageButton
@@ -29,6 +31,9 @@ open class CommentsFragment : BottomSheetDialogFragment() {
     private var authManager = FirebaseAuthManager()
     private val commentsAdapter = CommentsAdapter(mutableListOf())
     private val db: FirebaseFirestore = Firebase.firestore
+    private var lastVisible: DocumentSnapshot? = null
+    private val PAGE_SIZE = 20  // Number of comments per page
+
 
     @SuppressLint("MissingInflatedId")
     override fun onCreateView(
@@ -73,7 +78,8 @@ open class CommentsFragment : BottomSheetDialogFragment() {
                 .addOnSuccessListener { document ->
                     val userName = document.getString("name") ?: "Unknown User"
                     val image = document.getString("profileImageUrl")
-                    val currentTimeMillis = System.currentTimeMillis() // Get current time in milliseconds
+                    val currentTimeMillis =
+                        System.currentTimeMillis() // Get current time in milliseconds
 
                     val commentData = hashMapOf(
                         "text" to comment,
@@ -91,7 +97,7 @@ open class CommentsFragment : BottomSheetDialogFragment() {
                                 .addOnSuccessListener { querySnapshot ->
                                     val newCount = querySnapshot.size()
                                     // Update comment count in the parent fragment
-                                    (parentFragment as? HomeFragment)?.updateCommentCount(
+                                    (parentFragment as? HomeFragment)?.getCommentCount(
                                         postId,
                                         newCount
                                     )
@@ -110,12 +116,20 @@ open class CommentsFragment : BottomSheetDialogFragment() {
                 }
         }
     }
-    private fun loadComments() {
-        db.collection("home").document(postId).collection("comments")
+
+    private fun loadComments(isNextPage: Boolean = false) {
+        var query = db.collection("home").document(postId).collection("comments")
             .orderBy("timestamp", Query.Direction.ASCENDING)
-            .get()
+            .limit(20)
+
+        // If loading the next page, use startAfter to get documents after the last one
+        if (isNextPage && lastVisible != null) {
+            query = query.startAfter(lastVisible!!)
+        }
+        query.get()
             .addOnSuccessListener { documents ->
                 val comments = mutableListOf<Comment>()
+                // Loop through the documents and add them to the comments list
                 for (document in documents) {
                     val text = document.getString("text") ?: ""
                     val userName = document.getString("userName") ?: "Unknown User"
@@ -123,12 +137,16 @@ open class CommentsFragment : BottomSheetDialogFragment() {
                     val timestamp = document.getLong("timestamp") ?: 0L
 
                     // Add the profileImageUrl to the Comment instance
-                    comments.add(Comment(text, userName, timestamp,profileImageUrl))
+                    comments.add(Comment(text, userName, timestamp, profileImageUrl))
                 }
-                // Set the comments in the adapter
+
+                // Update the 'lastVisible' variable for the next page
+                lastVisible = documents.documents[documents.size() - 1]
+
+                // Set the comments in the adapter (append new comments to the existing list)
                 commentsAdapter.setComments(comments)
+
             }
     }
-
 }
 
