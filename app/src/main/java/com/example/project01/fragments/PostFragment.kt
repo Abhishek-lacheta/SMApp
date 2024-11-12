@@ -172,7 +172,8 @@ class PostFragment : Fragment() {
             currentUserId = currentUserId,
             onLikeClick = { item -> toggleLike(item) },// Pass the like click handler
             onComment = { item -> onComment(item) },
-            onItemClick = { item -> onItemClick(item) }
+            onItemClick = { item -> onItemClick(item) },
+            openUrl = { link -> }
         )
         binding.recyclerview.layoutManager = LinearLayoutManager(context)
         binding.recyclerview.adapter = adapter

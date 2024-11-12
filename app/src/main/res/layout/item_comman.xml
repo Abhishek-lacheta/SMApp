@@ -141,7 +141,6 @@
                 android:layout_marginTop="3dp"
                 android:text="@string/Description"
                 android:textSize="15sp" />
-
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 </LinearLayout>

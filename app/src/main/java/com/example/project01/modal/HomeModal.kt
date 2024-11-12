@@ -20,6 +20,7 @@ import kotlinx.parcelize.Parcelize
     var groupId: String?=null,
     var userName:String?=null,
     val image:String?=null,
+    val linkAddress:String?=null,
     var likedBy: List<String> = listOf()
 ):Parcelable {
 

@@ -1,5 +1,6 @@
 package com.example.project01.adaptor
 
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,6 +13,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CircleCrop
 import com.example.project01.modal.HomeModal
 import com.example.project01.R
+import com.example.project01.fragments.HomeFragment
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -22,6 +24,7 @@ class HomeAdaptor(
     private val currentUserId: String?,
     private val onLikeClick: (HomeModal) -> Unit,
     private val onItemClick: (HomeModal) -> Unit,
+    private val openUrl: (String) -> Unit // Here, we pass openUrl as a parameter
 ) : RecyclerView.Adapter<HomeAdaptor.ViewHolder>() {
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -51,8 +54,8 @@ class HomeAdaptor(
         holder.titleTextView.text = item.title
         holder.descTextView.text = item.desc
         holder.userName.text = item.userName
-        holder.likeCount.text = "${item.likeCount} likes" // Set like count text
-        holder.commentcount.text = "${item.commentcount} comments" // Bind comment count
+        holder.likeCount.text = "${item.likeCount} likes"
+        holder.commentcount.text = "${item.commentcount} comments"
 
         item.created_at?.let {
             val date = it.toDate()
@@ -64,11 +67,10 @@ class HomeAdaptor(
 
         holder.showPopupMenu.visibility = if (currentUserId == item.userId) View.VISIBLE else View.GONE
 
-        // Load image using Glide
         Glide.with(holder.itemView.context)
             .load(item.imageUrl)
             .into(holder.imageView)
-        //Get UserProfileImage
+
         Glide.with(holder.itemView.context).load(item.image).transform(CircleCrop())
             .into(holder.userImage)
 
@@ -92,17 +94,23 @@ class HomeAdaptor(
             onItemClick(item)
         }
 
+        holder.imageView.setOnClickListener {
+
+            openUrl(item.linkAddress ?: "")
+
+        }
     }
 
     fun addData(newData: List<HomeModal>) {
         val newList = ArrayList(itemList)
-        newList.addAll(newData)  // Add new data to the existing list
-        itemList = newList  // Update the list in the adapter
-        notifyDataSetChanged()  // Notify RecyclerView to update
+        newList.addAll(newData)
+        itemList = newList
+        notifyDataSetChanged()
     }
 
     override fun getItemCount(): Int = itemList.size
 }
+
 
 
 

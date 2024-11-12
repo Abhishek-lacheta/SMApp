@@ -127,7 +127,6 @@ class PostFirebaseManager(private val context: Context) {
             }
     }
 
-
     // AddPostHomeActivity Upload image and save home data
     fun saveData(
         imageUri: Uri,
@@ -135,6 +134,7 @@ class PostFirebaseManager(private val context: Context) {
         desc: String,
         selectedGroupId: String?,
         isFavorite: Boolean,
+        linkAddress: String,
         callback: (Boolean) -> Unit
     ) {
         val currentUser = authManager.getCurrentUser()
@@ -153,7 +153,9 @@ class PostFirebaseManager(private val context: Context) {
                         "isFavorite" to isFavorite,
                         "userId" to user.uid,
                         "userName" to userName,
-                        "image" to image
+                        "image" to image,
+                        "linkAddress" to linkAddress,
+
                     )
 
                     val storageRef = storage.reference
@@ -190,7 +192,6 @@ class PostFirebaseManager(private val context: Context) {
         imageUri: Uri,
         title: String,
         description: String,
-
         callback: (Boolean) -> Unit
     ) {
         val title_lc = title.lowercase()
@@ -214,7 +215,6 @@ class PostFirebaseManager(private val context: Context) {
                 callback(false) // Notify failure
             }
     }
-
 
     // updated Home Data
     private fun updatePost(

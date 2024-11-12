@@ -34,7 +34,6 @@ open class CommentsFragment : BottomSheetDialogFragment() {
     private var lastVisible: DocumentSnapshot? = null
     private val PAGE_SIZE = 20  // Number of comments per page
 
-
     @SuppressLint("MissingInflatedId")
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,

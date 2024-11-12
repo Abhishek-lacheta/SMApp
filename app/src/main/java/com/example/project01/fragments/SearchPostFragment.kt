@@ -43,7 +43,8 @@ class SearchPostFragment : Fragment(), Searchable {
             currentUserId = null,
             onLikeClick = { item -> (item) },
             onComment = { item -> (item) },
-            onItemClick = { item -> (item) }
+            onItemClick = { item -> (item) },
+            openUrl = { link -> }
         )
         binding.recyclerview.adapter = adaptor
     }

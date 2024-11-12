@@ -98,14 +98,12 @@ class UserFragment : Fragment() {
                     .build()
             findNavController().navigate(R.id.followingFragment, bundle, navOptions)
         }
-
         if (userId != null) {
             fetchFollowersCount(userId)
             fetchFollowingCount(userId)
             fetchGroupCount(userId)
         }
     }
-
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.user_menu, menu)
         super.onCreateOptionsMenu(menu, inflater)

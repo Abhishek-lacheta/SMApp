@@ -79,6 +79,20 @@
                 android:visibility="gone"
                 android:scaleType="centerCrop"/>
 
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="link"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:layout_marginTop="3dp"
+                android:layout_marginStart="12dp"
+                />
+            <EditText
+                android:id="@+id/link"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="text" />
             <Button
                 android:id="@+id/select_image_button"
                 android:layout_width="wrap_content"

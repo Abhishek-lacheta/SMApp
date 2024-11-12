@@ -66,6 +66,10 @@ dependencies {
 
     implementation("com.github.bumptech.glide:glide:4.15.1")
     implementation("com.google.firebase:firebase-auth")
+//refress indicator
+    implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
+//crome custam tab
+    implementation("androidx.browser:browser:1.4.0")
 
     // Jetpack Compose integration
     implementation("androidx.navigation:navigation-compose:$nav_version")

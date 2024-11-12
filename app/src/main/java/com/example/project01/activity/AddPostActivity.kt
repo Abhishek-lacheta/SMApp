@@ -163,10 +163,11 @@ class AddPostActivity : AppCompatActivity() {
 
         val title = binding.homeTitleId.text.toString().trim()
         val desc = binding.homeDescId.text.toString().trim()
+        val linkAddress=binding.link.text.toString().trim()
 
         imageUri?.let { uri ->
             databaseManager.saveData(
-                uri, title, desc, selectedGroupId, isFavorite
+                uri, title, desc, selectedGroupId, isFavorite,linkAddress
             ) { success ->
                 binding.submitLoader.visibility = View.GONE
                 binding.homeButtonId.visibility = View.VISIBLE

@@ -1,11 +1,13 @@
 package com.example.project01.fragments
 
 import android.annotation.SuppressLint
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.browser.customtabs.CustomTabsIntent
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
@@ -43,7 +45,7 @@ class HomeFragment : Fragment() {
 
         // Initialize FirebaseDatabaseManager
         firebaseDatabaseManager = PostFirebaseManager(requireContext())
-        firebaseManager= FirebaseManager(requireContext())
+        firebaseManager = FirebaseManager(requireContext())
 
 
         // Setup RecyclerView
@@ -61,6 +63,10 @@ class HomeFragment : Fragment() {
             adapter.addData(dataList) // Existing data ko adapter me add karna
         }
 
+        binding.swipeRefreshLayout.setOnRefreshListener {
+            getPost()
+        }
+
         binding.recyclerview.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
@@ -74,53 +80,57 @@ class HomeFragment : Fragment() {
             }
         })
     }
+
     //fetch home data
     private fun getPost() {
-        isLoading = true // Data load ho raha hai, loading flag set karo
+        isLoading = true
+        binding.swipeRefreshLayout.isRefreshing = true
 
-        // Firestore se data fetch karo
+
         firebaseDatabaseManager.getPost(lastVisibleDocument) { fetchedList, lastVisible ->
-            isLoading = false  // Data load hone ke baad loading ko false karo
+            isLoading = false
+            // Data load hone ke baad loading ko false karo
+            binding.swipeRefreshLayout.isRefreshing = false
 
             // Agar fetched list empty hai
             if (fetchedList.isEmpty()) {
                 if (dataList.isEmpty()) {
-                    // Agar dono dataList aur fetchedList empty hai, "No Data Found" show karo
+
                     noDataLayout.visibility = View.VISIBLE
                     binding.recyclerview.visibility = View.GONE
                 }
             } else {
-                // Agar data mil gaya hai, "No Data Found" ko hide karo
+
                 noDataLayout.visibility = View.GONE
+
                 binding.recyclerview.visibility = View.VISIBLE
 
-                // Naye data ko existing list me add karo
+                lastVisibleDocument = lastVisible
                 adapter.addData(fetchedList)
 
-                // Pagination ke liye lastVisibleDocument update karo
-                lastVisibleDocument = lastVisible
-
-                // Data ko add karo dataList me
                 dataList.addAll(fetchedList)
+
+                adapter.notifyDataSetChanged()
             }
-            dataList.forEach{item->
+            dataList.forEach { item ->
                 item.id?.let {
-                    firebaseManager.getCommentCountForPost(it){
-                        count->
-                        item.commentcount=count
+                    firebaseManager.getCommentCountForPost(it) { count ->
+                        item.commentcount = count
                         adapter.notifyItemChanged(dataList.indexOf(item))
                     }
                 }
             }
         }
     }
+
     private fun setupRecyclerView() {
         adapter = HomeAdaptor(
             itemList = dataList,
             currentUserId = null,
             onLikeClick = { item -> toggleLike(item) },
             onComment = { item -> onComment(item) },
-            onItemClick = { item -> onItemClick(item) }
+            onItemClick = { item -> onItemClick(item) },
+            openUrl = { link -> openUrl(link) }
         )
         binding.recyclerview.layoutManager = LinearLayoutManager(context)
         binding.recyclerview.adapter = adapter
@@ -158,6 +168,7 @@ class HomeFragment : Fragment() {
 
         findNavController().navigate(R.id.userProfileFragment, bundle, navOptions)
     }
+
     private fun toggleLike(item: HomeModal) {
         val currentUserId = FirebaseAuth.getInstance().currentUser?.uid ?: return
         val newLikedStatus = !item.isLikedByCurrentUser // Toggle the like status
@@ -178,7 +189,29 @@ class HomeFragment : Fragment() {
             }
         }
     }
+
+    private fun openUrl(url: String) {
+        if (url.isNullOrEmpty()) {
+            Toast.makeText(requireContext(), "No link available", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        // Ensure URL starts with "http://" or "https://"
+        val formattedUrl = if (url.startsWith("http://") || url.startsWith("https://")) {
+            url
+        } else {
+            "https://$url"
+        }
+        try {
+            // Create CustomTabsIntent
+            val customTabsIntent = CustomTabsIntent.Builder().build()
+
+            // Launch URL in Chrome Custom Tab
+            customTabsIntent.launchUrl(requireContext(), Uri.parse(formattedUrl))
+
+        } catch (e: Exception) {
+            Toast.makeText(requireContext(), "Error opening link", Toast.LENGTH_SHORT).show()
+            e.printStackTrace()
+        }
+    }
 }
-
-
-

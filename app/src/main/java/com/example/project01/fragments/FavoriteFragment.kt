@@ -112,7 +112,8 @@ class FavoriteFragment : Fragment() {
             currentUserId = null,
             onLikeClick = { item -> toggleLike(item) },// Pass the like click handler
             onComment = { item -> onComment(item) },
-            onItemClick = { item -> onItemClick(item) }
+            onItemClick = { item -> onItemClick(item) },
+            openUrl = { link -> }
         )
         binding.recyclerview.adapter = adapter
     }
