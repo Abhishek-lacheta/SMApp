@@ -8,7 +8,9 @@ import com.example.project01.repositoryfirebase.FirebaseRepositoryPost
 
 class FavoriteViewModel : ViewModel() {
 
-    private val repository = FirebaseRepositoryPost()
+    private val repository = FirebaseRepositoryPost(
+
+    )
     private val _favoritePosts = MutableLiveData<List<HomeModal>>()
     val favoritePosts: LiveData<List<HomeModal>> = _favoritePosts
 

@@ -1,12 +1,19 @@
 package com.example.project01.repositoryfirebase
 
+import android.net.Uri
 import android.util.Log
 import com.example.project01.modal.HomeModal
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.SetOptions
+import com.google.firebase.storage.FirebaseStorage
+import kotlinx.coroutines.tasks.await
+import java.util.UUID
 
-class FirebaseRepositoryPost {
+class FirebaseRepositoryPost() {
 
     private val database = FirebaseFirestore.getInstance()
+    private val storage = FirebaseStorage.getInstance()
 
     //Fetch Favorite Post Frome FavoriteFragment
     fun getFavoritePosts(callback: (List<HomeModal>) -> Unit) {
@@ -82,5 +89,4 @@ class FirebaseRepositoryPost {
                 callback(false)  // If failed, callback with false
             }
     }
-
 }

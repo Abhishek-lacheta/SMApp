@@ -64,7 +64,7 @@ class FavoriteFragment : Fragment() {
     private fun setupRecyclerView(dataList: List<HomeModal>) {
         adapter = HomeAdaptor(
             itemList = dataList,
-            currentUserId = FirebaseAuth.getInstance().currentUser?.uid,
+            currentUserId = null,
             onLikeClick = { item -> toggleLike(item) },
             onComment = { item -> onComment(item) },
             onItemClick = { item -> onItemClick(item) },
@@ -112,7 +112,6 @@ class FavoriteFragment : Fragment() {
             adapter.notifyItemChanged(favoriteViewModel.favoritePosts.value?.indexOf(it) ?: -1)
         }
     }
-
     fun onItemClick(modal: HomeModal) {
         val bundle = Bundle().apply {
             putString("userId", modal.userId)

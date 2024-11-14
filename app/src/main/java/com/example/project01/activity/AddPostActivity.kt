@@ -10,12 +10,18 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Spinner
 import android.widget.Toast
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
 import com.example.project01.R
 import com.example.project01.databinding.ActivityAddPostBinding
-import com.example.project01.repositoryfirebase.PostFirebaseManager
-import com.example.project01.repositoryfirebase.GroupFirebaseManager
 import com.example.project01.modal.HomeModal
+import com.example.project01.repositoryfirebase.FirebaseRepositoryPost
+import com.example.project01.repositoryfirebase.GroupFirebaseManager
+import com.example.project01.repositoryfirebase.PostFirebaseManager
+import com.example.project01.viewmodal.AddPostViewModel
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.FirebaseStorage
 
 class AddPostActivity : AppCompatActivity() {
 
@@ -197,5 +203,6 @@ class AddPostActivity : AppCompatActivity() {
         }
     }
 }
+
 
 
