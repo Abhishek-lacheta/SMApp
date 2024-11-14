@@ -18,16 +18,16 @@
         app:title="Home"
         app:titleTextColor="@color/black" />
 
-    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+    <!--<androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/swipeRefreshLayout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content">-->
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerview"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
-    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+   <!-- </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>-->
 
 
     <LinearLayout

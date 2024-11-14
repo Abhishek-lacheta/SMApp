@@ -1,4 +1,4 @@
-package com.example.project01.firebase
+package com.example.project01.repositoryfirebase
 
 import android.content.Context
 import android.net.Uri
@@ -23,11 +23,9 @@ class PostFirebaseManager(private val context: Context) {
     ) {
         var query = database.collection("home").limit(2)
 
-
         lastVisible?.let {
             query = query.startAfter(it)
         }
-
         query.get()
             .addOnSuccessListener { result ->
                 val dataList = ArrayList<HomeModal>()
@@ -50,8 +48,6 @@ class PostFirebaseManager(private val context: Context) {
                 callback(dataList, lastVisibleDoc)
             }
     }
-
-
     // Post Fragment Group ke andar ki post fetch data groupById
     fun getPostByGroup(
         userId: String,
@@ -185,7 +181,6 @@ class PostFirebaseManager(private val context: Context) {
                 callback(false) // Notify failure
             }
     }
-
     // Update Data in Home collection  From AddGroupActivity
     fun updateData(
         postId: String,
@@ -215,7 +210,6 @@ class PostFirebaseManager(private val context: Context) {
                 callback(false) // Notify failure
             }
     }
-
     // updated Home Data
     private fun updatePost(
         postId: String,

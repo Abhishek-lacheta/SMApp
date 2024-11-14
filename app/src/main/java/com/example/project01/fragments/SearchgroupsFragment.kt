@@ -8,8 +8,8 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.project01.adaptor.GroupAdapter
 import com.example.project01.databinding.FragmentSearchGroupsBinding
-import com.example.project01.firebase.FirebaseAuthManager
-import com.example.project01.firebase.SearchFirebaseManager
+import com.example.project01.repositoryfirebase.FirebaseAuthManager
+import com.example.project01.repositoryfirebase.SearchFirebaseManager
 import com.example.project01.modal.GroupModal
 
 

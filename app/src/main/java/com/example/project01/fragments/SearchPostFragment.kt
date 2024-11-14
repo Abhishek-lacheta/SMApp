@@ -9,7 +9,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.project01.adaptor.HomeAdaptor
 import com.example.project01.databinding.FragmentSearchPostBinding
-import com.example.project01.firebase.SearchFirebaseManager
+import com.example.project01.repositoryfirebase.SearchFirebaseManager
 import com.example.project01.modal.HomeModal
 
 class SearchPostFragment : Fragment(), Searchable {

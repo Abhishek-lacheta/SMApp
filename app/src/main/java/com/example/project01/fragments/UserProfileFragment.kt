@@ -13,8 +13,8 @@ import com.bumptech.glide.Glide
 import com.example.project01.R
 import com.example.project01.adaptor.GroupAdapter
 import com.example.project01.databinding.FragmentUserProfileBinding
-import com.example.project01.firebase.UserFirebaseManager
-import com.example.project01.firebase.GroupFirebaseManager
+import com.example.project01.repositoryfirebase.UserFirebaseManager
+import com.example.project01.repositoryfirebase.GroupFirebaseManager
 import com.example.project01.modal.GroupModal
 
 class UserProfileFragment : Fragment() {

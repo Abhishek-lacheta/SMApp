@@ -24,9 +24,9 @@ import com.example.project01.activity.AddGroupActivity
 import com.example.project01.activity.SettingActivity
 import com.example.project01.adaptor.GroupAdapter
 import com.example.project01.databinding.FragmentUserBinding
-import com.example.project01.firebase.FirebaseAuthManager
-import com.example.project01.firebase.UserFirebaseManager
-import com.example.project01.firebase.GroupFirebaseManager
+import com.example.project01.repositoryfirebase.FirebaseAuthManager
+import com.example.project01.repositoryfirebase.UserFirebaseManager
+import com.example.project01.repositoryfirebase.GroupFirebaseManager
 import com.example.project01.modal.GroupModal
 
 

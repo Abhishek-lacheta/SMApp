@@ -11,7 +11,7 @@ import androidx.lifecycle.lifecycleScope
 import com.example.project01.R
 import com.example.project01.databinding.ActivityChangePasswordBinding
 import com.example.project01.dialogs.DialogUtils
-import com.example.project01.firebase.FirebaseAuthManager
+import com.example.project01.repositoryfirebase.FirebaseAuthManager
 import kotlinx.coroutines.launch
 
 class ChangePasswordActivity : AppCompatActivity() {

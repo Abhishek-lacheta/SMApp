@@ -10,7 +10,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
 import com.example.project01.R
 import com.example.project01.databinding.ActivityEditProfileBinding
-import com.example.project01.firebase.UserFirebaseManager
+import com.example.project01.repositoryfirebase.UserFirebaseManager
 
 
 class EditProfileActivity : AppCompatActivity() {

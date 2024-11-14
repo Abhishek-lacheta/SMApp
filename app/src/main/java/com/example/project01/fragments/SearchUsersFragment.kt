@@ -8,7 +8,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.project01.adaptor.UserAdaptor
 import com.example.project01.databinding.FragmentSearchUsersBinding
-import com.example.project01.firebase.SearchFirebaseManager
+import com.example.project01.repositoryfirebase.SearchFirebaseManager
 import com.example.project01.modal.UserModal
 
 class SearchUsersFragment : Fragment(), Searchable {

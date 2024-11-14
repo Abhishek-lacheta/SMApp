@@ -13,8 +13,8 @@ import android.widget.Toast
 import com.bumptech.glide.Glide
 import com.example.project01.R
 import com.example.project01.databinding.ActivityAddPostBinding
-import com.example.project01.firebase.PostFirebaseManager
-import com.example.project01.firebase.GroupFirebaseManager
+import com.example.project01.repositoryfirebase.PostFirebaseManager
+import com.example.project01.repositoryfirebase.GroupFirebaseManager
 import com.example.project01.modal.HomeModal
 
 class AddPostActivity : AppCompatActivity() {

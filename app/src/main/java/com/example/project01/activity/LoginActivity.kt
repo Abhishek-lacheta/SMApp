@@ -7,7 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.example.project01.databinding.ActivityLoginBinding
 import com.example.project01.dialogs.DialogUtils
-import com.example.project01.firebase.FirebaseAuthManager
+import com.example.project01.repositoryfirebase.FirebaseAuthManager
 import kotlinx.coroutines.launch
 
 class LoginActivity : AppCompatActivity() {

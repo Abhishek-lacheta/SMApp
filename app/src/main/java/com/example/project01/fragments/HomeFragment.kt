@@ -1,5 +1,4 @@
 package com.example.project01.fragments
-
 import android.annotation.SuppressLint
 import android.net.Uri
 import android.os.Bundle
@@ -9,29 +8,27 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.example.project01.adaptor.HomeAdaptor
 import com.example.project01.modal.HomeModal
 import com.example.project01.R
 import com.example.project01.databinding.FragmentHomeBinding
-import com.example.project01.firebase.FirebaseManager
-import com.example.project01.firebase.PostFirebaseManager
+import com.example.project01.repositoryfirebase.FirebaseManager
+import com.example.project01.repositoryfirebase.PostFirebaseManager
+import com.example.project01.viewmodal.HomeViewModel
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.DocumentSnapshot
 
 class HomeFragment : Fragment() {
     private lateinit var adapter: HomeAdaptor
     private lateinit var binding: FragmentHomeBinding
-    private var dataList = ArrayList<HomeModal>()
+    private lateinit var homeViewModel: HomeViewModel
     private lateinit var firebaseDatabaseManager: PostFirebaseManager
     private lateinit var firebaseManager: FirebaseManager
     private lateinit var noDataLayout: View
-    private var isLoading = false
-    private var lastVisibleDocument: DocumentSnapshot? = null
-
     @SuppressLint("MissingInflatedId")
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -44,86 +41,41 @@ class HomeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         // Initialize FirebaseDatabaseManager
+
+        homeViewModel=ViewModelProvider(this).get(HomeViewModel::class)
         firebaseDatabaseManager = PostFirebaseManager(requireContext())
         firebaseManager = FirebaseManager(requireContext())
-
-
         // Setup RecyclerView
         noDataLayout = binding.noDataLayout
 
-        setupRecyclerView()
-
-        // Agar dataList empty hai, toh data fetch karo
-        if (dataList.isEmpty()) {
-            getPost() // Fetch data if it's empty
-        } else {
-            // Agar data hai already, toh direct display karo
-            noDataLayout.visibility = View.GONE
-            binding.recyclerview.visibility = View.VISIBLE
-            adapter.addData(dataList) // Existing data ko adapter me add karna
-        }
-
-        binding.swipeRefreshLayout.setOnRefreshListener {
-            getPost()
-        }
-
-        binding.recyclerview.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                super.onScrolled(recyclerView, dx, dy)
-                // Agar list ke end tak pahuch gaye toh data load karo
-                if (!recyclerView.canScrollVertically(1)) {
-                    // Agar loading nahi ho raha, tabhi new data fetch karo
-                    if (!isLoading) {
-                        getPost()
-                    }
-                }
-            }
-        })
-    }
-
-    //fetch home data
-    private fun getPost() {
-        isLoading = true
-        binding.swipeRefreshLayout.isRefreshing = true
-
-
-        firebaseDatabaseManager.getPost(lastVisibleDocument) { fetchedList, lastVisible ->
-            isLoading = false
-            // Data load hone ke baad loading ko false karo
-            binding.swipeRefreshLayout.isRefreshing = false
-
-            // Agar fetched list empty hai
+        homeViewModel.Posts.observe(viewLifecycleOwner, Observer { fetchedList ->
             if (fetchedList.isEmpty()) {
-                if (dataList.isEmpty()) {
-
-                    noDataLayout.visibility = View.VISIBLE
-                    binding.recyclerview.visibility = View.GONE
-                }
+                noDataLayout.visibility = View.VISIBLE
+                binding.recyclerview.visibility = View.GONE
             } else {
-
                 noDataLayout.visibility = View.GONE
-
                 binding.recyclerview.visibility = View.VISIBLE
-
-                lastVisibleDocument = lastVisible
-                adapter.addData(fetchedList)
-
-                dataList.addAll(fetchedList)
-
-                adapter.notifyDataSetChanged()
+                setupRecyclerView(fetchedList)
             }
-            dataList.forEach { item ->
+            homeViewModel.Posts.value?.forEach { item ->
                 item.id?.let {
                     firebaseManager.getCommentCountForPost(it) { count ->
                         item.commentcount = count
-                        adapter.notifyItemChanged(dataList.indexOf(item))
+                        adapter.notifyItemChanged(homeViewModel.Posts.value?.indexOf(item)?: -1)
                     }
                 }
             }
-        }
-    }
 
-    private fun setupRecyclerView() {
+        })
+        homeViewModel.getPosts()
+
+        /*binding.swipeRefreshLayout.setOnRefreshListener {
+
+        }*/
+
+
+    }
+    private fun setupRecyclerView(dataList: List<HomeModal>) {
         adapter = HomeAdaptor(
             itemList = dataList,
             currentUserId = null,
@@ -151,10 +103,10 @@ class HomeFragment : Fragment() {
 
     //new comment count
     fun getCommentCount(postId: String, newCount: Int) {
-        val post = dataList.find { it.id == postId }
+        val post = homeViewModel.Posts.value?.find{ it.id == postId }
         post?.let {
             it.commentcount = newCount
-            adapter.notifyItemChanged(dataList.indexOf(it))
+            adapter.notifyItemChanged(homeViewModel.Posts.value?.indexOf(it)?: -1)
         }
     }
 
@@ -183,7 +135,7 @@ class HomeFragment : Fragment() {
                     item.likedBy = item.likedBy.filter { id -> id != currentUserId }
                     item.likeCount -= 1
                 }
-                adapter.notifyItemChanged(dataList.indexOf(item)) // Notify adapter of changes
+                adapter.notifyItemChanged(homeViewModel.Posts.value?.indexOf(item)?: -1)
             } else {
                 Toast.makeText(context, "Failed to update like", Toast.LENGTH_SHORT).show()
             }

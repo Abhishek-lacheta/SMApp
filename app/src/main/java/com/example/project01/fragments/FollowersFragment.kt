@@ -11,7 +11,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.project01.adaptor.FollowerAdaptor
 import com.example.project01.databinding.FragmentFollowersBinding
-import com.example.project01.firebase.UserFirebaseManager
+import com.example.project01.repositoryfirebase.UserFirebaseManager
 import com.example.project01.modal.FollowerModal
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.FirebaseFirestore

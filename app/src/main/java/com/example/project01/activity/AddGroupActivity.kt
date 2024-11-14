@@ -8,7 +8,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
 import com.example.project01.databinding.ActivityAddGroupBinding
-import com.example.project01.firebase.GroupFirebaseManager
+import com.example.project01.repositoryfirebase.GroupFirebaseManager
 import com.example.project01.modal.GroupModal
 
 class AddGroupActivity : AppCompatActivity() {

@@ -2,7 +2,6 @@ package com.example.project01.fragments
 
 import android.annotation.SuppressLint
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,7 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.project01.R
 import com.example.project01.adaptor.CommentsAdapter
 import com.example.project01.databinding.FragmentCommentsBinding
-import com.example.project01.firebase.FirebaseAuthManager
+import com.example.project01.repositoryfirebase.FirebaseAuthManager
 import com.example.project01.modal.Comment
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.firebase.Firebase
@@ -31,8 +30,7 @@ open class CommentsFragment : BottomSheetDialogFragment() {
     private var authManager = FirebaseAuthManager()
     private val commentsAdapter = CommentsAdapter(mutableListOf())
     private val db: FirebaseFirestore = Firebase.firestore
-    private var lastVisible: DocumentSnapshot? = null
-    private val PAGE_SIZE = 20  // Number of comments per page
+
 
     @SuppressLint("MissingInflatedId")
     override fun onCreateView(
@@ -101,7 +99,6 @@ open class CommentsFragment : BottomSheetDialogFragment() {
                                         newCount
                                     )
                                 }
-
                             // Update commentsAdapter with the new comment
                             commentsAdapter.addComment(
                                 Comment(
@@ -116,19 +113,14 @@ open class CommentsFragment : BottomSheetDialogFragment() {
         }
     }
 
-    private fun loadComments(isNextPage: Boolean = false) {
+    private fun loadComments() {
         var query = db.collection("home").document(postId).collection("comments")
             .orderBy("timestamp", Query.Direction.ASCENDING)
             .limit(20)
 
-        // If loading the next page, use startAfter to get documents after the last one
-        if (isNextPage && lastVisible != null) {
-            query = query.startAfter(lastVisible!!)
-        }
         query.get()
             .addOnSuccessListener { documents ->
                 val comments = mutableListOf<Comment>()
-                // Loop through the documents and add them to the comments list
                 for (document in documents) {
                     val text = document.getString("text") ?: ""
                     val userName = document.getString("userName") ?: "Unknown User"
@@ -138,10 +130,6 @@ open class CommentsFragment : BottomSheetDialogFragment() {
                     // Add the profileImageUrl to the Comment instance
                     comments.add(Comment(text, userName, timestamp, profileImageUrl))
                 }
-
-                // Update the 'lastVisible' variable for the next page
-                lastVisible = documents.documents[documents.size() - 1]
-
                 // Set the comments in the adapter (append new comments to the existing list)
                 commentsAdapter.setComments(comments)
 

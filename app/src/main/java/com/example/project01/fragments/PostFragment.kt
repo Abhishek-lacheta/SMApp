@@ -17,9 +17,9 @@ import com.example.project01.R
 import com.example.project01.activity.AddPostActivity
 import com.example.project01.adaptor.HomeAdaptor
 import com.example.project01.databinding.FragmentPostBinding
-import com.example.project01.firebase.FirebaseAuthManager
-import com.example.project01.firebase.FirebaseManager
-import com.example.project01.firebase.PostFirebaseManager
+import com.example.project01.repositoryfirebase.FirebaseAuthManager
+import com.example.project01.repositoryfirebase.FirebaseManager
+import com.example.project01.repositoryfirebase.PostFirebaseManager
 import com.example.project01.modal.HomeModal
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentSnapshot
