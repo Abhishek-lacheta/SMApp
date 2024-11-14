@@ -182,7 +182,6 @@ class UserFirebaseManager(private val context: Context) {
                 onCountFetched(count)
             }
     }
-
     //fetch user data on userProfileActivity unused function example ke liye
     fun loadData(
         userId: String,

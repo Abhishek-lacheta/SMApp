@@ -1,10 +1,7 @@
 package com.example.project01.repositoryfirebase
 
 import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import com.example.project01.modal.HomeModal
-import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 
 class FirebaseRepositoryPost {
@@ -72,4 +69,18 @@ class FirebaseRepositoryPost {
                 callback(dataList)
             }
     }
+
+    // Delete post method From PostFragment
+    fun deletePost(documentId: String, callback: (Boolean) -> Unit) {
+        database.collection("home")
+            .document(documentId)
+            .delete()
+            .addOnSuccessListener {
+                callback(true)  // If successful, callback with true
+            }
+            .addOnFailureListener {
+                callback(false)  // If failed, callback with false
+            }
+    }
+
 }

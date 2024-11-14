@@ -67,6 +67,16 @@ class PostFragment : Fragment() {
         noDataLayout = binding.noDataLayout
 
 
+        // Observe the deletion status
+        postViewModel.isPostDeleted.observe(viewLifecycleOwner, Observer { success ->
+            if (success) {
+                Toast.makeText(context, "Item deleted successfully", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(context, "Failed to delete item", Toast.LENGTH_SHORT).show()
+            }
+        })
+
+
         postViewModel.posts.observe(viewLifecycleOwner, Observer { fetchList->
             if (fetchList.isEmpty()){
                 noDataLayout.visibility=View.VISIBLE
@@ -149,17 +159,12 @@ class PostFragment : Fragment() {
         findNavController().navigate(R.id.userProfileFragment, bundle)
     }
 
+    // Modified deleteItem function
     private fun deleteItem(item: HomeModal): Boolean {
         item.id?.let { documentId ->
-            databaseManager.deletePost(documentId) { success ->
-                if (success) {
-                    postViewModel.removeFromList(item)
-                    adapter.notifyDataSetChanged()
-                    Toast.makeText(context, "Item deleted successfully", Toast.LENGTH_SHORT).show()
-                } else {
-                    Toast.makeText(context, "Failed to delete item", Toast.LENGTH_SHORT).show()
-                }
-            }
+            postViewModel.deletePost(documentId)  // Call ViewModel to delete the post
+            postViewModel.removeFromList(item, postViewModel.posts.value ?: arrayListOf())
+            adapter.notifyDataSetChanged()  // Refresh the adapter
         }
         return true
     }

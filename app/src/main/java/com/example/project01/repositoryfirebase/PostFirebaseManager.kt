@@ -84,21 +84,6 @@ class PostFirebaseManager(private val context: Context) {
         }
     }
 
-    // PostFragment Delete a document
-    fun deletePost(documentId: String, callback: (Boolean) -> Unit) {
-        database.collection("home")
-            .document(documentId)
-            .delete()
-            .addOnSuccessListener {
-                callback(true)
-            }
-            .addOnFailureListener { e ->
-                Toast.makeText(context, "Error deleting document: ${e.message}", Toast.LENGTH_LONG)
-                    .show()
-                callback(false)
-            }
-    }
-
     // Favorite Fragment fetch home data
     fun getFavoritePost(callback: (List<HomeModal>) -> Unit) {
         database.collection("home")
@@ -122,6 +107,21 @@ class PostFirebaseManager(private val context: Context) {
                 callback(emptyList())
             }
     }
+    // PostFragment Delete a document
+    fun deletePost(documentId: String, callback: (Boolean) -> Unit) {
+        database.collection("home")
+            .document(documentId)
+            .delete()
+            .addOnSuccessListener {
+                callback(true)
+            }
+            .addOnFailureListener { e ->
+                Toast.makeText(context, "Error deleting document: ${e.message}", Toast.LENGTH_LONG)
+                    .show()
+                callback(false)
+            }
+    }
+
 
     // AddPostHomeActivity Upload image and save home data
     fun saveData(
@@ -216,10 +216,10 @@ class PostFirebaseManager(private val context: Context) {
         postUpdates: HashMap<String, Any>,
         callback: (Boolean) -> Unit
     ) {
-        database.collection("home").document(postId)
+        database.collection("home")
+            .document(postId)
             .update(postUpdates)
             .addOnSuccessListener {
-
                 callback(true)
             }
             .addOnFailureListener { e ->

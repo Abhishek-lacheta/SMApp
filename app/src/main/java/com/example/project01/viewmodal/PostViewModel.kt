@@ -11,14 +11,21 @@ class PostViewModel : ViewModel() {
     private val _posts = MutableLiveData<ArrayList<HomeModal>>()
     val posts: LiveData<ArrayList<HomeModal>> = _posts
 
+    private val _isPostDeleted = MutableLiveData<Boolean>()
+    val isPostDeleted: LiveData<Boolean> get() = _isPostDeleted
+
     fun getPost(userId: String, modalId: String) {
         repositoryPost.getPostByGroup(userId,modalId) { fetchList ->
-
             _posts.value = fetchList
         }
     }
-
-    fun removeFromList(item: HomeModal) {
-        _posts.value?.remove(item)
+    fun deletePost(documentId: String) {
+        repositoryPost.deletePost(documentId) { success ->
+            _isPostDeleted.value = success  // Update LiveData with success or failure
+        }
+    }
+    // Remove post from list
+    fun removeFromList(item: HomeModal, posts: ArrayList<HomeModal>) {
+        posts.remove(item)
     }
 }
