@@ -9,10 +9,11 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.PopupMenu
 import android.widget.Toast
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.example.project01.R
 import com.example.project01.activity.AddPostActivity
 import com.example.project01.adaptor.HomeAdaptor
@@ -21,14 +22,13 @@ import com.example.project01.repositoryfirebase.FirebaseAuthManager
 import com.example.project01.repositoryfirebase.FirebaseManager
 import com.example.project01.repositoryfirebase.PostFirebaseManager
 import com.example.project01.modal.HomeModal
+import com.example.project01.viewmodal.PostViewModel
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.DocumentSnapshot
 
 class PostFragment : Fragment() {
     // Group ke andar ki post
     private lateinit var adapter: HomeAdaptor
     private lateinit var binding: FragmentPostBinding
-    private var dataList = ArrayList<HomeModal>()
     private lateinit var databaseManager: PostFirebaseManager
     private lateinit var firebaseManager: FirebaseManager
     private lateinit var modalId: String
@@ -37,8 +37,8 @@ class PostFragment : Fragment() {
     private lateinit var navController: NavController
     private val authManager = FirebaseAuthManager()
     private lateinit var noDataLayout: View
-    private var isLoading = false
-    private var lastVisibleDocument: DocumentSnapshot? = null
+    private lateinit var postViewModel: PostViewModel
+
 
     @SuppressLint("MissingInflatedId")
     override fun onCreateView(
@@ -63,22 +63,23 @@ class PostFragment : Fragment() {
 
         databaseManager = PostFirebaseManager(requireContext())
         firebaseManager= FirebaseManager(requireContext())
-
+        postViewModel=ViewModelProvider(this).get(PostViewModel::class)
         noDataLayout = binding.noDataLayout
 
 
-        setupRecyclerView()
+        postViewModel.posts.observe(viewLifecycleOwner, Observer { fetchList->
+            if (fetchList.isEmpty()){
+                noDataLayout.visibility=View.VISIBLE
+                binding.recyclerview.visibility=View.GONE
 
-        // Agar dataList empty hai, toh data fetch karo
-        if (dataList.isEmpty()) {
-            getPosts() // Fetch data if it's empty
-        } else {
-            // Agar data hai already, toh direct display karo
-            noDataLayout.visibility = View.GONE
-            binding.recyclerview.visibility = View.VISIBLE
-            adapter.addData(dataList) // Existing data ko adapter me add karna
-        }
+            }else{
+                binding.recyclerview.visibility=View.VISIBLE
+                noDataLayout.visibility=View.VISIBLE
+                setupRecyclerView(fetchList)
+            }
 
+        })
+        postViewModel.getPost(userId,modalId)
 
         binding.AddBlocktoolbar.setTitle(modalName)
         binding.AddBlocktoolbar.menu.clear()
@@ -86,18 +87,7 @@ class PostFragment : Fragment() {
         binding.AddBlocktoolbar.setNavigationOnClickListener {
             navController.navigateUp()
         }
-        binding.recyclerview.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                super.onScrolled(recyclerView, dx, dy)
-                // Agar list ke end tak pahuch gaye toh data load karo
-                if (!recyclerView.canScrollVertically(1)) {
-                    // Agar loading nahi ho raha, tabhi new data fetch karo
-                    if (!isLoading) {
-                        getPosts()
-                    }
-                }
-            }
-        })
+
 
     }
 
@@ -114,33 +104,6 @@ class PostFragment : Fragment() {
 
         bottomSheet.show(parentFragmentManager, bottomSheet.tag)
     }
-
-    // fetch data on group fragment
-    private fun getPosts() {
-        isLoading = true
-
-        databaseManager.getPostByGroup(
-            userId,
-            modalId,
-            lastVisibleDocument
-        ) { fetchedList, lastVisible ->
-            isLoading = false
-            if (fetchedList.isEmpty()) {
-                if (dataList.isEmpty()) {
-                noDataLayout.visibility = View.VISIBLE
-                binding.recyclerview.visibility = View.GONE
-            } }else {
-                noDataLayout.visibility = View.GONE
-                binding.recyclerview.visibility = View.VISIBLE
-
-                adapter.addData(fetchedList)
-                lastVisibleDocument = lastVisible
-                dataList.addAll(fetchedList)
-
-            }
-        }
-    }
-
     private fun toggleLike(item: HomeModal) {
         val currentUserId = FirebaseAuth.getInstance().currentUser?.uid ?: return
         val newLikedStatus = !item.isLikedByCurrentUser // Toggle the like status
@@ -157,14 +120,14 @@ class PostFragment : Fragment() {
                     item.likedBy = item.likedBy.filter { id -> id != currentUserId }
                     item.likeCount -= 1
                 }
-                adapter.notifyItemChanged(dataList.indexOf(item)) // Notify adapter of changes
+                adapter.notifyItemChanged(postViewModel.posts.value?.indexOf(item)?:-1) // Notify adapter of changes
             } else {
                 Toast.makeText(context, "Failed to update like", Toast.LENGTH_SHORT).show()
             }
         }
     }
 
-    private fun setupRecyclerView() {
+    private fun setupRecyclerView(dataList:ArrayList<HomeModal>) {
         val currentUserId = authManager.getCurrentUser()?.uid // Get the current user's UID
         adapter = HomeAdaptor(
             itemList = dataList,
@@ -190,7 +153,7 @@ class PostFragment : Fragment() {
         item.id?.let { documentId ->
             databaseManager.deletePost(documentId) { success ->
                 if (success) {
-                    dataList.remove(item)
+                    postViewModel.removeFromList(item)
                     adapter.notifyDataSetChanged()
                     Toast.makeText(context, "Item deleted successfully", Toast.LENGTH_SHORT).show()
                 } else {

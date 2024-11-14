@@ -48,7 +48,7 @@ class PostFirebaseManager(private val context: Context) {
                 callback(dataList, lastVisibleDoc)
             }
     }
-    // Post Fragment Group ke andar ki post fetch data groupById
+    // PostFragment Group ke andar ki post fetch data groupById
     fun getPostByGroup(
         userId: String,
         groupId: String,

@@ -7,7 +7,6 @@ import com.example.project01.modal.HomeModal
 import com.example.project01.repositoryfirebase.FirebaseRepositoryPost
 
 class HomeViewModel : ViewModel() {
-
     private val repository = FirebaseRepositoryPost()
     private val _Posts = MutableLiveData<List<HomeModal>>()
     val Posts: LiveData<List<HomeModal>> = _Posts
