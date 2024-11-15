@@ -1,7 +1,9 @@
 package com.example.project01.repositoryfirebase
 
+import android.util.Log
 import com.example.project01.modal.GroupModal
 import com.example.project01.modal.HomeModal
+import com.example.project01.modal.UserModal
 import com.google.firebase.firestore.FirebaseFirestore
 
 class FirebaseRepositorySearch() {
@@ -32,6 +34,25 @@ class FirebaseRepositorySearch() {
             .addOnSuccessListener { result ->
                 val dataList = result.documents.mapNotNull { document ->
                     document.toObject(GroupModal::class.java)
+                }
+                callback(dataList)
+            }
+
+    }
+
+    fun searchUsers(searchQuery: String, callback: (List<UserModal>) -> Unit) {
+        val lowerCaseQuery = searchQuery.lowercase()
+        Log.d("FirestoreQuery", "Searching for: $lowerCaseQuery")
+
+        val query = database.collection("user")
+            .whereGreaterThanOrEqualTo("name_Lc", lowerCaseQuery)
+            .whereLessThanOrEqualTo("name_Lc", lowerCaseQuery + "\uf8ff")
+        query.get()
+            .addOnSuccessListener { result ->
+                Log.d("FirestoreQuery", "Query successful, found ${result.size()} results.")
+
+                val dataList = result.documents.mapNotNull { document ->
+                    document.toObject(UserModal::class.java)
                 }
                 callback(dataList)
             }
