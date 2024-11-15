@@ -16,12 +16,14 @@ import com.example.project01.R
 import com.example.project01.databinding.ActivityAddPostBinding
 import com.example.project01.modal.HomeModal
 import com.example.project01.viewmodal.AddPostViewModel
+import com.example.project01.viewmodal.GroupViewModel
 
 class AddPostActivity : AppCompatActivity() {
 
     private var post: HomeModal? = null
     private lateinit var binding: ActivityAddPostBinding
-    private lateinit var addpostViewModel: AddPostViewModel  // ViewModel instance
+    private lateinit var groupViewModel: GroupViewModel
+    private lateinit var addpostViewModel:AddPostViewModel
     private val PICK_IMAGE_REQUEST = 71
     private var imageUri: Uri? = null
     private val nameList = mutableListOf<String>()
@@ -35,7 +37,8 @@ class AddPostActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         // Initialize ViewModel directly using ViewModelProvider
-        addpostViewModel = ViewModelProvider(this).get(AddPostViewModel::class.java)
+        groupViewModel = ViewModelProvider(this).get(GroupViewModel::class.java)
+        addpostViewModel=ViewModelProvider(this).get(AddPostViewModel::class)
 
         // Retrieve the passed data (if any)
         post = intent.getParcelableExtra("post")
@@ -65,10 +68,10 @@ class AddPostActivity : AppCompatActivity() {
         }
 
         // get group name by group Id
-        addpostViewModel.getGroups()
+        groupViewModel.getGroups()
 
         // Observe groupList LiveData to get groups and populate spinner
-        addpostViewModel.groupList.observe(this, Observer { groups ->
+        groupViewModel.groupList.observe(this, Observer { groups ->
             nameList.clear()
             idList.clear()
             groups.forEach { (name, id) ->

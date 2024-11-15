@@ -1,5 +1,6 @@
 package com.example.project01.repositoryfirebase
 
+import com.example.project01.modal.GroupModal
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 
@@ -24,5 +25,19 @@ class FirebaseRepositoryGroup {
                     callback(nameList.zip(idList))
                 }
         }
+    }
+    // fetch group data on the basis of userId in UserProfileFragment and UserFragment
+    fun getGroups(userId: String, callback: (List<GroupModal>) -> Unit) {
+        database.collection("group").whereEqualTo("userId", userId)
+            .get()
+            .addOnSuccessListener { result ->
+                val dataList = ArrayList<GroupModal>()
+                for (document in result.documents) {
+                    val item = document.toObject(GroupModal::class.java)
+                    item?.id = document.id
+                    item?.let { dataList.add(it) }
+                }
+                callback(dataList)
+            }
     }
 }

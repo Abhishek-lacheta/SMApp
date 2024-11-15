@@ -14,6 +14,8 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
@@ -28,6 +30,8 @@ import com.example.project01.repositoryfirebase.FirebaseAuthManager
 import com.example.project01.repositoryfirebase.UserFirebaseManager
 import com.example.project01.firebaseold.GroupFirebaseManager
 import com.example.project01.modal.GroupModal
+import com.example.project01.viewmodal.GroupViewModel
+import com.example.project01.viewmodal.HomeViewModel
 
 
 class UserFragment : Fragment() {
@@ -40,10 +44,9 @@ class UserFragment : Fragment() {
     private val itemList = mutableListOf<GroupModal>()
     private lateinit var databaseManager: UserFirebaseManager
     private lateinit var groupdatabaseManager: GroupFirebaseManager
-
+    private lateinit var groupViewModel: GroupViewModel
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View? {
         binding = FragmentUserBinding.inflate(inflater, container, false)
         return binding.root
@@ -60,28 +63,30 @@ class UserFragment : Fragment() {
 
         // Initialize FirebaseDatabaseManager
         databaseManager = UserFirebaseManager(requireContext())
-        groupdatabaseManager= GroupFirebaseManager(requireContext())
-
+        groupdatabaseManager = GroupFirebaseManager(requireContext())
+        groupViewModel=ViewModelProvider(this).get(GroupViewModel::class)
         // Set up RecyclerView
         binding.groupRecyclerview.layoutManager = GridLayoutManager(context, 2)
-        // Fetch data from Firestore
+        // Fetch GroupList from Firestore
         if (userId != null) {
-            getGroups(userId)
+            groupViewModel.fetchGroups(userId)
         }
         getCurrentUser()
+
+        // Fetch GroupList from Firestore
+        groupViewModel.group.observe(viewLifecycleOwner, Observer { groupList ->
+
+            setupRecyclerView(groupList)
+        })
 
         //Open Follwers Screen
         binding.clickfollower.setOnClickListener {
             val bundle = Bundle().apply {
                 putString("userId", userId)
             }
-            val navOptions =
-                NavOptions.Builder()
-                    .setEnterAnim(R.anim.slide_in_right)
-                    .setExitAnim(R.anim.slide_out_left)
-                    .setPopEnterAnim(R.anim.slide_in_left)
-                    .setPopExitAnim(R.anim.slide_out_right)
-                    .build()
+            val navOptions = NavOptions.Builder().setEnterAnim(R.anim.slide_in_right)
+                .setExitAnim(R.anim.slide_out_left).setPopEnterAnim(R.anim.slide_in_left)
+                .setPopExitAnim(R.anim.slide_out_right).build()
             findNavController().navigate(R.id.followersFragment, bundle, navOptions)
         }
         //Open Following screen
@@ -89,13 +94,9 @@ class UserFragment : Fragment() {
             val bundle = Bundle().apply {
                 putString("userId", userId)
             }
-            val navOptions =
-                NavOptions.Builder()
-                    .setEnterAnim(R.anim.slide_in_right)
-                    .setExitAnim(R.anim.slide_out_left)
-                    .setPopEnterAnim(R.anim.slide_in_left)
-                    .setPopExitAnim(R.anim.slide_out_right)
-                    .build()
+            val navOptions = NavOptions.Builder().setEnterAnim(R.anim.slide_in_right)
+                .setExitAnim(R.anim.slide_out_left).setPopEnterAnim(R.anim.slide_in_left)
+                .setPopExitAnim(R.anim.slide_out_right).build()
             findNavController().navigate(R.id.followingFragment, bundle, navOptions)
         }
         if (userId != null) {
@@ -104,6 +105,7 @@ class UserFragment : Fragment() {
             fetchGroupCount(userId)
         }
     }
+
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.user_menu, menu)
         super.onCreateOptionsMenu(menu, inflater)
@@ -160,10 +162,7 @@ class UserFragment : Fragment() {
                 binding.name.text = username ?: "No username"
 
                 profileImageUrl?.let {
-                    Glide.with(this)
-                        .load(it)
-                        .transform(CircleCrop())
-                        .into(binding.profileImageView)
+                    Glide.with(this).load(it).transform(CircleCrop()).into(binding.profileImageView)
                 } ?: run {
                     binding.profileImageView.setImageResource(R.drawable.ic_defauluser) // Set default image
                 }
@@ -172,7 +171,7 @@ class UserFragment : Fragment() {
     }
 
     //SetUp RecyclerView
-    private fun setupRecyclerView() {
+    private fun setupRecyclerView(itemList: List<GroupModal>) {
         groupRecyclerAdapteradaptor = GroupAdapter(
             itemList = itemList,
             onGroupPopupMenu = { view, item -> showPopupMenu(view, item) },
@@ -233,23 +232,13 @@ class UserFragment : Fragment() {
                 "Item clicked: ${model.id}, ${model.name},${authManager.getCurrentUser()?.uid}"
             )
         }
-        val navOptions =
-            NavOptions.Builder()
-                .setEnterAnim(R.anim.slide_in_right)
-                .setExitAnim(R.anim.slide_out_left)
-                .setPopEnterAnim(R.anim.slide_in_left)
-                .setPopExitAnim(R.anim.slide_out_right)
-                .build()
+        val navOptions = NavOptions.Builder().setEnterAnim(R.anim.slide_in_right)
+            .setExitAnim(R.anim.slide_out_left).setPopEnterAnim(R.anim.slide_in_left)
+            .setPopExitAnim(R.anim.slide_out_right).build()
 
         findNavController().navigate(R.id.postFragment, bundle, navOptions)
     }
 
-    //get groups from group collection
-    private fun getGroups(userId: String) {
-        groupdatabaseManager.getGroups(userId) { fetchedList ->
-            itemList.clear()
-            itemList.addAll(fetchedList)
-            setupRecyclerView()
-        }
-    }
+
 }
+

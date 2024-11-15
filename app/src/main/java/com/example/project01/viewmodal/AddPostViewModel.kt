@@ -12,18 +12,8 @@ import kotlinx.coroutines.launch
 
 class AddPostViewModel:ViewModel() {
     private val repository = FirebaseRepositoryPost()
-    private val grouprepository=FirebaseRepositoryGroup()
     private val _isPostSaved = MutableLiveData<Boolean>()
     val isPostSaved: LiveData<Boolean> = _isPostSaved
-    private val _groupList = MutableLiveData<List<Pair<String, String>>>()
-    val groupList: LiveData<List<Pair<String, String>>> = _groupList
-
-    fun getGroups(){
-       grouprepository.getGroup { fetchgroups->
-           _groupList.value=fetchgroups
-
-       }
-   }
 
     // Function to save data
     fun saveData(
