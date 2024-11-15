@@ -5,16 +5,14 @@ import android.util.Log
 import com.example.project01.modal.HomeModal
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.SetOptions
 import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.tasks.await
 import java.util.UUID
-
 class FirebaseRepositoryPost() {
-
     private val database = FirebaseFirestore.getInstance()
     private val storage = FirebaseStorage.getInstance()
     private var authManager = FirebaseAuthManager()
+
     //Fetch Favorite Post Frome FavoriteFragment
     fun getFavoritePosts(callback: (List<HomeModal>) -> Unit) {
         database.collection("home")
@@ -90,7 +88,7 @@ class FirebaseRepositoryPost() {
             }
     }
 
-    // Save data to Firestore and Storage
+    // Save data to Firestore and Storage Frome AddPostActivity
     suspend fun savePost(
         imageUri: Uri,
         title: String,
@@ -101,12 +99,12 @@ class FirebaseRepositoryPost() {
         callback: (Boolean) -> Unit
     ) {
         val currentUser = authManager.getCurrentUser()
-        currentUser?.let { user ->
+        currentUser?.let { user1 ->
             try {
                 // User data fetch karo Firestore se
-                val userSnapshot = database.collection("user").document(user.uid).get().await()
-                val userName = userSnapshot.getString("name") ?: "Unknown User"
-                val image = userSnapshot.getString("profileImageUrl")
+                val user = database.collection("user").document(user1.uid).get().await()
+                val userName = user.getString("name") ?: "Unknown User"
+                val image = user.getString("profileImageUrl")
 
                 // Home data prepare karo
                 val homeMap = hashMapOf(
@@ -116,7 +114,7 @@ class FirebaseRepositoryPost() {
                     "created_at" to FieldValue.serverTimestamp(),
                     "groupId" to (selectedGroupId ?: ""),
                     "isFavorite" to isFavorite,
-                    "userId" to user.uid,
+                    "userId" to user1.uid,
                     "userName" to userName,
                     "image" to image,
                     "linkAddress" to linkAddress
@@ -140,13 +138,12 @@ class FirebaseRepositoryPost() {
                 callback(true)
             } catch (e: Exception) {
                 e.printStackTrace()
-                // Failure callback
                 callback(false)
             }
         }
     }
 
-    // Function to update existing post data
+    // Function to update existing post From AddPostActivity
     suspend fun updateData(
         postId: String,
         imageUri: Uri,
@@ -184,7 +181,7 @@ class FirebaseRepositoryPost() {
         try {
             database.collection("home")
                 .document(postId)
-                .update(postUpdates).await()  // Update document in Firestore
+                .update(postUpdates).await()
 
             callback(true)  // Success
         } catch (e: Exception) {
