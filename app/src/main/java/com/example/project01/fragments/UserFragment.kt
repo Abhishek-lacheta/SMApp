@@ -31,7 +31,6 @@ import com.example.project01.repositoryfirebase.UserFirebaseManager
 import com.example.project01.firebaseold.GroupFirebaseManager
 import com.example.project01.modal.GroupModal
 import com.example.project01.viewmodal.GroupViewModel
-import com.example.project01.viewmodal.HomeViewModel
 
 
 class UserFragment : Fragment() {
@@ -77,6 +76,15 @@ class UserFragment : Fragment() {
         groupViewModel.group.observe(viewLifecycleOwner, Observer { groupList ->
 
             setupRecyclerView(groupList)
+        })
+
+        // Observe the deletion status
+        groupViewModel.isGroupDeleted.observe(viewLifecycleOwner, Observer { success ->
+            if (success) {
+                Toast.makeText(context, "Item deleted successfully", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(context, "Failed to delete item", Toast.LENGTH_SHORT).show()
+            }
         })
 
         //Open Follwers Screen
@@ -202,22 +210,13 @@ class UserFragment : Fragment() {
         popupMenu.show()
     }
 
-    //delete data
+    // delete group from UserFragment
     private fun deleteItem(item: GroupModal): Boolean {
         item.id?.let { documentId ->
-            groupdatabaseManager.deleteGroup(documentId) { success ->
-                if (success) {
-                    itemList.remove(item)
-                    groupRecyclerAdapteradaptor.notifyDataSetChanged()
-                    Toast.makeText(context, "Item deleted successfully", Toast.LENGTH_SHORT).show()
-                } else {
-                    Toast.makeText(context, "Failed to delete item", Toast.LENGTH_SHORT).show()
-                }
-            }
-        } ?: run {
-            Toast.makeText(context, "Item ID is null", Toast.LENGTH_SHORT).show()
+            groupViewModel.deleteGroup(documentId) // Call ViewModel to delete the post
+            groupViewModel.removeFromList(item,groupViewModel.group.value?: arrayListOf())
+            groupRecyclerAdapteradaptor.notifyDataSetChanged()
         }
-
         return true
     }
 

@@ -27,7 +27,7 @@ class FirebaseRepositoryGroup {
         }
     }
     // fetch group data on the basis of userId in UserProfileFragment and UserFragment
-    fun getGroups(userId: String, callback: (List<GroupModal>) -> Unit) {
+    fun getGroups(userId: String, callback: (ArrayList<GroupModal>) -> Unit) {
         database.collection("group").whereEqualTo("userId", userId)
             .get()
             .addOnSuccessListener { result ->
@@ -40,4 +40,19 @@ class FirebaseRepositoryGroup {
                 callback(dataList)
             }
     }
+
+    //UserFragment delele dacument
+    fun deleteGroup(documentId: String, callback: (Boolean) -> Unit) {
+        database.collection("group")
+            .document(documentId)
+            .delete()
+            .addOnSuccessListener {
+                callback(true)
+            }
+            .addOnFailureListener {
+                callback(false)  // If failed, callback with false
+            }
+
+    }
+
 }
