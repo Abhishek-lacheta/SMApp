@@ -15,18 +15,15 @@ import com.bumptech.glide.Glide
 import com.example.project01.R
 import com.example.project01.databinding.ActivityAddPostBinding
 import com.example.project01.modal.HomeModal
-import com.example.project01.firebaseold.GroupFirebaseManager
 import com.example.project01.viewmodal.AddPostViewModel
 
 class AddPostActivity : AppCompatActivity() {
 
     private var post: HomeModal? = null
     private lateinit var binding: ActivityAddPostBinding
-    private lateinit var postViewModel: AddPostViewModel  // ViewModel instance
-    private lateinit var groupdatabaseManager: GroupFirebaseManager
+    private lateinit var addpostViewModel: AddPostViewModel  // ViewModel instance
     private val PICK_IMAGE_REQUEST = 71
     private var imageUri: Uri? = null
-    private lateinit var spinner: Spinner
     private val nameList = mutableListOf<String>()
     private val idList = mutableListOf<String>()
     private var selectedGroupId: String? = null
@@ -38,8 +35,7 @@ class AddPostActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         // Initialize ViewModel directly using ViewModelProvider
-        postViewModel = ViewModelProvider(this).get(AddPostViewModel::class.java)
-        groupdatabaseManager= GroupFirebaseManager(this)
+        addpostViewModel = ViewModelProvider(this).get(AddPostViewModel::class.java)
 
         // Retrieve the passed data (if any)
         post = intent.getParcelableExtra("post")
@@ -68,9 +64,19 @@ class AddPostActivity : AppCompatActivity() {
             finish()
         }
 
-        spinner = findViewById(R.id.spinner)
-        getGroup()
+        // get group name by group Id
+        addpostViewModel.getGroups()
 
+        // Observe groupList LiveData to get groups and populate spinner
+        addpostViewModel.groupList.observe(this, Observer { groups ->
+            nameList.clear()
+            idList.clear()
+            groups.forEach { (name, id) ->
+                nameList.add(name)
+                idList.add(id)
+            }
+            setupSpinner()
+        })
         binding.selectImageButton.setOnClickListener {
             openImageChooser()
         }
@@ -90,7 +96,11 @@ class AddPostActivity : AppCompatActivity() {
                         }
                     }
                 } else {
-                    Toast.makeText(this, "Please fill in both title and description.", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        this,
+                        "Please fill in both title and description.",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             } else {
                 Toast.makeText(this, "Please select an image.", Toast.LENGTH_SHORT).show()
@@ -98,7 +108,7 @@ class AddPostActivity : AppCompatActivity() {
         }
 
         // Observe the LiveData to get success/failure status
-        postViewModel.isPostSaved.observe(this, Observer { success ->
+        addpostViewModel.isPostSaved.observe(this, Observer { success ->
             if (success) {
                 Toast.makeText(this, "Upload successful", Toast.LENGTH_SHORT).show()
                 finish()
@@ -111,9 +121,9 @@ class AddPostActivity : AppCompatActivity() {
     private fun setupSpinner() {
         val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, nameList)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        spinner.adapter = adapter
+        binding.spinner.adapter = adapter
 
-        spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+        binding.spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(
                 parent: AdapterView<*>, view: View, position: Int, id: Long
             ) {
@@ -121,18 +131,6 @@ class AddPostActivity : AppCompatActivity() {
             }
 
             override fun onNothingSelected(parent: AdapterView<*>) {}
-        }
-    }
-
-    private fun getGroup() {
-        groupdatabaseManager.getGroup { groups ->
-            nameList.clear()
-            idList.clear()
-            groups.forEach { (name, id) ->
-                nameList.add(name)
-                idList.add(id)
-            }
-            setupSpinner()
         }
     }
 
@@ -146,7 +144,7 @@ class AddPostActivity : AppCompatActivity() {
 
         imageUri?.let { uri ->
             if (uri != null) {
-                postViewModel.updateData(postId, uri, title, description)
+                addpostViewModel.updateData(postId, uri, title, description)
             }
         }
     }
@@ -161,7 +159,7 @@ class AddPostActivity : AppCompatActivity() {
         val linkAddress = binding.link.text.toString().trim()
 
         imageUri?.let { uri ->
-            postViewModel.saveData(uri, title, desc, selectedGroupId, isFavorite, linkAddress)
+            addpostViewModel.saveData(uri, title, desc, selectedGroupId, isFavorite, linkAddress)
         }
     }
 
