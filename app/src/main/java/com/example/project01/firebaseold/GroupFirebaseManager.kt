@@ -87,7 +87,7 @@ class GroupFirebaseManager(private val context: Context)  {
             .addOnSuccessListener {
                 imageRef.downloadUrl.addOnSuccessListener { downloadUri ->
                     homeMap["imageUrl"] = downloadUri.toString()
-                    saveGroup(homeMap, callback)
+                    //saveGroup(homeMap, callback)
                 }
             }
             .addOnFailureListener {
@@ -124,7 +124,7 @@ class GroupFirebaseManager(private val context: Context)  {
                 imageRef.downloadUrl.addOnSuccessListener { downloadUri ->
                     groupUpdate["imageUrl"] = downloadUri.toString()
                     // Pass groupId along with groupUpdate
-                    updateGroup(groupId, groupUpdate, callback)
+                   // updateGroup(groupId, groupUpdate, callback)
                 }
             }
             .addOnFailureListener {

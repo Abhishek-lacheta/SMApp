@@ -163,6 +163,7 @@ class AddPostActivity : AppCompatActivity() {
 
         imageUri?.let { uri ->
             addpostViewModel.saveData(uri, title, desc, selectedGroupId, isFavorite, linkAddress)
+
         }
     }
 

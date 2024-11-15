@@ -6,10 +6,13 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
 import com.example.project01.databinding.ActivityAddGroupBinding
 import com.example.project01.firebaseold.GroupFirebaseManager
 import com.example.project01.modal.GroupModal
+import com.example.project01.viewmodal.AddGroupViewModel
 
 class AddGroupActivity : AppCompatActivity() {
 
@@ -18,6 +21,7 @@ class AddGroupActivity : AppCompatActivity() {
     private val PICK_IMAGE_REQUEST = 71
     private var imageUri: Uri? = null
     private var group: GroupModal? = null
+    private lateinit var addGroupViewModel: AddGroupViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -25,7 +29,21 @@ class AddGroupActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         databaseManager = GroupFirebaseManager(this)
+        addGroupViewModel= ViewModelProvider(this).get(AddGroupViewModel::class)
+
+        // Observe the LiveData to get success/failure status
+        addGroupViewModel.isGroupSaved.observe(this, Observer { success ->
+            if (success) {
+                Toast.makeText(this, "Groups Saved", Toast.LENGTH_SHORT).show()
+                finish()
+            } else {
+                Toast.makeText(this, "Upload failed", Toast.LENGTH_SHORT).show()
+            }
+        })
+
+
         group = intent.getParcelableExtra("group")
+
         //Set Update Data
         group?.let {
             binding.nameId.setText(it.name)
@@ -77,10 +95,7 @@ class AddGroupActivity : AppCompatActivity() {
         val name = binding.nameId.text.toString().trim()
 
         imageUri?.let { uri ->
-            databaseManager.saveGroup(uri, name) { success ->
-                binding.submitLoader.visibility = View.GONE
-                binding.buttonId.visibility = View.VISIBLE
-            }
+            addGroupViewModel.saveGroup(uri,name)
         }
     }
 
@@ -90,16 +105,9 @@ class AddGroupActivity : AppCompatActivity() {
         binding.buttonId.visibility = View.GONE
         val name = binding.nameId.text.toString().trim()
         imageUri?.let { uri ->
-            databaseManager.updateData(groupId, name, uri) { success ->
-                binding.submitLoader.visibility = View.GONE
-                binding.buttonId.visibility = View.VISIBLE
-                if (success) {
-                    Toast.makeText(this, "Data updated successfully", Toast.LENGTH_SHORT).show()
-                    finish() // Close the activity after successful update
-                } else {
-                    Toast.makeText(this, "Failed to update data", Toast.LENGTH_SHORT).show()
-                }
-            }
+           addGroupViewModel.updateGroup(groupId,name,uri)
+
+
         }
     }
     private fun openImageChooser() {
