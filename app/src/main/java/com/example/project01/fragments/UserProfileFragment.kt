@@ -14,7 +14,7 @@ import com.example.project01.R
 import com.example.project01.adaptor.GroupAdapter
 import com.example.project01.databinding.FragmentUserProfileBinding
 import com.example.project01.repositoryfirebase.UserFirebaseManager
-import com.example.project01.repositoryfirebase.GroupFirebaseManager
+import com.example.project01.firebaseold.GroupFirebaseManager
 import com.example.project01.modal.GroupModal
 
 class UserProfileFragment : Fragment() {
@@ -22,7 +22,7 @@ class UserProfileFragment : Fragment() {
     private lateinit var userId: String
     private var followedUserId: String? = null
     private lateinit var firebaseDatabaseManager: UserFirebaseManager
-    private lateinit var groupdatabaseManger:GroupFirebaseManager
+    private lateinit var groupdatabaseManger: GroupFirebaseManager
     private val itemList = mutableListOf<GroupModal>()
     private lateinit var groupRecyclerAdapter: GroupAdapter
     private var isFollowing: Boolean = false

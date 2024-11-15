@@ -15,7 +15,7 @@ import com.bumptech.glide.Glide
 import com.example.project01.R
 import com.example.project01.databinding.ActivityAddPostBinding
 import com.example.project01.modal.HomeModal
-import com.example.project01.repositoryfirebase.GroupFirebaseManager
+import com.example.project01.firebaseold.GroupFirebaseManager
 import com.example.project01.viewmodal.AddPostViewModel
 
 class AddPostActivity : AppCompatActivity() {
@@ -39,7 +39,7 @@ class AddPostActivity : AppCompatActivity() {
 
         // Initialize ViewModel directly using ViewModelProvider
         postViewModel = ViewModelProvider(this).get(AddPostViewModel::class.java)
-        groupdatabaseManager=GroupFirebaseManager(this)
+        groupdatabaseManager= GroupFirebaseManager(this)
 
         // Retrieve the passed data (if any)
         post = intent.getParcelableExtra("post")

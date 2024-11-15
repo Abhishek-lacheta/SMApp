@@ -26,7 +26,7 @@ import com.example.project01.adaptor.GroupAdapter
 import com.example.project01.databinding.FragmentUserBinding
 import com.example.project01.repositoryfirebase.FirebaseAuthManager
 import com.example.project01.repositoryfirebase.UserFirebaseManager
-import com.example.project01.repositoryfirebase.GroupFirebaseManager
+import com.example.project01.firebaseold.GroupFirebaseManager
 import com.example.project01.modal.GroupModal
 
 
@@ -39,7 +39,7 @@ class UserFragment : Fragment() {
     private lateinit var groupRecyclerAdapteradaptor: GroupAdapter
     private val itemList = mutableListOf<GroupModal>()
     private lateinit var databaseManager: UserFirebaseManager
-    private lateinit var groupdatabaseManager:GroupFirebaseManager
+    private lateinit var groupdatabaseManager: GroupFirebaseManager
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -60,7 +60,7 @@ class UserFragment : Fragment() {
 
         // Initialize FirebaseDatabaseManager
         databaseManager = UserFirebaseManager(requireContext())
-        groupdatabaseManager=GroupFirebaseManager(requireContext())
+        groupdatabaseManager= GroupFirebaseManager(requireContext())
 
         // Set up RecyclerView
         binding.groupRecyclerview.layoutManager = GridLayoutManager(context, 2)
