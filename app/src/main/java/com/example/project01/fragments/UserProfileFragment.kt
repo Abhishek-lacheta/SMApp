@@ -6,6 +6,8 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
@@ -16,6 +18,7 @@ import com.example.project01.databinding.FragmentUserProfileBinding
 import com.example.project01.repositoryfirebase.UserFirebaseManager
 import com.example.project01.firebaseold.GroupFirebaseManager
 import com.example.project01.modal.GroupModal
+import com.example.project01.viewmodal.GroupViewModel
 
 class UserProfileFragment : Fragment() {
     private lateinit var binding: FragmentUserProfileBinding
@@ -26,6 +29,7 @@ class UserProfileFragment : Fragment() {
     private val itemList = mutableListOf<GroupModal>()
     private lateinit var groupRecyclerAdapter: GroupAdapter
     private var isFollowing: Boolean = false
+    private lateinit var groupViewModel: GroupViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -44,6 +48,7 @@ class UserProfileFragment : Fragment() {
 
         firebaseDatabaseManager = UserFirebaseManager(requireContext())
         groupdatabaseManger= GroupFirebaseManager(requireContext())
+        groupViewModel=ViewModelProvider(this).get(GroupViewModel::class)
         binding.groupRecyclerview.layoutManager = GridLayoutManager(requireContext(), 2)
 
         binding.clickfollower.setOnClickListener {
@@ -74,12 +79,17 @@ class UserProfileFragment : Fragment() {
 
         if (userId.isNotEmpty()) {
             loadUserData(userId)
-            getGroups(userId)
+            groupViewModel.fetchGroups(userId)
             fetchFollowersCount(userId)
             fetchFollowingCount(userId)
             fetchGroupCount(userId)
             fetchFollowStatus(userId)
         }
+        groupViewModel.group.observe(viewLifecycleOwner, Observer { fetchgroupList->
+
+            setupRecyclerView(fetchgroupList)
+        })
+
         binding.followButton.setOnClickListener {
             followedUserId?.let { id ->
                 if (isFollowing) {
@@ -141,7 +151,7 @@ class UserProfileFragment : Fragment() {
     }
 
     // SetUp RecyclerView
-    private fun setupRecyclerView() {
+    private fun setupRecyclerView(itemList:List<GroupModal>) {
         groupRecyclerAdapter = GroupAdapter(
             itemList = itemList,
             onItemClick = { item -> onItemClick(item) },
@@ -162,12 +172,6 @@ class UserProfileFragment : Fragment() {
             }
         }
     }
-    private fun getGroups(userId: String) {
-        groupdatabaseManger.getGroups(userId) { fetchedList ->
-            itemList.clear()
-            itemList.addAll(fetchedList)
-            setupRecyclerView()
-        }
-    }
+
 
 }
