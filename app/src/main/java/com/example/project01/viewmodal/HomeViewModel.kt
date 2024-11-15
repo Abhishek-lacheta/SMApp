@@ -5,8 +5,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.project01.modal.HomeModal
 import com.example.project01.repositoryfirebase.FirebaseRepositoryPost
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.storage.FirebaseStorage
 
 class HomeViewModel : ViewModel() {
     private val repository = FirebaseRepositoryPost(

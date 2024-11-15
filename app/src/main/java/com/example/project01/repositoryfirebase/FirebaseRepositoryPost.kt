@@ -14,7 +14,7 @@ class FirebaseRepositoryPost() {
 
     private val database = FirebaseFirestore.getInstance()
     private val storage = FirebaseStorage.getInstance()
-
+    private var authManager = FirebaseAuthManager()
     //Fetch Favorite Post Frome FavoriteFragment
     fun getFavoritePosts(callback: (List<HomeModal>) -> Unit) {
         database.collection("home")
@@ -89,4 +89,108 @@ class FirebaseRepositoryPost() {
                 callback(false)  // If failed, callback with false
             }
     }
+
+    // Save data to Firestore and Storage
+    suspend fun savePost(
+        imageUri: Uri,
+        title: String,
+        desc: String,
+        selectedGroupId: String?,
+        isFavorite: Boolean,
+        linkAddress: String,
+        callback: (Boolean) -> Unit
+    ) {
+        val currentUser = authManager.getCurrentUser()
+        currentUser?.let { user ->
+            try {
+                // User data fetch karo Firestore se
+                val userSnapshot = database.collection("user").document(user.uid).get().await()
+                val userName = userSnapshot.getString("name") ?: "Unknown User"
+                val image = userSnapshot.getString("profileImageUrl")
+
+                // Home data prepare karo
+                val homeMap = hashMapOf(
+                    "title" to title,
+                    "title_lc" to title.lowercase(),
+                    "desc" to desc,
+                    "created_at" to FieldValue.serverTimestamp(),
+                    "groupId" to (selectedGroupId ?: ""),
+                    "isFavorite" to isFavorite,
+                    "userId" to user.uid,
+                    "userName" to userName,
+                    "image" to image,
+                    "linkAddress" to linkAddress
+                )
+
+                // Image ko Firebase Storage pe upload karo
+                val storageRef = storage.reference
+                val imageRef = storageRef.child("images/${UUID.randomUUID()}.jpg")
+                imageRef.putFile(imageUri).await() // await for suspending functions
+
+                // Image ka download URL lo
+                val downloadUri = imageRef.downloadUrl.await()
+
+                // Image URL ko home data mein add karo
+                homeMap["imageUrl"] = downloadUri.toString()
+
+                // Firestore mein data save karo
+                database.collection("home").document().set(homeMap).await()
+
+                // Success callback
+                callback(true)
+            } catch (e: Exception) {
+                e.printStackTrace()
+                // Failure callback
+                callback(false)
+            }
+        }
+    }
+
+    // Function to update existing post data
+    suspend fun updateData(
+        postId: String,
+        imageUri: Uri,
+        title: String,
+        description: String,
+        callback: (Boolean) -> Unit
+    ) {
+        try {
+            val title_lc = title.lowercase()
+            val postUpdates = hashMapOf<String, Any>(
+                "title" to title,
+                "title_lc" to title_lc,
+                "desc" to description
+            )
+
+            val imageRef = storage.reference.child("images/${UUID.randomUUID()}.jpg")
+            imageRef.putFile(imageUri).await()  // Upload image to Firebase Storage
+
+            val downloadUri = imageRef.downloadUrl.await()  // Get the download URL
+            postUpdates["imageUrl"] = downloadUri.toString()
+
+            updatePost(postId, postUpdates, callback)  // Update Firestore document
+        } catch (e: Exception) {
+            e.printStackTrace()
+            callback(false)  // Failure
+        }
+    }
+
+    // Helper function to update Firestore document
+    private suspend fun updatePost(
+        postId: String,
+        postUpdates: HashMap<String, Any>,
+        callback: (Boolean) -> Unit
+    ) {
+        try {
+            database.collection("home")
+                .document(postId)
+                .update(postUpdates).await()  // Update document in Firestore
+
+            callback(true)  // Success
+        } catch (e: Exception) {
+            e.printStackTrace()
+            callback(false)  // Failure
+        }
+    }
+
 }

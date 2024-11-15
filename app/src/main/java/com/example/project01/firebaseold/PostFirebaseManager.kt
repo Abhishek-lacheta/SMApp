@@ -1,10 +1,11 @@
-package com.example.project01.repositoryfirebase
+package com.example.project01.firebaseold
 
 import android.content.Context
 import android.net.Uri
 import android.util.Log
 import android.widget.Toast
 import com.example.project01.modal.HomeModal
+import com.example.project01.repositoryfirebase.FirebaseAuthManager
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore

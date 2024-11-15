@@ -4,7 +4,6 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import android.content.Intent
 import android.net.Uri
-import android.util.Log
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
@@ -16,18 +15,14 @@ import com.bumptech.glide.Glide
 import com.example.project01.R
 import com.example.project01.databinding.ActivityAddPostBinding
 import com.example.project01.modal.HomeModal
-import com.example.project01.repositoryfirebase.FirebaseRepositoryPost
 import com.example.project01.repositoryfirebase.GroupFirebaseManager
-import com.example.project01.repositoryfirebase.PostFirebaseManager
 import com.example.project01.viewmodal.AddPostViewModel
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.storage.FirebaseStorage
 
 class AddPostActivity : AppCompatActivity() {
 
     private var post: HomeModal? = null
     private lateinit var binding: ActivityAddPostBinding
-    private lateinit var databaseManager: PostFirebaseManager
+    private lateinit var postViewModel: AddPostViewModel  // ViewModel instance
     private lateinit var groupdatabaseManager: GroupFirebaseManager
     private val PICK_IMAGE_REQUEST = 71
     private var imageUri: Uri? = null
@@ -41,11 +36,13 @@ class AddPostActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityAddPostBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        databaseManager = PostFirebaseManager(this)
+
+        // Initialize ViewModel directly using ViewModelProvider
+        postViewModel = ViewModelProvider(this).get(AddPostViewModel::class.java)
         groupdatabaseManager=GroupFirebaseManager(this)
 
-        // Retrieve the passed data
-        post = intent.getParcelableExtra<HomeModal>("post")
+        // Retrieve the passed data (if any)
+        post = intent.getParcelableExtra("post")
 
         // Set title and description if post exists
         post?.let {
@@ -88,22 +85,27 @@ class AddPostActivity : AppCompatActivity() {
                         savePost()
                     } else {
                         // Update existing post
-
-                        post!!.id?.let { postId ->
+                        post?.id?.let { postId ->
                             updatePost(postId)
                         }
                     }
                 } else {
-                    Toast.makeText(
-                        this,
-                        "Please fill in both title and description.",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    Toast.makeText(this, "Please fill in both title and description.", Toast.LENGTH_SHORT).show()
                 }
             } else {
                 Toast.makeText(this, "Please select an image.", Toast.LENGTH_SHORT).show()
             }
         }
+
+        // Observe the LiveData to get success/failure status
+        postViewModel.isPostSaved.observe(this, Observer { success ->
+            if (success) {
+                Toast.makeText(this, "Upload successful", Toast.LENGTH_SHORT).show()
+                finish()
+            } else {
+                Toast.makeText(this, "Upload failed", Toast.LENGTH_SHORT).show()
+            }
+        })
     }
 
     private fun setupSpinner() {
@@ -116,7 +118,6 @@ class AddPostActivity : AppCompatActivity() {
                 parent: AdapterView<*>, view: View, position: Int, id: Long
             ) {
                 selectedGroupId = idList[position]
-                Log.d("AddPostHomeActivity", "Selected Group ID: $selectedGroupId")
             }
 
             override fun onNothingSelected(parent: AdapterView<*>) {}
@@ -124,7 +125,6 @@ class AddPostActivity : AppCompatActivity() {
     }
 
     private fun getGroup() {
-
         groupdatabaseManager.getGroup { groups ->
             nameList.clear()
             idList.clear()
@@ -133,32 +133,21 @@ class AddPostActivity : AppCompatActivity() {
                 idList.add(id)
             }
             setupSpinner()
-
-
         }
     }
 
-    // Update Home Collection
+    // Update Home Collection (this stays the same)
     private fun updatePost(postId: String) {
         binding.submitLoader.visibility = View.VISIBLE
         binding.homeButtonId.visibility = View.GONE
 
         val title = binding.homeTitleId.text.toString().trim()
         val description = binding.homeDescId.text.toString().trim()
-        imageUri.let { uri ->
-            if (uri != null) {
-                databaseManager.updateData(postId, uri, title, description) { success ->
-                    binding.submitLoader.visibility = View.GONE
-                    binding.homeButtonId.visibility = View.VISIBLE
-                    if (success) {
-                        Toast.makeText(this, "Data updated successfully", Toast.LENGTH_SHORT).show()
-                        finish() // Close the activity after successful update
-                    } else {
-                        Toast.makeText(this, "Failed to update data", Toast.LENGTH_SHORT).show()
-                    }
-                }
-            }
 
+        imageUri?.let { uri ->
+            if (uri != null) {
+                postViewModel.updateData(postId, uri, title, description)
+            }
         }
     }
 
@@ -169,21 +158,10 @@ class AddPostActivity : AppCompatActivity() {
 
         val title = binding.homeTitleId.text.toString().trim()
         val desc = binding.homeDescId.text.toString().trim()
-        val linkAddress=binding.link.text.toString().trim()
+        val linkAddress = binding.link.text.toString().trim()
 
         imageUri?.let { uri ->
-            databaseManager.saveData(
-                uri, title, desc, selectedGroupId, isFavorite,linkAddress
-            ) { success ->
-                binding.submitLoader.visibility = View.GONE
-                binding.homeButtonId.visibility = View.VISIBLE
-
-                if (success) {
-                    Toast.makeText(this, "Upload successful", Toast.LENGTH_SHORT).show()
-                } else {
-                    Toast.makeText(this, "Upload failed", Toast.LENGTH_SHORT).show()
-                }
-            }
+            postViewModel.saveData(uri, title, desc, selectedGroupId, isFavorite, linkAddress)
         }
     }
 
@@ -203,6 +181,7 @@ class AddPostActivity : AppCompatActivity() {
         }
     }
 }
+
 
 
 

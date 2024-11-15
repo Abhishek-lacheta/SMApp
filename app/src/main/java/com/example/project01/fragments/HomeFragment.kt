@@ -18,7 +18,7 @@ import com.example.project01.modal.HomeModal
 import com.example.project01.R
 import com.example.project01.databinding.FragmentHomeBinding
 import com.example.project01.repositoryfirebase.FirebaseManager
-import com.example.project01.repositoryfirebase.PostFirebaseManager
+import com.example.project01.firebaseold.PostFirebaseManager
 import com.example.project01.viewmodal.HomeViewModel
 import com.google.firebase.auth.FirebaseAuth
 
