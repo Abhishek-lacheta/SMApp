@@ -182,6 +182,16 @@ class UserFirebaseManager(private val context: Context) {
                 onCountFetched(count)
             }
     }
+
+    // fetch group count on the basis of userId in UserProfileActivity
+    fun getGroupCount(userId: String, callback: (Int) -> Unit) {
+        database.collection("group").whereEqualTo("userId", userId)
+            .get()
+            .addOnSuccessListener { result ->
+                val groupCount = result.size()
+                callback(groupCount)
+            }
+    }
     //fetch user data on userProfileActivity unused function example ke liye
     fun loadData(
         userId: String,

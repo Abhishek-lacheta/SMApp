@@ -40,7 +40,6 @@ class UserFragment : Fragment() {
     val currentUser = authManager.getCurrentUser()
     val userId = currentUser?.uid
     private lateinit var groupRecyclerAdapteradaptor: GroupAdapter
-    private val itemList = mutableListOf<GroupModal>()
     private lateinit var databaseManager: UserFirebaseManager
     private lateinit var groupdatabaseManager: GroupFirebaseManager
     private lateinit var groupViewModel: GroupViewModel
@@ -153,7 +152,7 @@ class UserFragment : Fragment() {
 
     // Function to fetch group count
     private fun fetchGroupCount(userId: String) {
-        groupdatabaseManager.getGroupCount(userId) { count ->
+        databaseManager.getGroupCount(userId) { count ->
             binding.groupCountTextView.text = count.toString()
         }
     }

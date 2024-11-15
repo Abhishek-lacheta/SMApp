@@ -8,14 +8,14 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.project01.adaptor.UserAdaptor
 import com.example.project01.databinding.FragmentSearchUsersBinding
-import com.example.project01.repositoryfirebase.SearchFirebaseManager
+import com.example.project01.firebaseold.SearchFirebaseManager
 import com.example.project01.modal.UserModal
 
 class SearchUsersFragment : Fragment(), Searchable {
     private lateinit var binding: FragmentSearchUsersBinding
     private val itemList = mutableListOf<UserModal>()
     private lateinit var UserAdaptor: UserAdaptor
-    private lateinit var databaseManager:SearchFirebaseManager
+    private lateinit var databaseManager: SearchFirebaseManager
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,

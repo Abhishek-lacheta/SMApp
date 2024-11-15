@@ -26,7 +26,6 @@ class UserProfileFragment : Fragment() {
     private var followedUserId: String? = null
     private lateinit var firebaseDatabaseManager: UserFirebaseManager
     private lateinit var groupdatabaseManger: GroupFirebaseManager
-    private val itemList = mutableListOf<GroupModal>()
     private lateinit var groupRecyclerAdapter: GroupAdapter
     private var isFollowing: Boolean = false
     private lateinit var groupViewModel: GroupViewModel
@@ -131,7 +130,7 @@ class UserProfileFragment : Fragment() {
     }
 
     private fun fetchGroupCount(userId: String) {
-        groupdatabaseManger.getGroupCount(userId) { count ->
+        firebaseDatabaseManager.getGroupCount(userId) { count ->
             binding.groupCountTextView.text = count.toString()
         }
     }
