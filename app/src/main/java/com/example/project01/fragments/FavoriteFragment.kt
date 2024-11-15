@@ -61,6 +61,7 @@ class FavoriteFragment : Fragment() {
         // Call getFavoritePosts to fetch data
         favoriteViewModel.getFavoritePosts()
     }
+
     private fun setupRecyclerView(dataList: List<HomeModal>) {
         adapter = HomeAdaptor(
             itemList = dataList,
@@ -85,8 +86,8 @@ class FavoriteFragment : Fragment() {
 
     private fun toggleLike(item: HomeModal) {
         val currentUserId = FirebaseAuth.getInstance().currentUser?.uid ?: return
-        val newLikedStatus = !item.isLikedByCurrentUser // Toggle the like status
-
+        val newLikedStatus = !item.isLikedByCurrentUser
+        // Toggle the like status
         firebaseManager.toggleLike(item.id!!, currentUserId, newLikedStatus) { success ->
             if (success) {
                 // Update local state based on newLikedStatus
