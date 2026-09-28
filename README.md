@@ -159,3 +159,8 @@ app/src/main/java/com/example/project01/
 * **Modern UI Implementation:** Extensive use of `ViewBinding` eliminates `findViewById` and prevents null pointer exceptions related to views.
 * **Asynchronous Image Uploads:** Combines Kotlin Coroutines (`suspend` functions) and Firebase Tasks (`await()`) to handle complex operations like uploading an image, retrieving its download URL, and saving the post document in a clean, sequential manner.
 * **Memory Efficient Image Loading:** Utilizes the Glide library for highly optimized, cached image rendering in scrolling lists.
+
+---
+
+**Author:** Abhishek Lacheta  
+[GitHub Profile](https://github.com/Abhishek-lacheta)
